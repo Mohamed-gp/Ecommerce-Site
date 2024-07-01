@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #8b33fd70;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #8a33fd;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #8a33fd;
+}
+
+/* styles/globals.css */
+.flying-img {
+  position: absolute;
+  animation: fly_to_cart 1s ease-in-out;
+  -webkit-animation: fly_to_cart 1s ease-in-out;
+}
+
+@keyframes fly_to_cart {
+  0% {
+    left: 75px;
+    top: 40px;
+    z-index: 2333333333333333333333333;
+  }
+  100% {
+    z-index: 2333333333333333333333333;
+    left: calc(var(--left) + 40px + 75px);
+    top: calc(var(--top) + 40px);
+    transform: scale(0.2);
+  }
+}
+
+/* 
+  --- cart page
+*/
+th {
+  padding: 15px 0;
+}
+td {
+  padding: 20px 0;
+  text-align: center;
+}
+
+table tbody tr::after {
+  content: "";
+  position: absolute;
+  background-color: #8a33fd;
+  height: 0.1px;
+  bottom: 0;
+  width: 95%;
+  left: 2.5%;
+}
+
+.animation-right-arrow-father:hover > .animation-right-arrow {
+  position: relative;
+  animation: animate-right-arrow 0.3s infinite alternate linear;
+  -webkit-animation: animate-right-arrow 0.3s infinite alternate linear;
+}
+
+@keyframes animate-right-arrow {
+  from {
+    left: 0;
+  }
+  to {
+    left: 5px;
+  }
+}
+
+.or-sign-up::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  background-color: black;
+  height: 1px;
+  opacity: 0.5;
+}
