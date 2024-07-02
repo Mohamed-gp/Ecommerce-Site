@@ -1,12 +1,13 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaEyeSlash } from "react-icons/fa6";
+import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 
 const Login = () => {
   const [email, setemail] = useState<string>("");
   const [password, setpassword] = useState<string>("");
+  const [isHiddenPassword,setisHiddenPassword] = useState(true);
   const loginHandler = async (e) => {
     e.preventDefault();
     if (email.trim() == "") {
@@ -22,7 +23,7 @@ const Login = () => {
       });
       console.log(data);
       console.log("bata");
-    } catch (error : any) {
+    } catch (error: any) {
       toast.error(error.response.data.message);
       console.log(error.response.data.message);
     }
@@ -47,7 +48,10 @@ const Login = () => {
           }}
           className="flex h-full w-full flex-col justify-center  px-6 md:w-1/2"
         >
-          <p className="text-xl font-bold">Sign In</p>
+          <p className="text-xl font-bold">Login</p>
+          <p className="text-sm">
+            Log in to your account to manage your preferences.
+          </p>
 
           <button className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor">
             <img src="/Google.svg" alt="google" width={20} height={20} />
@@ -74,11 +78,12 @@ const Login = () => {
                 Password
               </label>
               <div className="mr-2 flex cursor-pointer gap-2 text-lg opacity-60">
-                <FaEyeSlash />
+                {isHiddenPassword && <FaEyeSlash onClick={() => setisHiddenPassword(false)}/>}
+                {!isHiddenPassword && <FaEye onClick={() => setisHiddenPassword(true)}/>}
               </div>
             </div>
             <input
-              type="password"
+              type={isHiddenPassword ? "password" : "text"}
               id="password"
               value={password}
               onChange={(e) => {
@@ -98,7 +103,7 @@ const Login = () => {
             <div className="mt-2 flex items-center justify-center gap-2">
               <p className="opacity-50">Don't Have An Account ? </p>
               <Link to="/register" className="text-mainColor underline">
-                Sign Up
+                Register
               </Link>
             </div>
           </form>

@@ -1,13 +1,14 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FaEyeSlash } from "react-icons/fa6";
+import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 
 export default function Register() {
   const [username, setusername] = useState<string>("");
   const [email, setemail] = useState<string>("");
   const [password, setpassword] = useState<string>("");
+  const [isHiddenPassword, setisHiddenPassword] = useState(true);
   const submiteHandler = async (e) => {
     e.preventDefault();
     if (email.trim() == "") {
@@ -26,12 +27,11 @@ export default function Register() {
         password,
       });
       console.log(data);
-    } catch (error : any) {
+    } catch (error: any) {
       console.log(error.response.data.message);
       toast.error(error.response.data.message);
     }
   };
-
 
   return (
     <>
@@ -45,11 +45,9 @@ export default function Register() {
         >
           <p className="text-xl font-bold">Sign Up</p>
           <p className="text-sm">
-            Sign up for free to access to in any of our products{" "}
+            Register for free to access to in any of our products{" "}
           </p>
-          <button
-            className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor"
-          >
+          <button className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor">
             <img src="/Google.svg" alt="google" width={20} height={20} />
             <p>Continue With Google</p>
           </button>
@@ -85,7 +83,12 @@ export default function Register() {
                 Password
               </label>
               <div className="mr-2 flex cursor-pointer gap-2 text-lg opacity-60">
-                <FaEyeSlash />
+                {isHiddenPassword && (
+                  <FaEyeSlash onClick={() => setisHiddenPassword(false)} />
+                )}
+                {!isHiddenPassword && (
+                  <FaEye onClick={() => setisHiddenPassword(true)} />
+                )}
               </div>
             </div>
             <input
@@ -93,7 +96,7 @@ export default function Register() {
               onChange={(e) => {
                 setpassword(e.target.value);
               }}
-              type="password"
+              type={isHiddenPassword ? "password" : "text"}
               id="password"
               className="mb-2 mt-1 rounded-lg border-2 py-2 pl-2 focus:outline-none"
             />
@@ -109,7 +112,7 @@ export default function Register() {
             <div className="mt-2 flex items-center justify-center gap-2">
               <p className="opacity-50">Already Have An Account ? </p>
               <Link to="/login" className="text-mainColor underline">
-                Sign In
+                Login
               </Link>
             </div>
           </form>

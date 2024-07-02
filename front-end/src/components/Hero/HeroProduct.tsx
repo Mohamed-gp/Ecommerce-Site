@@ -8,9 +8,9 @@ export default function HeroProduct() {
       className="container relative z-50  flex h-full w-[100vw] flex-col-reverse flex-wrap items-center justify-center gap-2 gap-y-6 py-12 lg:flex-row lg:justify-between"
       style={{ minHeight: "calc(100vh - 70.94px)" }}
     >
-      <div className="w-full  text-center leading-loose lg:w-1/2 lg:text-left">
-        <p className="mb-2 text-5xl font-bold">MacBook Pro 16</p>
-        <p className="opacity-60">
+      <div className="w-full  text-center leading-loose lg:w-1/2 lg:text-left px-16">
+        <p className="mb-2 text-xl md:text-5xl font-bold">MacBook Pro 16</p>
+        <p className="opacity-60 md:text-base text-sm">
           The MacBook 16 redefines creative potential. Experience raw power with
           the M1 Max chip, witness breathtaking visuals on the Liquid Retina XDR
           display, and stay unplugged for an astonishing 21 hours. Render
@@ -29,11 +29,11 @@ export default function HeroProduct() {
             Don't miss this limited time offer.
           </p>
         </div>
-        <div className="my-6 flex items-center justify-center gap-3 font-bold lg:justify-normal">
-          <Link to="/product" className="text-center w-[150px] rounded-xl bg-white px-3 py-1 text-[#201F20]">
+        <div className=" flex-wrap my-6 flex items-center justify-center gap-3 font-bold lg:justify-normal">
+          <Link to="/product" className="text-center rounded-xl bg-white px-3 py-1 text-[#201F20]">
             Read More
           </Link>
-          <button className="flex   w-[150px] items-center gap-1 rounded-xl bg-mainColor px-3 py-1 text-white">
+          <button className="flex   items-center gap-1 rounded-xl bg-mainColor px-3 py-1 text-white">
             <p>Add To Cart</p>
             <FaCartShopping />
           </button>

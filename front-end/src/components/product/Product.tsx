@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
+// product props
 export default function Product() {
   const [wishList, setwishList] = useState<boolean>(false);
   const [animate, setanimate] = useState<string>("");
@@ -11,45 +12,46 @@ export default function Product() {
     setwishList(!wishList);
     toast.success("Product Added To WishList Successfully");
   };
+  
+  
+  // const addProductHandler = (e) => {
+  //   const cart = document.querySelector(".cart-icon");
 
-  const addProductHandler = (e) => {
-    const cart = document.querySelector(".cart-icon");
+  //   const product =
+  //     e.currentTarget.parentElement.parentElement.parentElement.children[0]
+  //       .children[0];
+  //   // finding first grand parent of target button
+  //   let target_parent = product.parentNode;
+  //   // target_parent.style.zIndex = "100";
+  //   // Creating separate Image
+  //   // let img = target_parent.querySelector('img');
+  //   let flying_img = product.cloneNode();
+  //   flying_img.classList.add("flying-img");
 
-    const product =
-      e.currentTarget.parentElement.parentElement.parentElement.children[0]
-        .children[0];
-    // finding first grand parent of target button
-    let target_parent = product.parentNode;
-    // target_parent.style.zIndex = "100";
-    // Creating separate Image
-    // let img = target_parent.querySelector('img');
-    let flying_img = product.cloneNode();
-    flying_img.classList.add("flying-img");
+  //   target_parent.appendChild(flying_img);
+  //   // Finding position of flying image
+  //   const flying_img_pos = flying_img.getBoundingClientRect();
+  //   const shopping_cart_pos = cart.getBoundingClientRect();
 
-    target_parent.appendChild(flying_img);
-    // Finding position of flying image
-    const flying_img_pos = flying_img.getBoundingClientRect();
-    const shopping_cart_pos = cart.getBoundingClientRect();
+  //   let data = {
+  //     left:
+  //       shopping_cart_pos.left -
+  //       (shopping_cart_pos.width / 2 +
+  //         flying_img_pos.left +
+  //         flying_img_pos.width / 2),
+  //     top: shopping_cart_pos.bottom - flying_img_pos.bottom + 30,
+  //   };
 
-    let data = {
-      left:
-        shopping_cart_pos.left -
-        (shopping_cart_pos.width / 2 +
-          flying_img_pos.left +
-          flying_img_pos.width / 2),
-      top: shopping_cart_pos.bottom - flying_img_pos.bottom + 30,
-    };
+  //   flying_img.style.cssText = `
+  //                             --left : ${data.left.toFixed(2)}px;
+  //                             --top : ${data.top.toFixed(2)}px;
+  //                             `;
 
-    flying_img.style.cssText = `
-                              --left : ${data.left.toFixed(2)}px;
-                              --top : ${data.top.toFixed(2)}px;
-                              `;
-
-    setTimeout(() => {
-      // target_parent.style.zIndex = "";
-      target_parent.removeChild(flying_img);
-    }, 1000);
-  };
+  //   setTimeout(() => {
+  //     // target_parent.style.zIndex = "";
+  //     target_parent.removeChild(flying_img);
+  //   }, 1000);
+  // };
 
   return (
     <>
@@ -81,7 +83,7 @@ export default function Product() {
           </div>
 
           <div className=" absolute h-[149px] w-[269px] overflow-hidden">
-            <div className="absolute -left-[28px] -top-[3px]  flex h-10 w-[87px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
+            <div className="absolute -left-[35px] -top-[5px]  flex h-10   w-[100px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
               99%
             </div>
           </div>
@@ -101,15 +103,15 @@ export default function Product() {
           </div>
           <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal">
             <button
-              onClick={(e) => addProductHandler(e)}
-              className="flex w-[100px] items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"
+              // onClick={(e) => addProductHandler(e)}
+              className="flex  w-full !p-1  items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"
             >
               <p>Add To Cart</p>
               <FaCartShopping />
             </button>
             <Link
-              to="/"
-              className="w-[100px] rounded-lg bg-white px-1 py-1 text-center text-[#201F20]"
+              to="/product/:id"
+              className="w-full rounded-lg !p-1 bg-white px-1 py-1 text-center text-[#201F20]"
             >
               Read More
             </Link>

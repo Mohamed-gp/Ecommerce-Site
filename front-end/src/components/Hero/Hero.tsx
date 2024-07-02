@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { FaArrowLeft, FaArrowRight, FaCartShopping } from "react-icons/fa6";
+import {  useState } from "react";
 import HeroProduct from "./HeroProduct";
 import HeroSlider from "./HeroSlider";
 

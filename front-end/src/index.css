@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* width */
+html {
+  scrollbar-color: #8A33FD #8b33fd9a;
+}
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -104,3 +106,5 @@ table tbody tr::after {
   height: 1px;
   opacity: 0.5;
 }
+
+
