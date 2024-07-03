@@ -1,32 +1,37 @@
-import axios from "axios";
+import customAxios from "../../utils/axios/customAxios";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 
 const Login = () => {
-  const [email, setemail] = useState<string>("");
-  const [password, setpassword] = useState<string>("");
+  const [loading,setLoading] = useState(false)
+  const [formData,setformData] = useState({
+    email : "",
+    password : ""
+  })
+
   const [isHiddenPassword,setisHiddenPassword] = useState(true);
-  const loginHandler = async (e) => {
-    e.preventDefault();
+  const loginHandler = async (e : React.FormEvent) => {
+    setLoading(true)
+    e.preventDefault(); 
+    const {email,password} = formData
     if (email.trim() == "") {
+      setLoading(false)
       return toast.error("email Shouldn't be empty");
     }
     if (password.trim() == "") {
+      setLoading(false)
       return toast.error("password Shouldn't be empty");
     }
     try {
-      const { data } = await axios.post("http://localhost:3000/auth/login", {
-        email: email,
-        password: password,
-      });
-      console.log(data);
-      console.log("bata");
+      const { data } = await customAxios.post("/auth/login",formData);
+      console.log(data)
     } catch (error: any) {
       toast.error(error.response.data.message);
       console.log(error.response.data.message);
     }
+    setLoading(false)
   };
   return (
     <>
@@ -65,9 +70,9 @@ const Login = () => {
           <form action="" className="flex flex-col" onSubmit={loginHandler}>
             <label htmlFor="email">Email : </label>
             <input
-              value={email}
+              value={formData.email}
               onChange={(e) => {
-                setemail(e.target.value);
+                setformData({...formData,email : e.target.value});
               }}
               type="email"
               id="email"
@@ -85,9 +90,9 @@ const Login = () => {
             <input
               type={isHiddenPassword ? "password" : "text"}
               id="password"
-              value={password}
+              value={formData.password}
               onChange={(e) => {
-                setpassword(e.target.value);
+                setformData({...formData,password : e.target.value});
               }}
               className="mb-2 mt-1 rounded-lg border-2 py-2 pl-2 focus:outline-none"
             />
@@ -96,9 +101,10 @@ const Login = () => {
             </span>
             <button
               type="submit"
-              className="mx-auto w-fit rounded-xl bg-mainColor px-6 py-2 text-xl font-bold text-white"
+              disabled={loading}
+              className="mx-auto disabled:cursor-not-allowed disabled:opacity-50 w-fit rounded-xl bg-mainColor px-6 py-2 text-xl font-bold text-white"
             >
-              Sign In
+              {loading ? "Loading" : "Login"}
             </button>
             <div className="mt-2 flex items-center justify-center gap-2">
               <p className="opacity-50">Don't Have An Account ? </p>

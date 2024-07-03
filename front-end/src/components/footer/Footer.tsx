@@ -63,6 +63,12 @@ export default function Footer() {
           >
             Wishlist
           </Link>
+          <Link
+            to="/aboutus"
+            className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
+          >
+            About Us
+          </Link>
         </div>
       </div>
       <div className="container flex flex-col items-center justify-between gap-2 py-6 text-white md:flex-row">

@@ -1,36 +1,47 @@
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
+import customAxios from "../../utils/axios/customAxios";
 
 export default function Register() {
-  const [username, setusername] = useState<string>("");
-  const [email, setemail] = useState<string>("");
-  const [password, setpassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setformData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  useEffect(() => {
+    console.log(loading);
+  }, [loading]);
+
   const [isHiddenPassword, setisHiddenPassword] = useState(true);
-  const submiteHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
+    const { username, email, password } = formData;
     if (email.trim() == "") {
+      setLoading(false);
       return toast.error("email is required");
     }
     if (username.trim() == "") {
+      setLoading(false);
       return toast.error("username is required");
     }
     if (password.trim() == "") {
+      setLoading(false);
       return toast.error("password is required");
     }
     try {
-      const { data } = await axios.post("http://localhost:3000/auth/register", {
-        username,
-        email,
-        password,
+      const { data } = await customAxios.post("/auth/register", formData, {
+        withCredentials: true,
       });
       console.log(data);
     } catch (error: any) {
-      console.log(error.response.data.message);
+      console.log(error);
       toast.error(error.response.data.message);
     }
+    setLoading(false);
   };
 
   return (
@@ -43,7 +54,7 @@ export default function Register() {
           }}
           className="flex h-full  w-auto flex-col justify-center  px-6 md:w-1/2"
         >
-          <p className="text-xl font-bold">Sign Up</p>
+          <p className="text-xl font-bold">Register</p>
           <p className="text-sm">
             Register for free to access to in any of our products{" "}
           </p>
@@ -56,12 +67,12 @@ export default function Register() {
               OR
             </span>
           </div>
-          <form action="" className="flex flex-col" onSubmit={submiteHandler}>
+          <form action="" className="flex flex-col" onSubmit={submitHandler}>
             <label htmlFor="username">Username : </label>
             <input
-              value={username}
+              value={formData.username}
               onChange={(e) => {
-                setusername(e.target.value);
+                setformData({ ...formData, username: e.target.value });
               }}
               type="text"
               id="username"
@@ -70,11 +81,11 @@ export default function Register() {
 
             <label htmlFor="email">Email : </label>
             <input
-              value={email}
+              value={formData.email}
               type="email"
               id="email"
               onChange={(e) => {
-                setemail(e.target.value);
+                setformData({ ...formData, email: e.target.value });
               }}
               className="mb-2 mt-1 rounded-lg border-2 py-1 pl-2 focus:outline-none"
             />
@@ -92,9 +103,9 @@ export default function Register() {
               </div>
             </div>
             <input
-              value={password}
+              value={formData.password}
               onChange={(e) => {
-                setpassword(e.target.value);
+                setformData({ ...formData, password: e.target.value });
               }}
               type={isHiddenPassword ? "password" : "text"}
               id="password"
@@ -105,9 +116,10 @@ export default function Register() {
             </span>
             <button
               type="submit"
-              className="mx-auto w-fit rounded-xl bg-mainColor px-6 py-2 text-xl font-bold text-white"
+              disabled={loading}
+              className="mx-auto disabled:cursor-not-allowed w-fit rounded-xl bg-mainColor disabled:opacity-50 px-6 py-2 text-xl font-bold text-white"
             >
-              Sign Up
+              {loading ? "Loading..." : "Register"}
             </button>
             <div className="mt-2 flex items-center justify-center gap-2">
               <p className="opacity-50">Already Have An Account ? </p>

@@ -8,7 +8,7 @@ const Faq = () => {
         src="flaro-assets/images/faqs/gradient.svg"
         alt=""
       />
-      <div className="relative z-10 container px-4 mx-auto">
+      <div className="relative container px-4 mx-auto">
         <div className="md:max-w-4xl mx-auto">
           <h2 className="font-medium text-center text-5xl mb-12">
             Frequently Asked Questions

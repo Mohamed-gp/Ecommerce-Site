@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 html {
-  scrollbar-color: #8A33FD #8b33fd9a;
+  scrollbar-color: #8a33fd #8b33fd9a;
+  scroll-behavior: smooth;
 }
 ::-webkit-scrollbar {
   width: 5px;
@@ -107,4 +108,20 @@ table tbody tr::after {
   opacity: 0.5;
 }
 
-
+figure {
+  width: 800px;
+  height: 500px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  position: relative;
+}
+figure img {
+  max-width: 100%;
+  min-width: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}

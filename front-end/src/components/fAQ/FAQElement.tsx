@@ -16,17 +16,11 @@ const FAQElement = ({ question, answer }: FAQElementInterface) => {
             <h3 className="text-lg font-semibold leading-normal">{question}</h3>
             {open && (
               <motion.p
-                // style={{
-                //   clipPath: `${
-                //     open
-                //       ? "polygon(0 0, 100% 0%, 100% 100%, 0% 100%)"
-                //       : "polygon(0 0, 100% 0%, 100% 0, 0 0)"
-                //   }  `,
-                // }}
+
                 initial={{ opacity: 0 ,height : 0}} 
-                animate={{ opacity: 1 ,height : 160}}
+                animate={{ opacity: .7,height : "auto"}}
                 transition={{ duration: .1 }}
-                className={`text-gray-600 font-medium  `}
+                className={`text-gray-600 mt-2   `}
               >
                 {answer}
               </motion.p>

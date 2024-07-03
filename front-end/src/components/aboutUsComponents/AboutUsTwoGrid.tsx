@@ -18,7 +18,7 @@ interface AboutUsTwoGridInterface {
               />
             </div>
             <div className="lg:pl-[100px] flex items-center">
-              <div className="data w-full">
+              <div className="data w-full ">
                 <h2 className="font-manrope font-bold text-3xl lg:text-4xl text-black mb-9 max-lg:text-center relative">
                   {title}{" "}
                 </h2>

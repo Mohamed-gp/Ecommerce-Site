@@ -92,7 +92,7 @@ export default function Product() {
           <div className="left px-2 py-3">
             <p className="text-sm font-bold">MacBook Pro 16</p>
             <div className="rating-container my-1">
-              <RatingStars />
+              <RatingStars starsNumber={2} />
             </div>
             <div className="relative mx-0 w-fit text-base font-bold text-red-600">
               $3,999

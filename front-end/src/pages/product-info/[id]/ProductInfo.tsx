@@ -8,12 +8,13 @@ import {
 } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { MdInsertComment } from "react-icons/md";
+import ZoomedImage from "../../../components/zooomedImage/ZoomedImage";
 
 export default function ProductInfo() {
   const [quantity, setquantity] = useState(1);
   const productImages = [
     "/618d5bS2lUL._AC_SX466_-removebg-preview.png",
-    "/618d5bS2lUL._AC_SX466_-removebg-preview.png",
+    "/headshot-attractive-man-smiling-pleased-looking-intrigued-standing-blue-background.jpg",
     "/618d5bS2lUL._AC_SX466_-removebg-preview.png",
     "/618d5bS2lUL._AC_SX466_-removebg-preview.png",
   ];
@@ -39,15 +40,9 @@ export default function ProductInfo() {
           style={{ minHeight: "calc(100vh - 80px)" }}
           className=" flex xl:flex-row flex-col  items-center justify-between gap-x-24 py-12 "
         >
-          <div className="flex flex-col items-center gap-8">
-            <div className="">
-              <img
-                src={productImages[activeProductImageIndex]}
-                alt=""
-                width={500}
-                height={500}
-              />
-            </div>
+          <div className="flex flex-col items-center gap-8 overflow-hidden">
+            {/* zoomed components */}
+            <ZoomedImage productImages={productImages} activeProductImageIndex={activeProductImageIndex} />
             <div className="flex gap-2">
               {productImages.map((productImage, index) => (
                 <div
