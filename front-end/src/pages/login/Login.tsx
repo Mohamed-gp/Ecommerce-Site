@@ -3,35 +3,36 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
+import GoogleSignIn from "../../components/oauth/GoogleSignInButton";
 
 const Login = () => {
-  const [loading,setLoading] = useState(false)
-  const [formData,setformData] = useState({
-    email : "",
-    password : ""
-  })
+  const [loading, setLoading] = useState(false);
+  const [formData, setformData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [isHiddenPassword,setisHiddenPassword] = useState(true);
-  const loginHandler = async (e : React.FormEvent) => {
-    setLoading(true)
-    e.preventDefault(); 
-    const {email,password} = formData
+  const [isHiddenPassword, setisHiddenPassword] = useState(true);
+  const loginHandler = async (e: React.FormEvent) => {
+    setLoading(true);
+    e.preventDefault();
+    const { email, password } = formData;
     if (email.trim() == "") {
-      setLoading(false)
+      setLoading(false);
       return toast.error("email Shouldn't be empty");
     }
     if (password.trim() == "") {
-      setLoading(false)
+      setLoading(false);
       return toast.error("password Shouldn't be empty");
     }
     try {
-      const { data } = await customAxios.post("/auth/login",formData);
-      console.log(data)
+      const { data } = await customAxios.post("/auth/login", formData);
+      toast.success(data.message);
     } catch (error: any) {
       toast.error(error.response.data.message);
       console.log(error.response.data.message);
     }
-    setLoading(false)
+    setLoading(false);
   };
   return (
     <>
@@ -57,11 +58,7 @@ const Login = () => {
           <p className="text-sm">
             Log in to your account to manage your preferences.
           </p>
-
-          <button className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor">
-            <img src="/Google.svg" alt="google" width={20} height={20} />
-            <p>Continue With Google</p>
-          </button>
+          <GoogleSignIn />
           <div className="or-sign-up relative my-2 text-center  ">
             <span className="relative z-20 mx-auto  bg-white px-2 font-bold">
               OR
@@ -72,7 +69,7 @@ const Login = () => {
             <input
               value={formData.email}
               onChange={(e) => {
-                setformData({...formData,email : e.target.value});
+                setformData({ ...formData, email: e.target.value });
               }}
               type="email"
               id="email"
@@ -83,8 +80,12 @@ const Login = () => {
                 Password
               </label>
               <div className="mr-2 flex cursor-pointer gap-2 text-lg opacity-60">
-                {isHiddenPassword && <FaEyeSlash onClick={() => setisHiddenPassword(false)}/>}
-                {!isHiddenPassword && <FaEye onClick={() => setisHiddenPassword(true)}/>}
+                {isHiddenPassword && (
+                  <FaEyeSlash onClick={() => setisHiddenPassword(false)} />
+                )}
+                {!isHiddenPassword && (
+                  <FaEye onClick={() => setisHiddenPassword(true)} />
+                )}
               </div>
             </div>
             <input
@@ -92,7 +93,7 @@ const Login = () => {
               id="password"
               value={formData.password}
               onChange={(e) => {
-                setformData({...formData,password : e.target.value});
+                setformData({ ...formData, password: e.target.value });
               }}
               className="mb-2 mt-1 rounded-lg border-2 py-2 pl-2 focus:outline-none"
             />

@@ -23,30 +23,34 @@ const ZoomedImage = ({
       const moveX = (clientX / mWidth) * 100;
       const moveY = (clientY / mHeight) * 100;
 
-      magnifyingImg.current.style.transform = `translate(-${moveX}%, -${moveY}%) scale(2)`;
+      magnifyingImg.current.style.transformOrigin = `${moveX}% ${moveY}%`;
+      magnifyingImg.current.style.transform = "scale(2)";
+    }
+  };
 
-      magnifyingArea.current.addEventListener("mouseleave", () => {
-        if (magnifyingImg.current) {
-          magnifyingImg.current.style.transform = "translate(0, 0) scale(1)";
-        }
-      });
+  const resetTransform = () => {
+    if (magnifyingImg.current) {
+      magnifyingImg.current.style.transform = "scale(1)";
+      magnifyingImg.current.style.transformOrigin = "center center";
     }
   };
 
   return (
-    <figure
+    <div
       className="overflow-hidden"
       ref={magnifyingArea}
       onMouseMove={moveHandler}
+      onMouseLeave={resetTransform}
     >
       <img
         ref={magnifyingImg}
         src={productImages[activeProductImageIndex]}
-        alt="Zoomed product"
+        alt="Zoomed product "
+        className="object-cover"
         width={500}
         height={500}
       />
-    </figure>
+    </div>
   );
 };
 

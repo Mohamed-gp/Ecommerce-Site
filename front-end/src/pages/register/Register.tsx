@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import customAxios from "../../utils/axios/customAxios";
+import GoogleSignInButton from "../../components/oauth/GoogleSignInButton";
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
@@ -11,9 +12,6 @@ export default function Register() {
     email: "",
     password: "",
   });
-  useEffect(() => {
-    console.log(loading);
-  }, [loading]);
 
   const [isHiddenPassword, setisHiddenPassword] = useState(true);
   const submitHandler = async (e: React.FormEvent) => {
@@ -36,7 +34,8 @@ export default function Register() {
       const { data } = await customAxios.post("/auth/register", formData, {
         withCredentials: true,
       });
-      console.log(data);
+      toast.success(data.message)
+      
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -50,7 +49,7 @@ export default function Register() {
         <div
           style={{
             minHeight: "calc(100vh - 70.94px)",
-            boxShadow: "rgb(255 255 255 / 30%) 0px 0px 74px 55px",
+            // boxShadow: "rgb(255 255 255 / 30%) 0px 0px 74px 55px",
           }}
           className="flex h-full  w-auto flex-col justify-center  px-6 md:w-1/2"
         >
@@ -58,12 +57,10 @@ export default function Register() {
           <p className="text-sm">
             Register for free to access to in any of our products{" "}
           </p>
-          <button className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor">
-            <img src="/Google.svg" alt="google" width={20} height={20} />
-            <p>Continue With Google</p>
-          </button>
+          <GoogleSignInButton />
+
           <div className="or-sign-up relative my-2 text-center  ">
-            <span className="relative z-20 mx-auto  bg-white px-2 font-bold">
+            <span className="relative z-[9] mx-auto  bg-white px-2 font-bold">
               OR
             </span>
           </div>

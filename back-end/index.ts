@@ -1,12 +1,10 @@
 import express from "express";
 import authRouter from "./routes/authRouter";
-import cookieParser from "cookie-parser";
+import userRouter from "./routes/usersRouter";
 import connectToDB from "./lib/connectToDB";
 import dotenv from "dotenv";
 import cors from "cors";
-import {notFound,errorHandler} from "./middlewares/errors"
-
-
+import { notFound, errorHandler } from "./middlewares/errors";
 
 dotenv.config();
 const app = express();
@@ -26,9 +24,8 @@ app.listen(PORT, () => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/users", userRouter);
+// app.use("/api/admin",adminRouter)
 
-
-
-
-app.use(notFound)
-app.use(errorHandler)
+app.use(notFound);
+app.use(errorHandler);

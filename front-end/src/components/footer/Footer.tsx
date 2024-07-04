@@ -46,6 +46,12 @@ export default function Footer() {
         <div className="flex w-[30%] flex-col gap-2 text-white">
           <p>Pages</p>
           <Link
+            to="/"
+            className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
+          >
+            Home
+          </Link>
+          <Link
             to=""
             className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
           >
