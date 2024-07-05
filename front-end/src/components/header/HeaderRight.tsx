@@ -3,18 +3,26 @@ import { FaCartShopping, FaHeart, FaUser } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { useState } from "react";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { RiAdminFill } from "react-icons/ri";
 
 export default function HeaderRight() {
   const user: any = useSelector((state: IRootState) => state.auth.user);
   const [isCartEmpty, setisCartEmpty] = useState(false);
   return (
     <div className="flex items-center justify-between gap-3 text-sm md:text-lg ">
-      <Link
-        to={user?._id ? `/profile/${user._id}` : `/register`}
-        className=" md:text-xl "
-      >
-        <FaUser />
-      </Link>
+      {user?.role != "admin" ? (
+        <Link
+          to={user?._id ? `/profile/${user._id}` : `/register`}
+          className=" md:text-xl "
+        >
+          <FaUser />
+        </Link>
+      ) : (
+        <Link to="/admin" className=" md:text-xl ">
+          <RiAdminFill />
+        </Link>
+      )}
       <div className="border-r-2 py-2 pr-3 ">
         <Link
           to={user?._id ? `/wishlist/${user._id}` : "/register"}

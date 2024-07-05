@@ -108,3 +108,19 @@ table tbody tr::after {
   opacity: 0.5;
 }
 
+.admin-nav-link:hover,.admin-logout-button:hover {
+  background-color: #8a33fd;
+  color: white;
+  /* padding: 8px; */
+  border-radius: 10px 0 0 10px;
+  transition-duration: .5s;
+}
+
+
+.admin-nav-link.active {
+  /* admin-nav-link bg-mainColor text-white p-2 rounded-l-xl */
+  background-color: #8a33fd;
+  color: white;
+  padding: 8px;
+  border-radius: 10px 0 0 10px;
+}

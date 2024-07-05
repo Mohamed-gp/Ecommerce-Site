@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 
 const Profile = () => {
   const { id } = useParams();
-  const [user, setUser] = useState<any>();
+  const { user } = useSelector((state: IRootState) => state.auth);
+  const [userProfileInfo, setUserProfileInfo] = useState<any>();
   const dispatch = useDispatch();
 
   const getUserInfo = async () => {

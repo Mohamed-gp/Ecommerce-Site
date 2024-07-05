@@ -12,10 +12,10 @@ import ProductInfo from "./pages/product-info/[id]/ProductInfo";
 import { useEffect } from "react";
 import { UseSelector, useSelector } from "react-redux";
 import { IRootState } from "./redux/store";
+import Admin from "./pages/admin/Admin";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
-  console.log(user)
   return (
     <BrowserRouter>
       <Header />
@@ -30,6 +30,14 @@ function App() {
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/product/:id" element={<ProductInfo />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/*" element={<NotFound />} />
       </Routes>
       <Footer />

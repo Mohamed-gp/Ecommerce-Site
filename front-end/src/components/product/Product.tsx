@@ -8,12 +8,11 @@ import { Link } from "react-router-dom";
 export default function Product() {
   const [wishList, setwishList] = useState<boolean>(false);
   const [animate, setanimate] = useState<string>("");
-  const addWishListHandler = () => {
+  const toggleWishListHandler = () => {
     setwishList(!wishList);
-    toast.success("Product Added To WishList Successfully");
+    toast.success("toggled successfully");
   };
-  
-  
+
   // const addProductHandler = (e) => {
   //   const cart = document.querySelector(".cart-icon");
 
@@ -55,7 +54,7 @@ export default function Product() {
 
   return (
     <>
-     {/* data-aos="fade-down" problem with adding to cart */}
+      {/* data-aos="fade-down" problem with adding to cart */}
       <div className="flex flex-col ">
         <div className="relative  flex h-[150px] w-[270px] items-center justify-center   rounded-t-xl bg-white">
           <img
@@ -67,15 +66,15 @@ export default function Product() {
           <div className="absolute right-4 top-4 ">
             {wishList ? (
               <div
-                className="relative z-[1] cursor-pointer text-[red] "
-                onClick={() => setwishList(!wishList)}
+                className="relative z-[1] cursor-pointer text-mainColor "
+                onClick={() => toggleWishListHandler()}
               >
                 <FaHeart />
               </div>
             ) : (
               <div
                 className="relative z-[1] cursor-pointer "
-                onClick={() => addWishListHandler()}
+                onClick={() => toggleWishListHandler()}
               >
                 <FaRegHeart />
               </div>
