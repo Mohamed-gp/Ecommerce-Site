@@ -8,9 +8,12 @@ interface AdminSideBarLinkProps {
 
 const AdminSideBarLink = ({ link, icon }: AdminSideBarLinkProps) => {
   return (
-    <NavLink to={`/admin/${link}`} className="flex gap-1 p-2 admin-nav-link items-center">
+    <NavLink
+      to={`/admin/${link}`}
+      className="flex lg:flex lg:justify-normal justify-center lg:gap-1 p-2 admin-nav-link items-center lg:rounded-r-none rounded-xl"
+    > 
       {icon}
-      {link}
+      <span className="hidden lg:inline">{link}</span>
     </NavLink>
   );
 };

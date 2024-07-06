@@ -12,7 +12,8 @@ import ProductInfo from "./pages/product-info/[id]/ProductInfo";
 import { useEffect } from "react";
 import { UseSelector, useSelector } from "react-redux";
 import { IRootState } from "./redux/store";
-import Admin from "./pages/admin/Admin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -30,14 +31,20 @@ function App() {
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/product/:id" element={<ProductInfo />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin">
+          <Route
+            path="dashboard"
+            element={
+              user?.role == "admin" ? <AdminDashboard /> : <Navigate to={"/"} />
+            }
+          />
+          <Route
+            path="products"
+            element={
+              user?.role == "admin" ? <AdminProducts /> : <Navigate to={"/"} />
+            }
+          />
+        </Route>
         <Route path="/*" element={<NotFound />} />
       </Routes>
       <Footer />

@@ -12,10 +12,10 @@ const AdminSideBar = () => {
     <nav
       style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
       className={
-        "text-gray-500 pl-6 py-8  w-[300px] min-h-screen flex flex-col gap-2 text-lg bg-white "
+        "text-gray-500 p-2 lg:pl-6 lg:py-8  lg:w-[300px] min-h-screen flex flex-col gap-2 text-lg bg-white "
       }
     >
-      <p className="text-xl text-center">SwiftBuy</p>
+      <p className="text-xl text-center lg:block hidden">SwiftBuy</p>
       <AdminSideBarLink link="dashboard" icon={<MdDashboard />} />
       <AdminSideBarLink link="products" icon={<HiArchiveBox />} />
       <AdminSideBarLink link="categories" icon={<FaLinesLeaning />} />

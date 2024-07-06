@@ -16,8 +16,9 @@ const GoogleSignIn = () => {
       const { data } = await customAxios.post("/auth/google", {
         username: displayName,
         email,
-        photoURL: photoURL,
+        photoUrl: photoURL,
       });
+
       toast.success(data.message);
       dispatch(authActions.login(data.data));
     } catch (error) {

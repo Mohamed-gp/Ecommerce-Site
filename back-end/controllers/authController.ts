@@ -86,7 +86,7 @@ const registerController = async (req: Request, res: Response) => {
 };
 
 const googleSignIncontroller = async (req: Request, res: Response) => {
-  const { username, email, photoURL } = req.body;
+  const { username, email, photoUrl } = req.body;
   let user = await User.findOne({
     email,
   });
@@ -114,7 +114,7 @@ const googleSignIncontroller = async (req: Request, res: Response) => {
       Math.random().toString(36).slice(-8);
     user = await User.create({
       email: email,
-      photoURL,
+      photoUrl,
       username,
       password: await bcrypt.hash(generatedPassword, 10),
       provider: "google",
@@ -147,4 +147,9 @@ const logoutController = (req: Request, res: Response, next: NextFunction) => {
     .json({ data: null, message: "logout successfully" });
 };
 
-export { loginController, registerController, googleSignIncontroller ,logoutController };
+export {
+  loginController,
+  registerController,
+  googleSignIncontroller,
+  logoutController,
+};

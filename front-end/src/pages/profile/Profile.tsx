@@ -25,13 +25,12 @@ const Profile = () => {
   const logoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
-      toast.success(data.message);
       dispatch(authActions.logout(null));
+      toast.success(data.message);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
     }
-    dispatch(authActions.logout(null));
   };
   return (
     <>
@@ -65,7 +64,7 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center gap-3">
               <div className="overflow-hidden rounded-full">
                 <img
-                  src="/worldface-spanish-guy-white-background.jpg"
+                  src={user?.photoUrl}
                   width={200}
                   height={200}
                   alt="avatar"

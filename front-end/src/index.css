@@ -112,7 +112,7 @@ table tbody tr::after {
   background-color: #8a33fd;
   color: white;
   /* padding: 8px; */
-  border-radius: 10px 0 0 10px;
+  /* border-radius: 10px 0 0 10px; */
   transition-duration: .5s;
 }
 
@@ -122,5 +122,5 @@ table tbody tr::after {
   background-color: #8a33fd;
   color: white;
   padding: 8px;
-  border-radius: 10px 0 0 10px;
+  /* border-radius: 10px 0 0 10px; */
 }

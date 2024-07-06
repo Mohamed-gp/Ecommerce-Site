@@ -19,7 +19,7 @@ export default function HeaderRight() {
           <FaUser />
         </Link>
       ) : (
-        <Link to="/admin" className=" md:text-xl ">
+        <Link to="/admin/dashboard" className=" md:text-xl ">
           <RiAdminFill />
         </Link>
       )}
