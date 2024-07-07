@@ -42,7 +42,10 @@ export default function ProductInfo() {
         >
           <div className="flex flex-col items-center gap-8 overflow-hidden">
             {/* zoomed components */}
-            <ZoomedImage productImages={productImages} activeProductImageIndex={activeProductImageIndex} />
+            <ZoomedImage
+              productImages={productImages}
+              activeProductImageIndex={activeProductImageIndex}
+            />
             <div className="flex gap-2">
               {productImages.map((productImage, index) => (
                 <div
@@ -66,7 +69,7 @@ export default function ProductInfo() {
               <p className="opacity-50"> Digital</p>
             </div>
             <div className="flex items-center gap-1">
-              <RatingStars starsNumber={3.2}/>
+              <RatingStars starsNumber={3.2} />
               <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span>
               <MdInsertComment />
               <p>0 Reviews</p>

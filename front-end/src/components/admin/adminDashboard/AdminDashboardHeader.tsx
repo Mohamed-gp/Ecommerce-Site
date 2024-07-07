@@ -13,7 +13,8 @@ const AdminDashboardHeader = () => {
           <div className="img ">
             <img src={user.photoUrl} className="w-6 h-6 lg:w-10 lg:h-10 rounded-full fit-cover" alt="" />
           </div>
-          <p className="text-sm">{user.username}</p>
+          {/* <p className="text-sm">{user.username}</p> */}
+
         </div>
       </div>
   );

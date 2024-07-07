@@ -14,6 +14,10 @@ import { UseSelector, useSelector } from "react-redux";
 import { IRootState } from "./redux/store";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminProductsEdit from "./pages/admin/AdminProductsEdit";
+import AdminProductsAdd from "./pages/admin/AdminProductsAdd";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -42,6 +46,46 @@ function App() {
             path="products"
             element={
               user?.role == "admin" ? <AdminProducts /> : <Navigate to={"/"} />
+            }
+          />
+          <Route
+            path="products/edit/:id"
+            element={
+              user?.role == "admin" ? (
+                <AdminProductsEdit />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            }
+          />
+          <Route
+            path="products/add"
+            element={
+              user?.role == "admin" ? (
+                <AdminProductsAdd />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            }
+          />
+          <Route
+            path="categories"
+            element={
+              user?.role == "admin" ? (
+                <AdminCategories />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              user?.role == "admin" ? (
+                <AdminOrders />
+              ) : (
+                <Navigate to={"/"} />
+              )
             }
           />
         </Route>
