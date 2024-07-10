@@ -26,14 +26,16 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const verifyUser = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.id != req.params.id) {
-    return res.status(403).json({
-      data: null,
-      message: "access denied,you must be the user himself",
-    });
-  } else {
-    next();
-  }
+  verifyToken(req, res, () => {
+    if (req.user.id != req.params.id) {
+      return res.status(403).json({
+        data: null,
+        message: "access denied,you must be the user himself",
+      });
+    } else {
+      next();
+    }
+  });
 };
 
 const verifyAdminAndUser = (
@@ -41,22 +43,26 @@ const verifyAdminAndUser = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user.role == "admin" || req.user.id == req.params.id) {
-    next();
-  } else {
-    return res
-      .status(403)
-      .json({ data: null, message: "access denied,only admin himself" });
-  }
+  verifyToken(req, res, () => {
+    if (req.user.role == "admin" || req.user.id == req.params.id) {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({ data: null, message: "access denied,only admin himself" });
+    }
+  });
 };
 
 const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.role != "admin") {
-    return res
-      .status(403)
-      .json({ data: null, message: "access denied,only admin himself" });
-  }
-  next();
+  verifyToken(req, res, () => {
+    if (req.user.role != "admin") {
+      return res
+        .status(403)
+        .json({ data: null, message: "access denied,only admin himself" });
+    }
+    next();
+  });
 };
 
 export { verifyToken, verifyUser, verifyAdminAndUser, verifyAdmin };

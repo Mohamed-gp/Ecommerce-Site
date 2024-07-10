@@ -21,7 +21,7 @@ const AdminLogoutButton = () => {
   return (
     <button
       onClick={() => logoutHandler()}
-      className="flex items-center admin-logout-button p-2 justify-center lg:justify-normal"
+      className="flex items-center admin-logout-button p-1 lg:p-2 justify-center lg:justify-normal rounded-xl lg:rounded-l-lg"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

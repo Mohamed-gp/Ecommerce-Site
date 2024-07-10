@@ -18,6 +18,8 @@ import AdminProductsEdit from "./pages/admin/AdminProductsEdit";
 import AdminProductsAdd from "./pages/admin/AdminProductsAdd";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminAdmins from "./pages/admin/AdminAdmins";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -83,6 +85,26 @@ function App() {
             element={
               user?.role == "admin" ? (
                 <AdminOrders />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            }
+          />
+          <Route
+            path="admins"
+            element={
+              user?.role == "admin" ? (
+                <AdminAdmins />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              user?.role == "admin" ? (
+                <AdminSettings />
               ) : (
                 <Navigate to={"/"} />
               )

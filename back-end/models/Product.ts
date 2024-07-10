@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
     required: true,
   },
@@ -16,27 +16,30 @@ const schema = new mongoose.Schema({
   promoPercentage: {
     type: Number,
     required: true,
+    min : 1,
+    max : 99
   },
-  Images: {
-    type: Array,
+  images: {
+    type: [String],
     required: true,
   },
-  exclusive: {
+  isFeatured: {
     type: Boolean,
     required: true,
     default: false,
   },
   category: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    ref: "Category",
     required: true,
   },
-  rating: {
-    type: Array,
-  },
-  comments: {
-    type: Array,
-  },
-});
+  comments: [
+    {
+      type: [mongoose.Schema.ObjectId],
+      ref: "Comment",
+    },
+  ],
+},{timestamps : true});
 
 export const Product =
-  mongoose.models.product || mongoose.model("product", schema);
+  mongoose.models.Product || mongoose.model("product", schema);

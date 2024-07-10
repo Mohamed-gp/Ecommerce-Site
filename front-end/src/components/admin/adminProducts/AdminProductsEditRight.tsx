@@ -2,10 +2,11 @@ import { useSelector } from "react-redux";
 import { IRootState } from "../../../redux/store";
 import { FaEdit } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa6";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import ZoomedImageStatic from "../../zooomedImage/ZoomedImageStatic";
 
 const AdminProductsEditRight = () => {
+  const [isFeatured, setIsFeatured] = useState(false);
   return (
     <div className="p-6 flex-1">
       <p className="lg:text-2xl">Edit Product</p>
@@ -65,9 +66,7 @@ const AdminProductsEditRight = () => {
           type="number"
           min={1}
           max={99}
-          
           placeholder="50"
-
           className="w-full  pl-4 py-2 bg-white focus:outline-none my-2 border-2"
         />
       </div>
@@ -87,8 +86,28 @@ const AdminProductsEditRight = () => {
           className="w-full pl-4 py-2 bg-white focus:outline-none my-2 border-2"
         />
       </div>
+      <div className="my-3 flex justify-between items-center">
+        <p className="mt-6">Is Featured</p>
+        <div
+          onClick={() => setIsFeatured((prev) => !prev)}
+          className={`relative justify-center items-center ${
+            isFeatured ? "bg-mainColor" : "bg-mainColor/20"
+          } w-[70px] h-[30px] rounded-xl py-1`}
+        >
+          <span
+            className={`w-4 h-4 rounded-full absolute ${
+              isFeatured ? "right-2" : "right-10"
+            } top-1/2 -translate-y-1/2 ${
+              isFeatured ? "bg-white" : "bg-mainColor"
+            } duration-300`}
+          ></span>
+        </div>
+      </div>
       <div className="flex w-full justify-end">
-        <button disabled className="bg-mainColor disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg mt-4 ">
+        <button
+          disabled
+          className="bg-mainColor disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg mt-4 "
+        >
           Edit Product
         </button>
       </div>
