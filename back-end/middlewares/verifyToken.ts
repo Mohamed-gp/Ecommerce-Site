@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies["token"];
+export interface authRequest extends Request {
+  user?: any;
+}
 
+const verifyToken = (req: authRequest, res: Response, next: NextFunction) => {
+  const token = req.cookies["token"];
   if (token) {
     try {
       const decodedPayload = jwt.verify(
@@ -25,7 +28,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const verifyUser = (req: Request, res: Response, next: NextFunction) => {
+const verifyUser = (req: authRequest, res: Response, next: NextFunction) => {
   verifyToken(req, res, () => {
     if (req.user.id != req.params.id) {
       return res.status(403).json({
@@ -39,7 +42,7 @@ const verifyUser = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const verifyAdminAndUser = (
-  req: Request,
+  req: authRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -54,15 +57,13 @@ const verifyAdminAndUser = (
   });
 };
 
-const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
-  verifyToken(req, res, () => {
-    if (req.user.role != "admin") {
-      return res
-        .status(403)
-        .json({ data: null, message: "access denied,only admin himself" });
-    }
-    next();
-  });
+const verifyAdmin = (req: authRequest, res: Response, next: NextFunction) => {
+  if (req.user.role != "admin") {
+    return res
+      .status(403)
+      .json({ data: null, message: "access denied,only admin himself" });
+  }
+  next();
 };
 
 export { verifyToken, verifyUser, verifyAdminAndUser, verifyAdmin };

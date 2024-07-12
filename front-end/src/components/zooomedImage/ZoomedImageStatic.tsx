@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 interface ZoomedImageStaticProps {
-  imageSrc: string;
+  imageSrc: string | FileList;
 }
 
 const ZoomedImageStatic = ({ imageSrc }: ZoomedImageStaticProps) => {
@@ -37,7 +37,13 @@ const ZoomedImageStatic = ({ imageSrc }: ZoomedImageStaticProps) => {
       onMouseMove={moveHandler}
       onMouseLeave={resetTransform}
     >
-      <img ref={magnifyingImg} src={imageSrc} alt="" />
+      <img
+        ref={magnifyingImg}
+        src={
+          typeof imageSrc == "string" ? imageSrc : URL.createObjectURL(imageSrc)
+        }
+        alt=""
+      />
     </div>
   );
 };

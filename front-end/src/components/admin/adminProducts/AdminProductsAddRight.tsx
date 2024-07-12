@@ -1,30 +1,42 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import customAxios from "../../../utils/axios/customAxios";
+import ZoomedImageStatic from "../../zooomedImage/ZoomedImageStatic";
 
 const AdminProductsAddRight = () => {
   const [data, setData] = useState({
     name: "",
     category: "",
-    images: "" as any,
     description: "",
     promotionPercentage: 1,
     price: 0,
     isFeatured: false,
+    images: [],
   });
-  useEffect(() => {
-    console.log(data.images);
-    console.log(data.category);
-  }, [data]);
   const createProductHandler = async () => {
     try {
-      const response = await customAxios.post("/products", data);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("category", data.category);
+      // for (let i = 0; i < images?.length; i++) {
+      //   formData.append("images", images[i]);
+      // }
+      formData.append("description", data.description);
+      formData.append(
+        "promotionPercentage",
+        data.promotionPercentage.toString()
+      );
+      formData.append("price", data.price.toString());
+      formData.append("isFeatured", data.isFeatured.toString());
+      const response = await customAxios.post("/products", formData);
       console.log(response.data);
+      toast.success(response.data.message)
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
+
   return (
     <div className="p-6 flex-1">
       <p className="lg:text-2xl">Add A New Product</p>
@@ -43,11 +55,11 @@ const AdminProductsAddRight = () => {
         <select
           name=""
           id=""
-          // value={data.name}
-          onChange={(e) => console.log(e.target.value)}
+          value={data.description}
+          onChange={(e) => setData({ ...data, category: e.target.value })}
           className="w-full pl-4 py-2 bg-white focus:outline-none my-2 border-2"
         >
-          <option value="disabled" className="disabled:opacity-50" disabled>
+          <option selected value="disabled" className="disabled:opacity-50" disabled>
             Enter The Category That Match Your Product
           </option>
           <option value="Electronics and Gadgets">
@@ -63,12 +75,11 @@ const AdminProductsAddRight = () => {
       <div className="my-3">
         <p>Images</p>
 
-        {/* <div className="flex gap-2 justify-between my-4">
-          <ZoomedImageStatic imageSrc="/iphone-15-pro-finish-select-202309-6-7inch_AV1.webp" />
-          <ZoomedImageStatic imageSrc="/iphone-15-pro-finish-select-202309-6-7inch_AV2_GEO_US.webp" />
-          <ZoomedImageStatic imageSrc="/iphone-15-pro-finish-select-202309-6-7inch_AV3.webp" />
-          <ZoomedImageStatic imageSrc="/iphone-15-pro-finish-select-202309-6-7inch_AV4.webp" />
-        </div> */}
+        <div className="flex gap-2 justify-between my-4">
+          {Array.from(data.images).map((image) => (
+            <>{image ? <ZoomedImageStatic imageSrc={image} /> : null}</>
+          ))}
+        </div>
       </div>
       <div className="flex w-full justify-end">
         <label
@@ -79,7 +90,11 @@ const AdminProductsAddRight = () => {
         </label>
         <input
           multiple
-          onChange={(e) => setData({ ...data, images: e.target.files })}
+          onChange={(e) => {
+            if (e.target.files != null) {
+              setData({ ...data, images: e.target.files as any });
+            }
+          }}
           className="hidden"
           type="file"
           name=""
@@ -148,7 +163,7 @@ const AdminProductsAddRight = () => {
       </div>
       <div className="flex w-full justify-end">
         <button
-          disabled={data.name == "" || data.category == ""}
+          disabled={data.category == "" || data.description == "" }
           onClick={() => createProductHandler()}
           className="bg-mainColor disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg mt-4 "
         >

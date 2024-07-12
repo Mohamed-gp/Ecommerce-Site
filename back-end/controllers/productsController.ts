@@ -27,11 +27,20 @@ const createProduct = async (req: Request, res: Response) => {
     price,
     isFeatured,
   } = req.body;
+  console.log(req.body);
+  console.log(req.files)
+  console.log({
+    name,
+    category,
+    images,
+    description,
+    promotionPercentage,
+    originalPrice,
+    price,
+    isFeatured,
+  });
 
-  console.log(req.body)
-
-  return res.status(201).json({message : "created successfully",data : null})
-
+  return res.status(201).json({ message: "created successfully", data: null });
 
   // name
 };

@@ -1,12 +1,19 @@
-import { Router } from "express";
+import { NextFunction, Router } from "express";
 import {
   getAllProducts,
   createProduct,
 } from "../controllers/productsController";
-import { verifyAdmin } from "../middlewares/verifyToken";
+import {
+  authRequest,
+  verifyAdmin,
+  verifyToken,
+} from "../middlewares/verifyToken";
 
 const router = Router();
 
-router.route("/").get(getAllProducts).post(verifyAdmin, createProduct);
+router
+  .route("/")
+  .get(getAllProducts)
+  .post(verifyToken,verifyAdmin,createProduct);
 
 export default router;
