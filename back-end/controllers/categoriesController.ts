@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Category from "../models/Category";
-import asyncHandler from "express-async-handler"
+// import asyncHandler from "express-async-handler"
 
 /**
  *
@@ -27,13 +27,15 @@ const getAllCategories = async (req: Request, res: Response) => {
  */
 const createCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
-  if (!name) {
-    return res
-      .status(400)
-      .json({ data: null, message: "you must enter a category title " });
+  console.log(name);
+  if (!name || name?.length < 7) {
+    return res.status(400).json({
+      data: null,
+      message: "you must enter a category title with lenght more than 7",
+    });
   }
-  let category = await Category.find({
-    name,
+  let category = await Category.findOne({
+    name: name,
   });
   if (category) {
     return res.status(400).json({ message: "this category already exist" });
@@ -48,7 +50,7 @@ const createCategory = async (req: Request, res: Response) => {
 
 /**
  *
- * @method GET
+ * @method delete
  * @route /api/categories/:id
  * @access public
  * @desc get products
@@ -66,4 +68,11 @@ const deleteCategory = async (req: Request, res: Response) => {
   return res
     .status(200)
     .json({ message: "category deleted successfully", data: null });
+};
+
+
+export {
+  getAllCategories,
+  createCategory,
+  deleteCategory,
 };

@@ -55,12 +55,16 @@ export default function Product() {
   return (
     <>
       {/* data-aos="fade-down" problem with adding to cart */}
-      <div className="flex flex-col ">
+      <div
+        style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
+        className="flex rounded-b-xl rounded-t-xl flex-col overflow-hidden"
+      >
         <div className="relative  flex h-[150px] w-[270px] items-center justify-center   rounded-t-xl bg-white">
           <img
             src="/618d5bS2lUL._AC_SX466_-removebg-preview.png"
             alt="618d5bS2lUL._AC_SX466_-removebg-preview.png"
             width={120}
+            className="hover:scale-110 duration-300 z-[8]"
             height={120}
           />
           <div className="absolute right-4 top-4 ">

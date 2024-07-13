@@ -30,7 +30,7 @@ const schema = new mongoose.Schema({
   },
   category: {
     type: mongoose.Schema.ObjectId,
-    ref: "Category",
+    ref: "category",
     required: true,
   },
   comments: [

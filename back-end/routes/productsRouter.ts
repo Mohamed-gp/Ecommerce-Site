@@ -1,19 +1,23 @@
-import { NextFunction, Router } from "express";
+import { Router } from "express";
 import {
-  getAllProducts,
   createProduct,
+  deleteProduct,
+  getAllProducts,
+  getProduct,
 } from "../controllers/productsController";
-import {
-  authRequest,
-  verifyAdmin,
-  verifyToken,
-} from "../middlewares/verifyToken";
+import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
+import upload from "../config/multer";
+import verifyObjectId from "../middlewares/verifyObjectId";
 
 const router = Router();
 
 router
   .route("/")
   .get(getAllProducts)
-  .post(verifyToken,verifyAdmin,createProduct);
+  .post(upload.array("images"), verifyToken, verifyAdmin, createProduct);
+router
+  .route("/:id")
+  .get(verifyObjectId, getProduct)
+  .delete(verifyToken, verifyAdmin, deleteProduct);
 
 export default router;

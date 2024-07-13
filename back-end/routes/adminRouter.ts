@@ -1,9 +1,9 @@
-import {Router} from "express"
-const router = Router()
+import { Router } from "express";
+import { getAdmins ,addAdmin,deleteAdmin} from "../controllers/adminController";
+import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
+const router = Router();
 
-router.route("/user").get()
+router.route("/admins").get(verifyToken, verifyAdmin, getAdmins).post(verifyToken, verifyAdmin, addAdmin);
+router.route("/admins/:id").delete(verifyToken, verifyAdmin,deleteAdmin)
 
-
-
-
-export default router
+export default router;

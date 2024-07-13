@@ -1,24 +1,21 @@
 import joi from "joi";
 import joiPasswordComplexity from "joi-password-complexity";
-import {loginInterface, registerInterface} from "../../interfaces/authInterface"
+// import {loginInterface, registerInterface} from "../../interfaces/authInterface"
 
-
-
-const verifyRegister = (obj :registerInterface) => {
+const verifyRegister = (obj: object) => {
   const schema = joi.object({
     username: joi.string().min(8).max(50).required(),
     email: joi.string().min(8).max(50).required().email(),
     password: joiPasswordComplexity(),
   });
-  return schema.validate(obj)
+  return schema.validate(obj);
 };
-const verifyLogin = (obj : loginInterface) => {
+const verifyLogin = (obj: object) => {
   const schema = joi.object({
     email: joi.string().min(8).max(50).required().email(),
     password: joiPasswordComplexity(),
   });
-  return schema.validate(obj)
+  return schema.validate(obj);
 };
 
-
-export {verifyRegister,verifyLogin}
+export { verifyRegister, verifyLogin };

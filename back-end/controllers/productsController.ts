@@ -1,5 +1,9 @@
-import { Request, Response } from "express";
+import cloudinary from "../config/cloudinary";
+import { NextFunction, Request, Response } from "express";
 import { Product } from "../models/Product";
+import multer from "multer";
+import removeFiles from "../utils/fs/cleanUpload";
+import { verifyCreateProduct } from "../utils/joi/productValidation";
 
 /**
  *
@@ -15,34 +19,78 @@ const getAllProducts = async (req: Request, res: Response) => {
     .status(200)
     .json({ message: "fetched successfully", data: products });
 };
+/**
+ *
+ * @method GET
+ * @route /api/products/:id
+ * @access public
+ * @desc get products
+ *
+ */
+const getProduct = async (req: Request, res: Response) => {
+  const product = await Product.findById(req.params.id).populate("category");
+  console.log(product);
+  if (!product) {
+    return res.status(404).json({ data: null, message: "product not found" });
+  }
 
-const createProduct = async (req: Request, res: Response) => {
-  const {
-    name,
-    category,
-    images,
-    description,
-    promotionPercentage,
-    originalPrice,
-    price,
-    isFeatured,
-  } = req.body;
-  console.log(req.body);
-  console.log(req.files)
-  console.log({
-    name,
-    category,
-    images,
-    description,
-    promotionPercentage,
-    originalPrice,
-    price,
-    isFeatured,
-  });
-
-  return res.status(201).json({ message: "created successfully", data: null });
-
-  // name
+  return res
+    .status(200)
+    .json({ message: "fetched successfully", data: product });
 };
 
-export { getAllProducts, createProduct };
+const createProduct = async (req: Request, res: Response) => {
+  removeFiles();
+  const { error } = verifyCreateProduct(req.body);
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: error.details[0].message, data: null });
+  }
+  const files = req.files as Express.Multer.File[];
+  if (files.length != 4) {
+    return res
+      .status(400)
+      .json({ message: "you must enter 4 images of the product", data: null });
+  }
+  const pictures = files?.map((file) => {
+    return file.path;
+  });
+  const uploadedPictures = await Promise.all(
+    pictures.map((picture) => cloudinary.uploader.upload(picture))
+  );
+  const pictureUrls = uploadedPictures.map((picture) => picture.url);
+  console.log(pictureUrls);
+  const product = await Product.create({
+    name: req.body.name,
+    description: req.body.description,
+    price: +req.body.price,
+    promoPercentage: +req.body.promotionPercentage,
+    category: req.body.category,
+    isFeatured: req.body.isFeatured,
+    images: pictureUrls,
+  });
+  return res
+    .status(201)
+    .json({ message: "created successfully", data: product });
+};
+
+const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return res
+      .status(404)
+      .json({ data: null, message: "no product find with this id" });
+  } else {
+    await Product.findByIdAndDelete(req.params.id);
+    return res
+      .status(200)
+      .json({ data: null, message: "deleted successfully" });
+  }
+};
+
+export { getAllProducts, createProduct, getProduct,deleteProduct };

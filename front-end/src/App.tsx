@@ -20,6 +20,7 @@ import AdminCategories from "./pages/admin/AdminCategories";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAdmins from "./pages/admin/AdminAdmins";
 import AdminSettings from "./pages/admin/AdminSettings";
+import Store from "./pages/store/Store";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -28,6 +29,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/store" element={<Store />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/aboutus" element={<AboutUs />} />
         <Route
@@ -83,31 +85,19 @@ function App() {
           <Route
             path="orders"
             element={
-              user?.role == "admin" ? (
-                <AdminOrders />
-              ) : (
-                <Navigate to={"/"} />
-              )
+              user?.role == "admin" ? <AdminOrders /> : <Navigate to={"/"} />
             }
           />
           <Route
             path="admins"
             element={
-              user?.role == "admin" ? (
-                <AdminAdmins />
-              ) : (
-                <Navigate to={"/"} />
-              )
+              user?.role == "admin" ? <AdminAdmins /> : <Navigate to={"/"} />
             }
           />
           <Route
             path="settings"
             element={
-              user?.role == "admin" ? (
-                <AdminSettings />
-              ) : (
-                <Navigate to={"/"} />
-              )
+              user?.role == "admin" ? <AdminSettings /> : <Navigate to={"/"} />
             }
           />
         </Route>

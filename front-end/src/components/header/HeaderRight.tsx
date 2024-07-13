@@ -32,7 +32,7 @@ export default function HeaderRight() {
         </Link>
       </div>
       <Link
-        to={user?._id ? `/cart/${user?._id}` : "/register"}
+        to={user?._id ? `/cart` : "/register"}
         className="cart-icon relative md:text-xl"
       >
         <FaCartShopping />

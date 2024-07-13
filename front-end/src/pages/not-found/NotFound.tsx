@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const NotFound = () => {
   return (
@@ -9,7 +9,7 @@ const NotFound = () => {
       <div className="">
         <img
           alt="Mountains"
-          src="/not-found-page.png"
+          src="/not-found-page (copy).png"
           width={0}
           height={0}
           sizes="100vw"

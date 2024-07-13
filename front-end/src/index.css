@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 html {
-  scrollbar-color: #8a33fd #8b33fd9a;
+  /* scrollbar-color: #8a33fd #8b33fd9a; */
+  scrollbar-color: #00c2ff #00c3ff81;
   scroll-behavior: smooth;
 }
 ::-webkit-scrollbar {
@@ -12,7 +13,7 @@ html {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #8b33fd70;
+  background: #00c3ffab;
   border-radius: 10px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -22,7 +23,7 @@ html {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #8a33fd;
+  background: #00c2ff;
   border-radius: 10px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -32,7 +33,7 @@ html {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #8a33fd;
+  background: #009bca;
 }
 
 /* styles/globals.css */
@@ -70,7 +71,7 @@ td {
 table tbody tr::after {
   content: "";
   position: absolute;
-  background-color: #8a33fd;
+  background-color: #00c2ff;
   height: 0.1px;
   bottom: 0;
   width: 95%;
@@ -108,23 +109,25 @@ table tbody tr::after {
   opacity: 0.5;
 }
 
-.admin-nav-link:hover,.admin-logout-button:hover {
-  background-color: #8a33fd;
+.admin-nav-link:hover,
+.admin-logout-button:hover {
+  background-color: #00c2ff;
   color: white;
   /* padding: 8px; */
   /* border-radius: 10px 0 0 10px; */
-  transition-duration: .5s;
+  transition-duration: 0.5s;
 }
-
 
 .admin-nav-link.active {
   /* admin-nav-link bg-mainColor text-white p-2 rounded-l-xl */
-  background-color: #8a33fd;
+  /* background-color: #00c2ff; */
+  background-color: #00c2ff;
   color: white;
   padding: 8px;
   /* border-radius: 10px 0 0 10px; */
 }
 
-thead,tr:not(:last-child) {
-  border-bottom: 1px solid #8a33fd;
+thead,
+tr:not(:last-child) {
+  border-bottom: 1px solid #00c2ff;
 }

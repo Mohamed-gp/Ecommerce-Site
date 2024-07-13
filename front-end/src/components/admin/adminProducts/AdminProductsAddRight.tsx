@@ -4,6 +4,20 @@ import customAxios from "../../../utils/axios/customAxios";
 import ZoomedImageStatic from "../../zooomedImage/ZoomedImageStatic";
 
 const AdminProductsAddRight = () => {
+  const [categories, setCategories] = useState([]);
+  const getCategories = async () => {
+    try {
+      const { data } = await customAxios.get("/categories");
+      setCategories(data.data);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+  useEffect(() => {
+    getCategories();
+  });
+
   const [data, setData] = useState({
     name: "",
     category: "",
@@ -12,15 +26,21 @@ const AdminProductsAddRight = () => {
     price: 0,
     isFeatured: false,
     images: [],
+    loading: false,
   });
   const createProductHandler = async () => {
     try {
+      setData({ ...data, loading: true });
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("category", data.category);
-      // for (let i = 0; i < images?.length; i++) {
-      //   formData.append("images", images[i]);
-      // }
+      if (data.images.length != 4) {
+        setData({ ...data, loading: false });
+        return toast.error("you must enter 4 images of the product");
+      }
+      for (let i = 0; i < data.images?.length; i++) {
+        formData.append("images", data.images[i]);
+      }
       formData.append("description", data.description);
       formData.append(
         "promotionPercentage",
@@ -30,12 +50,16 @@ const AdminProductsAddRight = () => {
       formData.append("isFeatured", data.isFeatured.toString());
       const response = await customAxios.post("/products", formData);
       console.log(response.data);
-      toast.success(response.data.message)
+      toast.success(response.data.message);
+      setData({ ...data, loading: false });
     } catch (error: any) {
+      setData({ ...data, loading: false });
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
+
+
 
   return (
     <div className="p-6 flex-1">
@@ -55,21 +79,21 @@ const AdminProductsAddRight = () => {
         <select
           name=""
           id=""
-          value={data.description}
+          defaultValue={data.category}
           onChange={(e) => setData({ ...data, category: e.target.value })}
           className="w-full pl-4 py-2 bg-white focus:outline-none my-2 border-2"
         >
-          <option selected value="disabled" className="disabled:opacity-50" disabled>
+          <option
+            value={""}
+            selected={data.category == ""}
+            className="disabled:opacity-50"
+            disabled
+          >
             Enter The Category That Match Your Product
           </option>
-          <option value="Electronics and Gadgets">
-            Electronics and Gadgets
-          </option>
-          <option value="Degital">Degital</option>
-          <option value="Books and Stationery">Books and Stationery</option>
-          <option value="Sports and Fitness">Sports and Fitness</option>
-          <option value="Home and Kitchen">Home and Kitchen</option>
-          <option value="Toys and Games">Toys and Games</option>
+          {categories?.map((category) => (
+            <option value={category?._id}>{category?.name}</option>
+          ))}
         </select>
       </div>
       <div className="my-3">
@@ -86,7 +110,7 @@ const AdminProductsAddRight = () => {
           htmlFor="admin-products-add"
           className="w-full text-center border-2  py-6  rounded-lg cursor-pointer "
         >
-          Add 4 Images Of Your Product
+          You Must Enter 4 Images Of Your Product
         </label>
         <input
           multiple
@@ -103,12 +127,11 @@ const AdminProductsAddRight = () => {
       </div>
       <div className="my-3">
         <p>Description</p>
-        <input
+        <textarea
           value={data.description}
           onChange={(e) => setData({ ...data, description: e.target.value })}
-          type="text"
           placeholder="enter the description of your new product"
-          className="w-full pl-4 py-2 bg-white focus:outline-none my-2 border-2"
+          className="w-full px-4 py-2 bg-white focus:outline-none my-2 border-2"
         />
       </div>
       <div className="my-3">
@@ -138,14 +161,16 @@ const AdminProductsAddRight = () => {
         <p>Price After Discount</p>
         <input
           disabled
-          value={+data.price * (1 - +data.promotionPercentage / 100)}
+          value={(+data.price * (1 - +data.promotionPercentage / 100)).toFixed(
+            2
+          )}
           type="text"
           placeholder="$900"
-          className="w-full pl-4 py-2 bg-white focus:outline-none my-2 border-2"
+          className="w-full opacity-50 cursor-not-allowed pl-4 py-2 bg-white focus:outline-none my-2 border-2"
         />
       </div>
-      <div className="my-3 flex justify-between items-center">
-        <p className="mt-6">Is Featured</p>
+      <div className="my-3 mt-6 flex justify-between items-center">
+        <p className="">Is Featured</p>
         <div
           onClick={() => setData({ ...data, isFeatured: !data.isFeatured })}
           className={`relative justify-center items-center ${
@@ -163,11 +188,16 @@ const AdminProductsAddRight = () => {
       </div>
       <div className="flex w-full justify-end">
         <button
-          disabled={data.category == "" || data.description == "" }
+          disabled={
+            data.category == "" ||
+            data.description == "" ||
+            data.images.length != 4 ||
+            data.loading
+          }
           onClick={() => createProductHandler()}
           className="bg-mainColor disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg mt-4 "
         >
-          Add Product
+          {data.loading == true ? "Loading..." : "Add Product"}
         </button>
       </div>
     </div>
