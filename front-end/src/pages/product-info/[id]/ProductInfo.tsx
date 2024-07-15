@@ -11,8 +11,7 @@ import { MdInsertComment } from "react-icons/md";
 import ZoomedImage from "../../../components/zooomedImage/ZoomedImage";
 import { useParams } from "react-router-dom";
 import customAxios from "../../../utils/axios/customAxios";
-import {Product} from "../../../interfaces/dbInterfaces"
-
+import { Product } from "../../../interfaces/dbInterfaces";
 
 export default function ProductInfo() {
   const { id } = useParams();
@@ -28,6 +27,7 @@ export default function ProductInfo() {
   };
   useEffect(() => {
     getProductById();
+    scrollTo(0, 0);
   }, []);
 
   const [quantity, setquantity] = useState(1);
@@ -50,7 +50,7 @@ export default function ProductInfo() {
     <div className="container">
       <div
         style={{ minHeight: "calc(100vh - 80px)" }}
-        className=" flex xl:flex-row flex-col  items-center justify-between gap-x-24 py-12 "
+        className=" flex xl:flex-row flex-col  items-center justify-between gap-x-24  "
       >
         <div className="flex flex-col items-center gap-8 overflow-hidden">
           {/* zoomed components */}
@@ -66,13 +66,12 @@ export default function ProductInfo() {
                 onClick={() => setactiveProductImageIndex(index)}
                 className={`${
                   index == activeProductImageIndex ? "opacity-50" : ""
-                } cursor-pointer`}
+                } cursor-pointer `}
               >
                 <img
                   src={productImage ? productImage : "nul"}
                   alt=""
-                  width={100}
-                  height={100}
+                  className="w-24 h-12 object-cover"
                 />
               </div>
             ))}
@@ -139,8 +138,8 @@ export default function ProductInfo() {
           <p>Add To Wishlist</p>
         </button> */}
           </div>
-          <div className="flex items-center gap-2">
-            <p>Total:</p>
+          <div className="flex items-center  justify-between gap-2">
+            <p className="text-xl font-bold">Total:</p>
             <p className=" text-mainColor">
               ${price} * {quantity} = ${price * quantity}
             </p>

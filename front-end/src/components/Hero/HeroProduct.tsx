@@ -18,7 +18,8 @@ export default function HeroProduct({ product }: HeroProductProps) {
         </p>
         <div className="my-2">
           <div className="relative mx-auto w-fit text-3xl text-red-600 lg:mx-0">
-            ${(product?.price * (1 - product?.promoPercentage / 100)).toFixed(2)}
+            $
+            {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(2)}
             <del className="absolute bottom-0 left-full text-sm text-white">
               ${(product?.price).toFixed(2)}
             </del>
@@ -40,12 +41,7 @@ export default function HeroProduct({ product }: HeroProductProps) {
           </button>
         </div>
       </div>
-      <img
-        src={product?.images[0]}
-        alt=""
-        width={400}
-        height={400}
-      />
+      <img src={product?.images[0]} alt="" width={400} height={400} />
     </div>
   );
 }

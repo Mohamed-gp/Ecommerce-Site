@@ -1,12 +1,11 @@
-import { useSelector } from "react-redux";
-import { IRootState } from "../../../redux/store";
-import { FaEdit } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa6";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import ZoomedImageStatic from "../../zooomedImage/ZoomedImageStatic";
+import { Product } from "../../../interfaces/dbInterfaces";
 
 const AdminProductsEditRight = () => {
   const [isFeatured, setIsFeatured] = useState(false);
+  const [product, setProduct] = useState<Product>();
+  useEffect(() => {}, []);
   return (
     <div className="p-6 flex-1">
       <p className="lg:text-2xl">Edit Product</p>

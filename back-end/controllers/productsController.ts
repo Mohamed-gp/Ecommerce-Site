@@ -8,12 +8,55 @@ import { verifyCreateProduct } from "../utils/joi/productValidation";
 /**
  *
  * @method GET
- * @route /api/products
+ * @route /api/products?query
  * @access public
  * @desc get products
  *
  */
 const getAllProducts = async (req: Request, res: Response) => {
+  let { search, category } = req.query;
+  console.log(category);
+  if (search && search != "") {
+    const products = await Product.find({
+      name: { $regex: search, $options: "i" },
+    });
+    return res.status(200).json({
+      message: "fetched Successfully",
+      data: products,
+    });
+  }
+  if (category && category != "") {
+    // const products = await Product.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: "categories",
+    //       localField: "category",
+    //       foreignField: "_id",
+    //       as: "categoryInfo",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$categoryInfo",
+    //   },
+    //   {
+    //     $match: {
+    //       "categoryInfo.name": category,
+    //     },
+    //   },
+    // ]);
+    if (typeof(category) == "string") {
+      category = category.replace("+", " ");
+    }
+    const products = await Product.find({}).populate("category");
+    const filteredProducts = products.filter(
+      (product) => product.category.name == category
+    );
+    return res.status(200).json({
+      message: "fetched Successfully",
+      data: filteredProducts,
+    });
+  }
+
   const products = await Product.find();
   return res
     .status(200)
@@ -93,4 +136,17 @@ const deleteProduct = async (
   }
 };
 
-export { getAllProducts, createProduct, getProduct,deleteProduct };
+const getFeaturedProducts = async (req: Request, res: Response) => {
+  const products = await Product.find({ isFeatured: true });
+  return res
+    .status(200)
+    .json({ message: "fetched successfully", data: products });
+};
+
+export {
+  getAllProducts,
+  createProduct,
+  getProduct,
+  deleteProduct,
+  getFeaturedProducts,
+};

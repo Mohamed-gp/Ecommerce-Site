@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getAllProducts,
   getProduct,
+  getFeaturedProducts,
 } from "../controllers/productsController";
 import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
 import upload from "../config/multer";
@@ -15,6 +16,7 @@ router
   .route("/")
   .get(getAllProducts)
   .post(upload.array("images"), verifyToken, verifyAdmin, createProduct);
+router.route("/featured").get(getFeaturedProducts);
 router
   .route("/:id")
   .get(verifyObjectId, getProduct)

@@ -6,14 +6,11 @@ import toast from "react-hot-toast";
 const AdminAdminsRight = () => {
   const [admins, setAdmins] = useState([]);
   const [adminEmail, setAdminEmail] = useState("");
-  useEffect(() => {
-    console.log(admins);
-  }, []);
   const getAdmins = async () => {
     try {
       const { data } = await customAxios.get("/admin/admins");
       setAdmins(data.data);
-      console.log(data)
+      
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -35,7 +32,7 @@ const AdminAdminsRight = () => {
   };
   const deleteHandler = async (id: string) => {
     try {
-      console.log(id);
+      
       const { data } = await customAxios.delete(`/admin/admins/${id}`);
       toast.success(data.message);
       getAdmins();
