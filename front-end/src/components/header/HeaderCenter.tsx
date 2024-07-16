@@ -22,7 +22,7 @@ export default function HeaderCenter() {
   const onChangeHandler = async () => {
     try {
       const { data } = await customAxios.get(`/products?search=${search}`);
-      setChangeHandlerProduct(data.data);
+      setChangeHandlerProduct(data.data.slice(0,4));
     } catch (error) {
       console.log(error);
     }
@@ -55,10 +55,10 @@ export default function HeaderCenter() {
           {changeHandlerProducts.map((product) => (
             <Link
               to={`/product/${product?._id}`}
-              className="py-2 flex items-center bg-white gap-2 px-4 cursor-pointer hover:bg-mainColor/90 duration-500 "
+              className="py-2 flex items-center overflow-hidden bg-white gap-2 px-4 cursor-pointer hover:bg-mainColor/90 duration-500 "
             >
-              <div className="img w-12 h-12">
-                <img src={product?.images[0]} alt={product?._id} />
+              <div className="img w-12 h-12 flex">
+                <img src={product?.images[0]} alt={product?._id} className=""/>
               </div>
               <p className="">{product?.name}</p>
             </Link>

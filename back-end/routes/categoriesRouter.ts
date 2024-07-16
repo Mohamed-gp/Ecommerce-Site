@@ -10,7 +10,7 @@ const router = Router();
 
 router
   .route("/")
-  .get(verifyToken, verifyAdmin, getAllCategories)
+  .get(getAllCategories)
   .post(verifyToken, verifyAdmin, createCategory);
 router.route("/:id").delete(verifyToken, verifyAdmin, deleteCategory);
 

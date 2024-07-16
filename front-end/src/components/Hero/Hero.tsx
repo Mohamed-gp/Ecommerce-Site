@@ -28,7 +28,7 @@ export default function Hero() {
       <HeroSlider slideIndex={slideIndex} setslideIndex={setslideIndex} />
       <div
         className={`flex serbas
-         w-[${100 * products.length}vw]  text-[white] duration-500 `}
+         w-[300vw]  text-[white] duration-500 `}
         style={{ transform: `translateX(${-100 * slideIndex}vw)` }}
       >
         {products?.map((product) => (

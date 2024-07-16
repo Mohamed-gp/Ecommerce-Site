@@ -60,7 +60,7 @@ export default function ProductInfo() {
               activeProductImageIndex={activeProductImageIndex}
             />
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             {product?.images?.map((productImage: string, index: number) => (
               <div
                 onClick={() => setactiveProductImageIndex(index)}
@@ -71,7 +71,7 @@ export default function ProductInfo() {
                 <img
                   src={productImage ? productImage : "nul"}
                   alt=""
-                  className="w-24 h-12 object-cover"
+                  className="w-24 h-24 object-cover"
                 />
               </div>
             ))}

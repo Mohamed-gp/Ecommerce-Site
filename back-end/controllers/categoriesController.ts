@@ -27,7 +27,6 @@ const getAllCategories = async (req: Request, res: Response) => {
  */
 const createCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
-  console.log(name);
   if (!name || name?.length < 7) {
     return res.status(400).json({
       data: null,

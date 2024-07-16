@@ -1,8 +1,12 @@
 import { FaCartShopping, FaHeart, FaRegHeart } from "react-icons/fa6";
 import RatingStars from "../ratingstars/RatingStars";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../../redux/store";
+import { authActions } from "../../redux/slices/authSlice";
+import customAxios from "../../utils/axios/customAxios";
 
 interface productProps {
   product: any;
@@ -55,6 +59,19 @@ export default function Product({ product }: productProps) {
   //   }, 1000);
   // };
 
+  const user = useSelector((state: IRootState) => state.auth.user);
+  const addToCart = async () => {
+    try {
+      const {data} = await customAxios.post("/cart/add", {
+        userId: user._id,
+        productId: user._id,
+      });
+
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <>
       {/* data-aos="fade-down" problem with adding to cart */}
@@ -62,14 +79,14 @@ export default function Product({ product }: productProps) {
         style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
         className="flex rounded-b-xl rounded-t-xl flex-col w-[270px] overflow-hidden"
       >
-        <div className="relative overflow-hidden  flex h-full w-[280px] items-center justify-center   rounded-t-xl bg-white">
-          <img
-            src={product?.images[0]}
-            alt={product?._id}
-            width={120}
-            className="hover:scale-110 duration-300 z-[8]"
-            height={120}
-          />
+        <div className="relative overflow-hidden flex-1 flex w-[280px] h-[150px] items-center justify-center   rounded-t-xl bg-white">
+          <div className="w-[140px] h-[143px] relative  hover:scale-110 duration-300 z-[8] flex justify-center items-center">
+            <img
+              src={product?.images[0]}
+              alt={product?._id}
+              className="  object-cover "
+            />
+          </div>
           <div className="absolute right-4 top-4 ">
             {wishList ? (
               <div
@@ -87,16 +104,15 @@ export default function Product({ product }: productProps) {
               </div>
             )}
           </div>
-
           <div className=" absolute h-[280px] w-[280px] ">
             <div className="absolute -left-[43px] top-[70px]  flex h-10   w-[120px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
               {product?.promoPercentage}%
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between rounded-b-xl bg-bgColorBlack px-2 leading-loose text-white">
+        <div className="flex items-center justify-between rounded-b-xl bg-bgColorBlack px-2  leading-loose text-white">
           <div className="left px-2 py-3">
-            <p className="text-sm font-bold">{product?.name}</p>
+            <p className="text-sm font-bold line-clamp-1">{product?.name}</p>
             <div className="rating-container my-1">
               <RatingStars starsNumber={product?.rating} />
             </div>
@@ -110,9 +126,9 @@ export default function Product({ product }: productProps) {
               </del>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal">
+          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal w-[110px]">
             <button
-              // onClick={(e) => addProductHandler(e)}
+              onClick={() => addToCart()}
               className="flex  w-full !p-1  items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"
             >
               <p>Add To Cart</p>

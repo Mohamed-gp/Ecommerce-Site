@@ -14,12 +14,18 @@ import { verifyCreateProduct } from "../utils/joi/productValidation";
  *
  */
 const getAllProducts = async (req: Request, res: Response) => {
-  let { search, category } = req.query;
-  console.log(category);
+  let { search, category, newArrivals } = req.query;
   if (search && search != "") {
     const products = await Product.find({
       name: { $regex: search, $options: "i" },
     });
+    return res.status(200).json({
+      message: "fetched Successfully",
+      data: products,
+    });
+  }
+  if (newArrivals == "true") {
+    const products = await Product.find().sort({ createdAt: 1 });
     return res.status(200).json({
       message: "fetched Successfully",
       data: products,
@@ -44,7 +50,7 @@ const getAllProducts = async (req: Request, res: Response) => {
     //     },
     //   },
     // ]);
-    if (typeof(category) == "string") {
+    if (typeof category == "string") {
       category = category.replace("+", " ");
     }
     const products = await Product.find({}).populate("category");
@@ -72,7 +78,6 @@ const getAllProducts = async (req: Request, res: Response) => {
  */
 const getProduct = async (req: Request, res: Response) => {
   const product = await Product.findById(req.params.id).populate("category");
-  console.log(product);
   if (!product) {
     return res.status(404).json({ data: null, message: "product not found" });
   }
@@ -103,7 +108,6 @@ const createProduct = async (req: Request, res: Response) => {
     pictures.map((picture) => cloudinary.uploader.upload(picture))
   );
   const pictureUrls = uploadedPictures.map((picture) => picture.url);
-  console.log(pictureUrls);
   const product = await Product.create({
     name: req.body.name,
     description: req.body.description,

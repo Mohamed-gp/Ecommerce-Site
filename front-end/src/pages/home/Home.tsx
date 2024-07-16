@@ -14,7 +14,6 @@ export default function Home() {
   const getAllCategories = async () => {
     try {
       const { data } = await customAxios.get("/categories");
-      console.log(data);
       setCategories(data.data);
     } catch (error) {
       console.log(error);

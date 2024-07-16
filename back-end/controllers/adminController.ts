@@ -15,7 +15,6 @@ const getAdmins = async (req: Request, res: Response, next: NextFunction) => {
 const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const email = req.body.adminEmail;
   /// joi validation email
-  console.log(email);
 
   let admin: any = await User.find({ email: email });
   if (admin.length == 0 || !admin) {
@@ -43,7 +42,6 @@ const deleteAdmin = async (
 ) => {
   const { id } = req.params;
   /// joi validation email
-  console.log(id);
   let admin: any = await User.findById(id);
   if (!admin) {
     return res

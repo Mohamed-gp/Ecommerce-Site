@@ -190,7 +190,7 @@ export default function Wishlist() {
             style={{ minHeight: `calc(100vh - 70.94px)` }}
           >
             <div className="flex h-[130px] w-[130px] items-center justify-center rounded-full bg-[#F0F9F4]">
-              <FaRegHeart className="h-1/2 w-1/2 text-[#28A642]" />
+              <FaRegHeart className="h-1/2 w-1/2 text-mainColor" />
             </div>
             <p className="my-6 mb-2 text-3xl font-bold">
               Your wishlist is empty

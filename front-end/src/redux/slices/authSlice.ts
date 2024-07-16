@@ -15,7 +15,36 @@ const authSlice = createSlice({
     },
     logout(state, action) {
       state.user = null;
-      localStorage.removeItem("user")
+      localStorage.removeItem("user");
+    },
+    addTocart(state, action) {
+      let index = -1;
+      const isExist = state.user.cart.find(
+        (el) => el.product._id == action.payload._id
+      );
+      if (!isExist) {
+        state.user.cart.push({
+          product: action.payload,
+          quantity: 1,
+        });
+      } else {
+        state.user.cart.map((el, ind) => {
+          if (el.product._id == action.payload._id) {
+            index = ind;
+          }
+        });
+        state.user.cart[index].quantity++;
+      }
+      localStorage.setItem("user", JSON.stringify(state.user));
+      /*
+      user
+      product
+      quantity
+      */
+    },
+    removeFromCart(state, action) {
+      state.user.cart = state.user.cart.filter((ele) => ele.product._id != action.payload);
+      localStorage.setItem("user", JSON.stringify(state.user));
     },
   },
 });

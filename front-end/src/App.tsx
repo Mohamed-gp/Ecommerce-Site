@@ -21,6 +21,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAdmins from "./pages/admin/AdminAdmins";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Store from "./pages/store/Store";
+import Wishlist from "./pages/wishlist/Wishlist";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/store" element={<Store />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/aboutus" element={<AboutUs />} />
         <Route
           path={"/register"}
