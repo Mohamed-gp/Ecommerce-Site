@@ -5,6 +5,7 @@ import {
   FaCartShopping,
   FaRegHeart,
   FaShare,
+  FaStar,
 } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { MdInsertComment } from "react-icons/md";
@@ -12,9 +13,15 @@ import ZoomedImage from "../../../components/zooomedImage/ZoomedImage";
 import { useParams } from "react-router-dom";
 import customAxios from "../../../utils/axios/customAxios";
 import { Product } from "../../../interfaces/dbInterfaces";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../../../redux/store";
+import { authActions } from "../../../redux/slices/authSlice";
+import Swal from "sweetalert2";
 
 export default function ProductInfo() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const user = useSelector((state: IRootState) => state.auth.user);
   const [product, setProduct] = useState<Product>({} as Product);
   const getProductById = async () => {
     try {
@@ -43,9 +50,93 @@ export default function ProductInfo() {
     toast.success("copied successfuly, share it with your friends");
     return result;
   };
-  const promotion = 0.5;
-  const originalPrice = 1230;
-  const price = originalPrice * (1 - promotion);
+
+  const addToCart = async () => {
+    try {
+      const { data } = await customAxios.post("/cart/add", {
+        userId: user._id,
+        productId: product._id,
+      });
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const [reviews, setreviews] = useState([]);
+  const getReviews = async () => {
+    try {
+      const { data } = await customAxios(`/homes/${id}/reviews `);
+      console.log("this is reviews");
+      console.log(data);
+      setreviews(data);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data);
+    }
+  };
+  const [review, setreview] = useState({
+    rating: 5,
+    comment: "",
+  });
+  const [emptyArray, setemptyArray] = useState<any[]>([]);
+  useEffect(() => {
+    setemptyArray([]);
+    for (let index = 0; index < 5; index++) {
+      setemptyArray((prev) => prev.concat(index));
+    }
+    // getReviews();
+  }, []);
+  const addReviewHandler = async () => {
+    try {
+      // const { data } = await customAxios.post(`/homes/${house?.id}/review`, {
+      //   rating: 6 - review.rating,
+      //   comment: review.comment,
+      // });
+      // getHouseReviews();
+      // console.log(data);
+
+      toast.success("Review Add Succefuly");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data);
+    }
+  };
+  const deleteReviewHandler = (id: string) => {
+    Swal.fire({
+      title: "Are you sure to remove this Review?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const { data } = await customAxios.delete(`/homes/${id}/review`);
+          getReviews();
+          toast.success(data);
+          Swal.fire({
+            title: "Deleted!",
+            text: "Review Deleted Successfuly",
+            icon: "success",
+          });
+        } catch (error: any) {
+          console.log(error);
+          toast.error(error?.response?.data);
+        }
+      } else {
+        Swal.fire({
+          title: "your Review is Safe!",
+          text: "something went wrong",
+          icon: "error",
+        });
+      }
+    });
+  };
   return (
     <div className="container">
       <div
@@ -90,15 +181,20 @@ export default function ProductInfo() {
             <RatingStars starsNumber={3.2} />
             <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span>
             <MdInsertComment />
-            <p>0 Reviews</p>
+            <p>{reviews?.length} Reviews</p>
             {/* <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span> */}
             {/* <FaBasketShopping />
         <p>154 Sold</p> */}
           </div>
           <div className="flex items-center gap-1 font-bold">
-            <p className="text-4xl">${price}</p>
+            <p className="text-4xl">
+              $
+              {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
+                2
+              )}
+            </p>
             <p className="text-xl opacity-50 line-through ">
-              ${product?.price}
+              ${product?.price?.toFixed(2)}
             </p>
             <p className="text-sm text-bgColorDanger ">
               {product?.promoPercentage}%OFF
@@ -124,7 +220,12 @@ export default function ProductInfo() {
                 +
               </button>
             </div>
-            <button className="flex flex-1 w-1/2 items-center justify-center gap-1 rounded-lg bg-mainColor px-1 py-2  text-white">
+            <button
+              onClick={() => {
+                addToCart();
+              }}
+              className="flex flex-1 w-1/2 items-center justify-center gap-1 rounded-lg bg-mainColor px-1 py-2  text-white"
+            >
               <p>Add To Cart</p>
               <FaCartShopping />
             </button>
@@ -141,25 +242,94 @@ export default function ProductInfo() {
           <div className="flex items-center  justify-between gap-2">
             <p className="text-xl font-bold">Total:</p>
             <p className=" text-mainColor">
-              ${price} * {quantity} = ${price * quantity}
+              $
+              {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
+                2
+              )}{" "}
+              * {quantity} = $
+              {(
+                product?.price *
+                (1 - product?.promoPercentage / 100) *
+                quantity
+              ).toFixed(2)}
             </p>
           </div>
         </div>
       </div>
-      <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
+      <p className="pl-3 border-l-mainColor mt-12 border-l-4 font-bold text-2xl">
         Description
       </p>
       <p className="opacity-50 text-lg my-2">{product?.description}</p>
-      <div className="flex justify-between my-6">
-        <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
-          Reviews
-        </p>
-        <span>{product?.comments?.length}</span>
+      <div className="reviews flex flex-col">
+        <div className="flex justify-between items-center">
+          <p className="text-3xl font-bold mt-4">Reviews</p>
+          <span className="text-xl">{reviews?.length}</span>
+        </div>
+        {user && (
+          <>
+            <div className="py-2 mt-8 px-4 mb-4 bg-white rounded-lg rounded-t-lg border ">
+              <textarea
+                id="comment"
+                value={review?.comment}
+                onChange={(e) =>
+                  setreview({ ...review, comment: e.target.value })
+                }
+                className="px-0 w-full text-sm   border-0 focus:ring-0 focus:outline-none "
+                placeholder="Write a review..."
+                required
+              ></textarea>
+            </div>
+            <div className="flex flex-row-reverse justify-between p-10">
+              {emptyArray?.map((index) => (
+                <FaStar
+                  onClick={() => setreview({ ...review, rating: index + 1 })}
+                  className={`${
+                    review.rating < index + 2
+                      ? "text-mainColor opacity-100 "
+                      : "text-mainColor opacity-10 "
+                  } w-6 h-6 mx-2 peer peer-hover:opacity-100 hover:opacity-100  cursor-pointer`}
+                />
+              ))}
+              <span>{6 - review.rating}/5</span>
+            </div>
+            <button
+              type="submit"
+              disabled={review.comment.trim() == ""}
+              onClick={() => addReviewHandler()}
+              className="flex disabled:opacity-50 disabled:cursor-not-allowed justify-center items-center text-xs font-medium   bg-buttonColor text-center mt-6 rounded-xl bg-mainColor px-6 py-3  text-white"
+            >
+              Post comment
+            </button>
+          </>
+        )}
+        <>
+          {/* {reviews?.map((review) => (
+                  <div className="flex flex-col  border-y border-y-[#4561ec26] py-4  my-4    ">
+                    <div className="flex items-center gap-2 my-3">
+                      <div className="size-10 rounded-full overflow-hidden">
+                        <img src={review?.User?.profileImage} alt="" />
+                      </div>
+                      <div className="flex flex-1 flex-col gap2 opacity-90">
+                        <Rating rating={review?.rating} />
+                        <p>{review?.User?.firstName}</p>
+                      </div>
+                      {review?.User?.id == user?.id && (
+                        <FaTrash
+                          onClick={() => deleteReviewHandler(review?.id)}
+                          className="cursor-pointer text-red-400"
+                        />
+                      )}
+                    </div>
+                    <p className="bg-white p-2 rounded-xl break-words ">
+                      {review?.comment}
+                    </p>
+                  </div>
+                ))} */}
+        </>
       </div>
       {product?.comments?.length == 0 ? (
         <p className="text-center my-12 text-xl">There is no reviews</p>
-      ) : // reviews
-      null}
+      ) : null}
     </div>
   );
 }

@@ -1,11 +1,31 @@
 import { FaCartShopping } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import customAxios from "../../utils/axios/customAxios";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../../redux/store";
+import { authActions } from "../../redux/slices/authSlice";
+import toast from "react-hot-toast";
 
 interface HeroProductProps {
   product: any;
 }
 
 export default function HeroProduct({ product }: HeroProductProps) {
+  const { user } = useSelector((state: IRootState) => state.auth);
+  const dispatch = useDispatch();
+  const addToCart = async () => {
+    try {
+      const { data } = await customAxios.post("/cart/add", {
+        userId: user._id,
+        productId: product._id,
+      });
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <div
       className="container relative z-50  flex h-full w-[100vw] flex-col-reverse flex-wrap items-center justify-center gap-2 gap-y-6 py-12 lg:flex-row lg:justify-between"
@@ -35,7 +55,12 @@ export default function HeroProduct({ product }: HeroProductProps) {
           >
             Read More
           </Link>
-          <button className="flex   items-center gap-1 rounded-xl bg-mainColor px-3 py-1 text-white">
+          <button
+            onClick={() => {
+              addToCart();
+            }}
+            className="flex   items-center gap-1 rounded-xl bg-mainColor px-3 py-1 text-white"
+          >
             <p>Add To Cart</p>
             <FaCartShopping />
           </button>

@@ -1,27 +1,33 @@
-import { Link, useParams } from "react-router-dom";
-import { FaDoorOpen, FaPersonWalkingArrowRight } from "react-icons/fa6";
+import { FaPersonWalkingArrowRight } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import customAxios from "../../../utils/axios/customAxios";
 import { IRootState } from "../../../redux/store";
 import { authActions } from "../../../redux/slices/authSlice";
 
 const AdminSettingsRight = () => {
-  const { id } = useParams();
   const { user } = useSelector((state: IRootState) => state.auth);
-  const [userProfileInfo, setUserProfileInfo] = useState<any>();
   const dispatch = useDispatch();
-
-  const getUserInfo = async () => {
-    try {
-      const { data } = await customAxios.get(`/users/${id}`);
-      setUser(data.data);
-    } catch (error) {}
-  };
-  useEffect(() => {
-    getUserInfo();
+  const [data, setData] = useState<any>({
+    username: "",
+    image: null,
   });
+
+  const updateUserInfo = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("username", data.username);
+      formData.append("image", data.image);
+      const result = await customAxios.post(`/users/${user?._id}`, formData);
+      dispatch(authActions.login(result.data.data));
+      toast.success(result.data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   const logoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
@@ -48,32 +54,57 @@ const AdminSettingsRight = () => {
                   className="w-full rounded-xl border-2 py-2 pl-3 pr-3 focus:outline-none"
                   id="username"
                   type="text"
+                  onChange={(e) =>
+                    setData({ ...data, username: e.target.value })
+                  }
+                  value={data?.username}
                   placeholder={user?.username}
                 />
               </div>
+              {user?.provider == "credentials" && (
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="email">Email:</label>
+                  <input
+                    className="w-full rounded-xl border-2 py-2 pl-3 pr-3 focus:outline-none"
+                    id="email"
+                    type="text"
+                    placeholder={user?.email}
+                  />
+                </div>
+              )}
+
               <div className="flex flex-col gap-1">
-                <label htmlFor="email">Email:</label>
+                <label htmlFor="email">Role:</label>
                 <input
-                  className="w-full rounded-xl border-2 py-2 pl-3 pr-3 focus:outline-none"
-                  id="email"
+                  className="w-full cursor-not-allowed rounded-xl border-2 py-2 pl-3 pr-3 focus:outline-none"
                   type="text"
-                  placeholder={user?.email}
+                  disabled
+                  placeholder={user?.role}
                 />
               </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
-              <div className="overflow-hidden rounded-full">
+              <div className="">
                 <img
-                  src={user?.photoUrl}
-                  width={200}
-                  height={200}
+                  src={
+                    data.image ? URL.createObjectURL(data.image) : user.photoUrl
+                  }
                   alt="avatar"
-                  className="rounded-full"
+                  className="w-28 h-28 rounded-full"
                 />
               </div>
-              {user?._id == id && (
+              {user?._id && (
                 <>
-                  <input type="file" id="image-change" className="hidden" />
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      if (e.target.files != null) {
+                        setData({ ...data, image: e.target.files[0] as any });
+                      }
+                    }}
+                    id="image-change"
+                    className="hidden"
+                  />
                   <label
                     htmlFor="image-change"
                     className="w-[142px] cursor-pointer rounded-xl border-2 border-mainColor bg-white px-3 py-1 text-center font-bold text-mainColor"
@@ -84,11 +115,15 @@ const AdminSettingsRight = () => {
               )}
             </div>
           </div>
-          <button className="fit-content mx-auto flex rounded-xl bg-mainColor  px-4 py-2 text-white">
+          <button
+            disabled={data.username == "" && data.image == null}
+            onClick={() => updateUserInfo()}
+            className="fit-content disabled:opacity-50 mx-auto flex rounded-xl bg-mainColor  px-4 py-2 text-white"
+          >
             Save Changes
           </button>
         </div>
-        {user?.provider == "credentials" && user?._id == id && (
+        {user?.provider == "credentials" && (
           <div className="my-10 rounded-xl border-2 border-mainColor p-3">
             <p className="border-b-2  pb-1 font-bold">Change Password</p>
             <div className="flex flex-col-reverse items-center justify-between gap-x-32 px-4 py-6 sm:flex-row">

@@ -38,7 +38,7 @@ const Faq = () => {
           <p className="text-gray-600 text-center font-medium">
             <span>Still have any questions? </span>
             <a
-              className="font-semibold text-indigo-600 hover:text-indigo-700"
+              className="font-semibold text-mainColor hover:text-mainColor/70"
               href="#contactUs"
             >
               Contact us

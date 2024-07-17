@@ -1,9 +1,11 @@
 import cloudinary from "../config/cloudinary";
 import { NextFunction, Request, Response } from "express";
-import { Product } from "../models/Product";
+import Product from "../models/Product";
+import User from "../models/User";
 import multer from "multer";
 import removeFiles from "../utils/fs/cleanUpload";
 import { verifyCreateProduct } from "../utils/joi/productValidation";
+import { authRequest } from "../interfaces/authInterface";
 
 /**
  *
@@ -25,7 +27,7 @@ const getAllProducts = async (req: Request, res: Response) => {
     });
   }
   if (newArrivals == "true") {
-    const products = await Product.find().sort({ createdAt: 1 });
+    const products = await Product.find().sort({ createdAt: -1 });
     return res.status(200).json({
       message: "fetched Successfully",
       data: products,
@@ -147,10 +149,44 @@ const getFeaturedProducts = async (req: Request, res: Response) => {
     .json({ message: "fetched successfully", data: products });
 };
 
+const toggleWishlist = async (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId, productId } = req.body;
+  try {
+    if (userId !== req.user.id) {
+      return res.status(403).json({
+        data: null,
+        message: "Access denied, you must be the user himself",
+      });
+    }
+    let user = await User.findById(userId).populate("wishlist");
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    const isExist = user.wishlist.find((ele: any) => productId == ele._id);
+    if (isExist) {
+      user.wishlist = user.wishlist.filter((ele: any) => ele._id != productId);
+    } else {
+      user.wishlist.push(productId);
+    }
+    user.save();
+    user = await User.findById(userId).populate("wishlist");
+    return res
+      .status(200)
+      .json({ message: "wishlist toggled successfull", data: user.wishlist });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   getAllProducts,
   createProduct,
   getProduct,
   deleteProduct,
   getFeaturedProducts,
+  toggleWishlist,
 };

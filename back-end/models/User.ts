@@ -31,26 +31,28 @@ const schema = new mongoose.Schema(
       default:
         "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?w=740&t=st=1720114109~exp=1720114709~hmac=a7a50bf745c8017e3f9827b2d1a5f9a37ea13abea449d49a5e83e69d8fdd4382",
     },
-    cart: {
-      type: mongoose.Schema.ObjectId,
-      ref: "cart",
-    },
+    cart: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Cart",
+      },
+    ],
     wishlist: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "product",
+        ref: "Product",
       },
     ],
     comments: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "comment",
+        ref: "Comment",
       },
     ],
   },
   { timestamps: true }
 );
 
-const User = mongoose.models.User || mongoose.model("user", schema);
+const User = mongoose.models.User || mongoose.model("User", schema);
 
 export default User;

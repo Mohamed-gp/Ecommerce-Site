@@ -1,6 +1,6 @@
 import { FaCartShopping, FaHeart, FaRegHeart } from "react-icons/fa6";
 import RatingStars from "../ratingstars/RatingStars";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,11 +13,21 @@ interface productProps {
 }
 // product props
 export default function Product({ product }: productProps) {
-  const [wishList, setwishList] = useState<boolean>(false);
-  const [animate, setanimate] = useState<string>("");
-  const toggleWishListHandler = () => {
-    setwishList(!wishList);
-    toast.success("toggled successfully");
+  const dispatch = useDispatch();
+  const user = useSelector((state: IRootState) => state.auth.user);
+  // const [animate, setanimate] = useState<string>("");
+  const toggleWishListHandler = async (userId: string, productId: string) => {
+    try {
+      const { data } = await customAxios.post("/products/wishlist", {
+        userId,
+        productId,
+      });
+      dispatch(authActions.setWishlist(data.data));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
   };
 
   // const addProductHandler = (e) => {
@@ -59,14 +69,14 @@ export default function Product({ product }: productProps) {
   //   }, 1000);
   // };
 
-  const user = useSelector((state: IRootState) => state.auth.user);
   const addToCart = async () => {
     try {
-      const {data} = await customAxios.post("/cart/add", {
+      const { data } = await customAxios.post("/cart/add", {
         userId: user._id,
-        productId: user._id,
+        productId: product._id,
       });
-
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -88,17 +98,17 @@ export default function Product({ product }: productProps) {
             />
           </div>
           <div className="absolute right-4 top-4 ">
-            {wishList ? (
+            {user?.wishlist?.find((ele: any) => ele._id == product._id) ? (
               <div
                 className="relative z-[1] cursor-pointer text-mainColor "
-                onClick={() => toggleWishListHandler()}
+                onClick={() => toggleWishListHandler(user._id, product._id)}
               >
                 <FaHeart />
               </div>
             ) : (
               <div
                 className="relative z-[1] cursor-pointer "
-                onClick={() => toggleWishListHandler()}
+                onClick={() => toggleWishListHandler(user._id, product._id)}
               >
                 <FaRegHeart />
               </div>
@@ -126,7 +136,7 @@ export default function Product({ product }: productProps) {
               </del>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal w-[110px]">
+          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal w-[180px]">
             <button
               onClick={() => addToCart()}
               className="flex  w-full !p-1  items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"

@@ -43,6 +43,7 @@ const ZoomedImageStatic = ({ imageSrc }: ZoomedImageStaticProps) => {
           typeof imageSrc == "string" ? imageSrc : URL.createObjectURL(imageSrc)
         }
         alt=""
+        className="cursor-zoom-in"
       />
     </div>
   );

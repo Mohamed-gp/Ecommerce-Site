@@ -41,7 +41,7 @@ const Login = () => {
           className="hidden h-full w-1/2 md:block"
           style={{
             minHeight: "calc(100vh - 70.94px)",
-            backgroundImage: `url(/${"purple-wallpaper-with-swirly-background.jpg"})`,
+            backgroundImage: `url(https://images.unsplash.com/photo-1553356084-58ef4a67b2a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTd8fHxlbnwwfHx8fHw%3D.jpg)`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -50,7 +50,6 @@ const Login = () => {
         <div
           style={{
             minHeight: "calc(100vh - 70.94px)",
-            boxShadow: "rgb(255 255 255 / 30%) 0px 0px 74px 55px",
           }}
           className="flex h-full w-full flex-col justify-center  px-6 md:w-1/2"
         >

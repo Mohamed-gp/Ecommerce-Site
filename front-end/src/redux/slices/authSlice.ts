@@ -17,33 +17,14 @@ const authSlice = createSlice({
       state.user = null;
       localStorage.removeItem("user");
     },
-    addTocart(state, action) {
-      let index = -1;
-      const isExist = state.user.cart.find(
-        (el) => el.product._id == action.payload._id
-      );
-      if (!isExist) {
-        state.user.cart.push({
-          product: action.payload,
-          quantity: 1,
-        });
-      } else {
-        state.user.cart.map((el, ind) => {
-          if (el.product._id == action.payload._id) {
-            index = ind;
-          }
-        });
-        state.user.cart[index].quantity++;
-      }
-      localStorage.setItem("user", JSON.stringify(state.user));
-      /*
-      user
-      product
-      quantity
-      */
+    setCart(state, action) {
+      let userParsed = JSON.parse(localStorage.getItem("user") as string);
+      userParsed.cart = action.payload;
+      state.user = userParsed;
+      localStorage.setItem("user", JSON.stringify(userParsed));
     },
-    removeFromCart(state, action) {
-      state.user.cart = state.user.cart.filter((ele) => ele.product._id != action.payload);
+    setWishlist(state, action) {
+      state.user.wishlist = action.payload;
       localStorage.setItem("user", JSON.stringify(state.user));
     },
   },

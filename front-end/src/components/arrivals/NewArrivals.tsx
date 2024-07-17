@@ -18,7 +18,7 @@ export default function NewArrivals() {
     getProducts();
   }, []);
   return (
-    <div className="container pt-6">
+    <div className="container pt-6" id="newArrivals">
       <p className="pl-3  border-l-mainColor border-l-4 font-bold text-2xl">
         New Arrivals
       </p>

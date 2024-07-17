@@ -10,6 +10,7 @@ import cors from "cors";
 import { notFound, errorHandler } from "./middlewares/errors";
 import cookieParser from "cookie-parser";
 import cartRouter from "./routes/cartRouter"
+import checkoutRouter from "./routes/checkoutRouter"
 
 dotenv.config();
 const app = express();
@@ -36,6 +37,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/categories", categoriesRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/checkout", checkoutRouter);
 
 
 app.use(notFound);

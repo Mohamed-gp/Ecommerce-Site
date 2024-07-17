@@ -31,18 +31,19 @@ const schema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.ObjectId,
-      ref: "category",
+      ref: "Category",
       required: true,
     },
     comments: [
       {
         type: [mongoose.Schema.ObjectId],
-        ref: "comment",
+        ref: "Comment",
       },
     ],
   },
   { timestamps: true }
 );
 
-export const Product =
-  mongoose.models.Product || mongoose.model("product", schema);
+const Product = mongoose.models.Product || mongoose.model("Product", schema);
+
+export default Product;

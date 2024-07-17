@@ -3,17 +3,43 @@ import { FaArrowRight, FaTrash, FaXmark } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
+import { Link, useNavigate } from "react-router-dom";
+import customAxios from "../../utils/axios/customAxios";
+import toast from "react-hot-toast";
+import ZoomedImageStatic from "../../components/zooomedImage/ZoomedImageStatic";
 
 export default function Cart() {
-  const cart: any[] = useSelector((state: IRootState) => state.auth.user.cart);
+  const cart: any[] = useSelector((state: IRootState) => state.auth.user?.cart);
+  const user = useSelector((state: IRootState) => state.auth.user);
   const dispatch = useDispatch();
   const [coupon, setCoupon] = useState("");
-  useEffect(() => {
-    console.log(coupon);
-  }, [coupon] );
+  const removeFromCartHandler = async (userId: string, productId: string) => {
+    try {
+      const { data } = await customAxios.delete(
+        `/cart/delete/${userId}/${productId}`
+      );
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const checkoutHandler = async () => {
+    try {
+      const { data } = await customAxios.post("/checkout", { cart });
+      // window.open(data.data, "_blank");
+      window.open(data.data, "_self");
+      // dispatch(authActions.setCart([]));
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <>
-      {cart.length != 0 ? (
+      {cart?.length != 0 ? (
         <>
           <div>
             <p className="my-6 mt-12 text-center text-xl font-bold">
@@ -35,27 +61,26 @@ export default function Cart() {
                   <tr className="relative">
                     <td>
                       <div className="mx-auto w-fit">
+                        {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
                         <img
                           src={ele?.product?.images[0]}
                           alt="mac"
                           width={100}
                           height={100}
-                        />
+                          />
                       </div>
                     </td>
                     <td>
                       <p>{ele?.product?.name}</p>
                     </td>
-                    <td>${ele?.product?.price}</td>
+                    <td>${(ele?.product?.price).toFixed(2)}</td>
                     <td>{ele?.quantity}</td>
-                    <td>${ele?.product?.price * ele?.quantity}</td>
+                    <td>${(ele?.product?.price * ele?.quantity).toFixed(2)}</td>
                     <td>
                       <div className="mx-auto w-fit cursor-pointer  text-bgColorDanger">
                         <FaTrash
                           onClick={() =>
-                            dispatch(
-                              authActions.removeFromCart(ele.product._id)
-                            )
+                            removeFromCartHandler(user?._id, ele?.product?._id)
                           }
                         />
                       </div>
@@ -100,9 +125,9 @@ export default function Cart() {
                     <p>
                       $
                       {cart
-                        .reduce(
+                        ?.reduce(
                           (acc, curr) =>
-                            curr.product.price * curr.quantity + acc,
+                            curr?.product?.price * curr?.quantity + acc,
                           0
                         )
                         .toFixed(2)}{" "}
@@ -111,9 +136,9 @@ export default function Cart() {
                     <p>
                       $
                       {cart
-                        .reduce(
+                        ?.reduce(
                           (acc, curr) =>
-                            curr.product.price * curr.quantity + acc,
+                            curr?.product?.price * curr?.quantity + acc,
                           0
                         )
                         .toFixed(2) - 0}{" "}
@@ -123,7 +148,10 @@ export default function Cart() {
                 </div>
               </div>
             </div>
-            <button className="animation-right-arrow-father mx-auto flex items-center gap-2 rounded-xl bg-mainColor px-4 py-2 text-sm text-white">
+            <button
+              onClick={() => checkoutHandler()}
+              className="animation-right-arrow-father mx-auto flex items-center gap-2 rounded-xl bg-mainColor px-4 py-2 text-sm text-white"
+            >
               <p>Proceed To Checkout</p>
               <div className="animation-right-arrow">
                 <FaArrowRight />
@@ -147,9 +175,12 @@ export default function Cart() {
               Your cart is empty and sad :(
             </p>
             <p className="opacity-60">Add something to make it happy!</p>
-            <button className="mt-6 rounded-xl bg-mainColor px-6 py-2  text-white">
+            <Link
+              to="/store"
+              className="mt-6 rounded-xl bg-mainColor px-6 py-2  text-white"
+            >
               Continue Shoping
-            </button>
+            </Link>
           </div>
         </>
       )}

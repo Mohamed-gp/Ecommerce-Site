@@ -13,6 +13,12 @@ const loginController = async (req: Request, res: Response) => {
   }
   const user = await User.findOne({
     email,
+  }).populate({
+    path: "cart",
+    populate: {
+      path: "product",
+      model: "Product",
+    },
   });
   if (!user) {
     return res.status(404).json({
@@ -58,6 +64,12 @@ const registerController = async (req: Request, res: Response) => {
   }
   let user = await User.findOne({
     email,
+  }).populate({
+    path: "cart",
+    populate: {
+      path: "product",
+      model: "Product",
+    },
   });
   if (user) {
     return res.status(400).json({ message: "email or password are incorrect" });
@@ -89,6 +101,12 @@ const googleSignIncontroller = async (req: Request, res: Response) => {
   const { username, email, photoUrl } = req.body;
   let user = await User.findOne({
     email,
+  }).populate({
+    path: "cart",
+    populate: {
+      path: "product",
+      model: "Product",
+    },
   });
   if (user) {
     const token = jwt.sign(

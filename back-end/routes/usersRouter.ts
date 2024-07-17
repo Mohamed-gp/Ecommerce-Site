@@ -1,9 +1,17 @@
 import { Router } from "express";
-import { getUserByIdController } from "../controllers/usersController";
-const router = Router()
+import {
+  getUserByIdController,
+  updateUserData,
+} from "../controllers/usersController";
+import { verifyToken, verifyUser } from "../middlewares/verifyToken";
+import upload from "../config/multer"
 
-router.route("/:id").get(getUserByIdController)
 
+const router = Router();
 
+router
+  .route("/:id")
+  .get(getUserByIdController)
+  .post(verifyToken, verifyUser, upload.single("image"), updateUserData);
 
-export default router
+export default router;

@@ -46,7 +46,7 @@ const ZoomedImage = ({
         ref={magnifyingImg}
         src={productImages[activeProductImageIndex]}
         alt="Zoomed product "
-        className="object-cover"
+        className="object-cover cursor-zoom-in  "
         width={500}
         height={500}
       />

@@ -25,7 +25,7 @@ export default function HeaderRight() {
       <div className="border-r-2 py-2 pr-3 ">
         <Link
           to={user?._id ? `/wishlist` : "/register"}
-          className=" md:text-xl "
+          className=" md:text-xl"
         >
           <FaHeart />
         </Link>
@@ -35,7 +35,7 @@ export default function HeaderRight() {
         className="cart-icon relative md:text-xl"
       >
         <FaCartShopping />
-        {user?.cart?.length != 0 && (
+        {user && user?.cart?.length != 0 && (
           <span className="absolute  bg-mainColor -right-1 -top-1 w-[13px] h-[13px] rounded-full"></span>
         )}
       </Link>

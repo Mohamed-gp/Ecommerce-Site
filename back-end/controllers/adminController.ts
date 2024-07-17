@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { authRequest } from "../interfaces/authInterface";
 import User from "../models/User";
+import Product from "../models/Product";
+import Comment from "../models/Comment";
+import Category from "../models/Category";
 
 const getAdmins = async (req: Request, res: Response, next: NextFunction) => {
   let admins: any = await User.find({ role: "admin" });
@@ -64,4 +67,69 @@ const deleteAdmin = async (
   }
 };
 
-export { getAdmins, addAdmin, deleteAdmin };
+const getUsersCount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const usersCount = await User.find().countDocuments();
+    return res
+      .status(200)
+      .json({ data: usersCount, message: "fetched successfull" });
+  } catch (error) {
+    next(error);
+  }
+};
+const getProductsCount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const productsCount = await Product.find().countDocuments();
+    return res
+      .status(200)
+      .json({ data: productsCount, message: "fetched successfull" });
+  } catch (error) {
+    next(error);
+  }
+};
+const getCategoriesCount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categoriesCount = await Category.find().countDocuments();
+    return res
+      .status(200)
+      .json({ data: categoriesCount, message: "fetched successfull" });
+  } catch (error) {
+    next(error);
+  }
+};
+const getCommentsCount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const commentsCount = await Comment.find().countDocuments();
+    return res
+      .status(200)
+      .json({ data: commentsCount, message: "fetched successfull" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  getAdmins,
+  addAdmin,
+  deleteAdmin,
+  getUsersCount,
+  getCategoriesCount,
+  getProductsCount,
+  getCommentsCount,
+};
