@@ -4,7 +4,7 @@ import Cart from "../models/Cart";
 import { authRequest } from "../interfaces/authInterface";
 
 const addToCart = async (req: Request, res: Response, next: NextFunction) => {
-  const { productId, userId } = req.body;
+  const { productId, userId, quantity } = req.body;
 
   try {
     let user = await User.findById(userId).populate({
@@ -27,14 +27,15 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
       cart = await Cart.create({
         user: userId,
         product: productId,
-        quantity: 1,
+        quantity: quantity || 1,
       });
 
       cart = await Cart.findById(cart._id).populate("product");
       user.cart.push(cart._id);
       await user.save();
     } else {
-      cart.quantity++;
+      quantity ? (cart.quantity = quantity) : cart.quantity++;
+      // cart.quantity++ = quantity;
       await cart.save();
     }
 

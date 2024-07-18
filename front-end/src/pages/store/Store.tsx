@@ -19,12 +19,17 @@ const Store = () => {
       : setQuery({ ...query, category: "" });
   }, [location]);
   useEffect(() => {
+    console.log(location.href);
     getProducts();
-  }, [query]);
+    scrollTo(0, 0);
+  }, [location]);
 
   const getProducts = async () => {
     try {
       const { data } = await customAxios.get(
+        `/products?search=${query.search}&category=${query.category}`
+      );
+      console.log(
         `/products?search=${query.search}&category=${query.category}`
       );
       setProducts(data.data);
@@ -32,13 +37,11 @@ const Store = () => {
       console.log(error);
     }
   };
-  useEffect(() => {
-    scrollTo(0, 0);
-  }, []);
+
   return (
     <div className="container pt-6 mt-6">
       <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
-        Store
+        {query.category != "" ? query.category : "Store"}
       </p>
       <div className="flex gap-8 flex-wrap my-12 justify-center">
         {products.map((product) => (

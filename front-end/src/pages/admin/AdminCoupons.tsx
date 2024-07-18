@@ -1,18 +1,14 @@
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import { useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
-import AdminOrdersRight from "../../components/admin/adminOrders/AdminOrdersRight";
+import AdminCouponsRight from "../../components/admin/adminCoupons/AdminCouponsRight";
 
-export default function AdminOrders() {
+export default function AdminCoupons() {
   const { user } = useSelector((state: IRootState) => state.auth);
   return (
     <div className="flex min-h-screen">
       <AdminSideBar />
-      <AdminOrdersRight />
+      <AdminCouponsRight />
     </div>
   );
-}
-
-{
-  /* <a href="https://aadl3inscription2024.dz" target="_blank">here adl</a> */
 }

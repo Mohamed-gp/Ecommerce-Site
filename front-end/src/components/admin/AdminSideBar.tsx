@@ -6,6 +6,7 @@ import { HiArchiveBox } from "react-icons/hi2";
 import { FaLinesLeaning } from "react-icons/fa6";
 import { FaBasketShopping } from "react-icons/fa6";
 import { FaUsersGear } from "react-icons/fa6";
+import { RiCoupon3Fill } from "react-icons/ri";
 import { FaGear } from "react-icons/fa6";
 const AdminSideBar = () => {
   return (
@@ -19,6 +20,7 @@ const AdminSideBar = () => {
       <AdminSideBarLink link="dashboard" icon={<MdDashboard />} />
       <AdminSideBarLink link="products" icon={<HiArchiveBox />} />
       <AdminSideBarLink link="categories" icon={<FaLinesLeaning />} />
+      <AdminSideBarLink link="coupons" icon={<RiCoupon3Fill />} />
       <AdminSideBarLink link="orders" icon={<FaBasketShopping />} />
       <AdminSideBarLink link="admins" icon={<FaUsersGear />} />
       <AdminSideBarLink link="settings" icon={<FaGear />} />

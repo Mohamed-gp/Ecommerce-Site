@@ -13,13 +13,15 @@ const loginController = async (req: Request, res: Response) => {
   }
   const user = await User.findOne({
     email,
-  }).populate({
-    path: "cart",
-    populate: {
-      path: "product",
-      model: "Product",
-    },
-  });
+  })
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        model: "Product",
+      },
+    })
+    .populate("wishlist");
   if (!user) {
     return res.status(404).json({
       data: null,
@@ -64,13 +66,15 @@ const registerController = async (req: Request, res: Response) => {
   }
   let user = await User.findOne({
     email,
-  }).populate({
-    path: "cart",
-    populate: {
-      path: "product",
-      model: "Product",
-    },
-  });
+  })
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        model: "Product",
+      },
+    })
+    .populate("wishlist");
   if (user) {
     return res.status(400).json({ message: "email or password are incorrect" });
   }
@@ -99,15 +103,16 @@ const registerController = async (req: Request, res: Response) => {
 
 const googleSignIncontroller = async (req: Request, res: Response) => {
   const { username, email, photoUrl } = req.body;
-  let user = await User.findOne({
-    email,
-  }).populate({
-    path: "cart",
-    populate: {
-      path: "product",
-      model: "Product",
-    },
-  });
+  let user = await User.findOne({ email })
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        model: "Product",
+      },
+    })
+    .populate("wishlist");
+
   if (user) {
     const token = jwt.sign(
       { id: user._id, role: user.role },

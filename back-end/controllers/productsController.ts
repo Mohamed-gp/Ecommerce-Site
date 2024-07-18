@@ -18,6 +18,7 @@ import { authRequest } from "../interfaces/authInterface";
 const getAllProducts = async (req: Request, res: Response) => {
   let { search, category, newArrivals } = req.query;
   if (search && search != "") {
+    console.log(search);
     const products = await Product.find({
       name: { $regex: search, $options: "i" },
     });

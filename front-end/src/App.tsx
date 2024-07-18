@@ -23,6 +23,7 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import Store from "./pages/store/Store";
 import Wishlist from "./pages/wishlist/Wishlist";
 import OrderConfirmed from "./pages/order-confirmed/OrderConfirmed";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 
 function App() {
   const { user } = useSelector((state: IRootState) => state.auth);
@@ -87,11 +88,17 @@ function App() {
             }
           />
           <Route
+            path="coupons"
+            element={
+              user?.role == "admin" ? <AdminCoupons /> : <Navigate to={"/"} />
+            }
+          />
+          {/* <Route
             path="orders"
             element={
               user?.role == "admin" ? <AdminOrders /> : <Navigate to={"/"} />
             }
-          />
+          /> */}
           <Route
             path="admins"
             element={

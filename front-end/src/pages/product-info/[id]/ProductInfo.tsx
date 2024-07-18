@@ -6,6 +6,7 @@ import {
   FaRegHeart,
   FaShare,
   FaStar,
+  FaTrash,
 } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { MdInsertComment } from "react-icons/md";
@@ -31,13 +32,12 @@ export default function ProductInfo() {
       console.log(error);
       toast.error(error.response.data.message);
     }
+    // finally loading
   };
   useEffect(() => {
     getProductById();
     scrollTo(0, 0);
   }, []);
-
-  const [quantity, setquantity] = useState(1);
 
   const [activeProductImageIndex, setactiveProductImageIndex] = useState(0);
   const copy = () => {
@@ -50,12 +50,13 @@ export default function ProductInfo() {
     toast.success("copied successfuly, share it with your friends");
     return result;
   };
-
+  const [quantity, setQuantity] = useState(1);
   const addToCart = async () => {
     try {
       const { data } = await customAxios.post("/cart/add", {
         userId: user._id,
         productId: product._id,
+        quantity,
       });
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
@@ -68,10 +69,9 @@ export default function ProductInfo() {
   const [reviews, setreviews] = useState([]);
   const getReviews = async () => {
     try {
-      const { data } = await customAxios(`/homes/${id}/reviews `);
-      console.log("this is reviews");
-      console.log(data);
-      setreviews(data);
+      const { data } = await customAxios(`/comments/${id}`);
+      console.log("reviews", data);
+      setreviews(data.data);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data);
@@ -79,7 +79,7 @@ export default function ProductInfo() {
   };
   const [review, setreview] = useState({
     rating: 5,
-    comment: "",
+    content: "",
   });
   const [emptyArray, setemptyArray] = useState<any[]>([]);
   useEffect(() => {
@@ -87,21 +87,21 @@ export default function ProductInfo() {
     for (let index = 0; index < 5; index++) {
       setemptyArray((prev) => prev.concat(index));
     }
-    // getReviews();
+    getReviews();
   }, []);
   const addReviewHandler = async () => {
     try {
-      // const { data } = await customAxios.post(`/homes/${house?.id}/review`, {
-      //   rating: 6 - review.rating,
-      //   comment: review.comment,
-      // });
-      // getHouseReviews();
-      // console.log(data);
-
-      toast.success("Review Add Succefuly");
+      const { data } = await customAxios.post(`/comments/${id}`, {
+        rating: 6 - review?.rating,
+        content: review?.content,
+        userId: user?._id,
+      });
+      getReviews();
+      console.log(data);
+      toast.success(data.message);
     } catch (error: any) {
       console.log(error);
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
     }
   };
   const deleteReviewHandler = (id: string) => {
@@ -116,9 +116,11 @@ export default function ProductInfo() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const { data } = await customAxios.delete(`/homes/${id}/review`);
+          const { data } = await customAxios.delete(
+            `/comments/${user?._id}/${id}`
+          );
+          toast.success(data.message);
           getReviews();
-          toast.success(data);
           Swal.fire({
             title: "Deleted!",
             text: "Review Deleted Successfuly",
@@ -126,7 +128,7 @@ export default function ProductInfo() {
           });
         } catch (error: any) {
           console.log(error);
-          toast.error(error?.response?.data);
+          toast.error(error?.response?.data.message);
         }
       } else {
         Swal.fire({
@@ -178,10 +180,21 @@ export default function ProductInfo() {
             <p className="opacity-50"> {product?.category?.name}</p>
           </div>
           <div className="flex items-center gap-1">
-            <RatingStars starsNumber={3.2} />
-            <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span>
-            <MdInsertComment />
-            <p>{reviews?.length} Reviews</p>
+            {reviews?.length != 0 && (
+              <>
+                <RatingStars
+                  starsNumber={
+                    reviews?.reduce((acc, curr, ind, arr) => {
+                      return curr.rate + acc;
+                    }, 0) / reviews.length
+                  }
+                />
+                <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span>
+                <MdInsertComment />
+                <p>{reviews?.length} Reviews</p>
+              </>
+            )}
+
             {/* <span className="mx-3 h-2 w-2 rounded-full bg-black opacity-25"></span> */}
             {/* <FaBasketShopping />
         <p>154 Sold</p> */}
@@ -204,7 +217,7 @@ export default function ProductInfo() {
           <div className="flex gap-5 items-center border-y-2 py-4 border-mainColor/20">
             <div className="flex  bg-white border-2 border-solid p-2 rounded-3xl items-center gap-2">
               <button
-                onClick={() => setquantity((prev) => prev - 1)}
+                onClick={() => setQuantity((prev) => prev - 1)}
                 disabled={quantity == 1}
                 className="bg-[#dadada] w-7 h-7 rounded-full flex justify-center items-center disabled:opacity-20"
               >
@@ -213,7 +226,7 @@ export default function ProductInfo() {
               <span>{quantity}</span>
               <button
                 onClick={() => {
-                  setquantity((prev) => prev + 1);
+                  setQuantity((prev) => prev + 1);
                 }}
                 className="bg-[#dadada] w-7 h-7  rounded-full flex justify-center items-center"
               >
@@ -270,9 +283,9 @@ export default function ProductInfo() {
             <div className="py-2 mt-8 px-4 mb-4 bg-white rounded-lg rounded-t-lg border ">
               <textarea
                 id="comment"
-                value={review?.comment}
+                value={review?.content}
                 onChange={(e) =>
-                  setreview({ ...review, comment: e.target.value })
+                  setreview({ ...review, content: e.target.value })
                 }
                 className="px-0 w-full text-sm   border-0 focus:ring-0 focus:outline-none "
                 placeholder="Write a review..."
@@ -294,40 +307,40 @@ export default function ProductInfo() {
             </div>
             <button
               type="submit"
-              disabled={review.comment.trim() == ""}
+              disabled={review.content.trim() == ""}
               onClick={() => addReviewHandler()}
-              className="flex disabled:opacity-50 disabled:cursor-not-allowed justify-center items-center text-xs font-medium   bg-buttonColor text-center mt-6 rounded-xl bg-mainColor px-6 py-3  text-white"
+              className="flex disabled:opacity-50 disabled:cursor-not-allowed justify-center items-center text-xs font-medium  mb-12 bg-buttonColor text-center mt-6 rounded-xl bg-mainColor px-6 py-3  text-white"
             >
               Post comment
             </button>
           </>
         )}
         <>
-          {/* {reviews?.map((review) => (
-                  <div className="flex flex-col  border-y border-y-[#4561ec26] py-4  my-4    ">
-                    <div className="flex items-center gap-2 my-3">
-                      <div className="size-10 rounded-full overflow-hidden">
-                        <img src={review?.User?.profileImage} alt="" />
-                      </div>
-                      <div className="flex flex-1 flex-col gap2 opacity-90">
-                        <Rating rating={review?.rating} />
-                        <p>{review?.User?.firstName}</p>
-                      </div>
-                      {review?.User?.id == user?.id && (
-                        <FaTrash
-                          onClick={() => deleteReviewHandler(review?.id)}
-                          className="cursor-pointer text-red-400"
-                        />
-                      )}
-                    </div>
-                    <p className="bg-white p-2 rounded-xl break-words ">
-                      {review?.comment}
-                    </p>
-                  </div>
-                ))} */}
+          {reviews?.map((review: any) => (
+            <div className="flex flex-col  border-y border-y-mainColor py-4  my-12    ">
+              <div className="flex items-center gap-2 my-3">
+                <div className="size-10 rounded-full overflow-hidden">
+                  <img src={review?.user?.photoUrl} alt="" />
+                </div>
+                <div className="flex flex-1 flex-col gap2 opacity-90">
+                  <RatingStars starsNumber={review?.rate} />
+                  <p>{review?.user?.username}</p>
+                </div>
+                {review?.user?._id == user?._id && (
+                  <FaTrash
+                    onClick={() => deleteReviewHandler(review?._id)}
+                    className="cursor-pointer text-red-400"
+                  />
+                )}
+              </div>
+              <p className="bg-white p-2 rounded-xl break-words ">
+                {review?.content}
+              </p>
+            </div>
+          ))}
         </>
       </div>
-      {product?.comments?.length == 0 ? (
+      {reviews?.length == 0 ? (
         <p className="text-center my-12 text-xl">There is no reviews</p>
       ) : null}
     </div>

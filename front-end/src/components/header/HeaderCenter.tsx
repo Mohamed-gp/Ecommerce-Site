@@ -7,10 +7,9 @@ import { Product } from "../../interfaces/dbInterfaces";
 export default function HeaderCenter() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const searchHandler = async () => {
+  const searchHandler = () => {
     try {
-      const { data } = await customAxios.get(`/products?search=${search}`);
-      navigate(`/store?search=${search}`);
+      navigate(`/store?search=${search.split(" ").join("+")}`);
       setSearch("");
     } catch (error) {
       console.log(error);
@@ -22,7 +21,7 @@ export default function HeaderCenter() {
   const onChangeHandler = async () => {
     try {
       const { data } = await customAxios.get(`/products?search=${search}`);
-      setChangeHandlerProduct(data.data.slice(0,4));
+      setChangeHandlerProduct(data.data.slice(0, 4));
     } catch (error) {
       console.log(error);
     }
@@ -30,8 +29,6 @@ export default function HeaderCenter() {
   useEffect(() => {
     if (search != "") {
       onChangeHandler();
-    } else {
-      setChangeHandlerProduct([]);
     }
   }, [search]);
 
@@ -52,17 +49,31 @@ export default function HeaderCenter() {
           className="absolute left-0 top-12 flex-col w-full"
           onClick={() => setSearch("")}
         >
-          {changeHandlerProducts.map((product) => (
-            <Link
-              to={`/product/${product?._id}`}
-              className="py-2 flex items-center overflow-hidden bg-white gap-2 px-4 cursor-pointer hover:bg-mainColor/90 duration-500 "
-            >
-              <div className="img w-12 h-12 flex">
-                <img src={product?.images[0]} alt={product?._id} className=""/>
-              </div>
-              <p className="">{product?.name}</p>
-            </Link>
-          ))}
+          {search != "" && (
+            <>
+              {changeHandlerProducts.map((product) => (
+                <div className="relative">
+                  <Link
+                    to={`/product/${product?._id}`}
+                    className="py-2 flex items-center overflow-hidden z-10 bg-white gap-2 px-4 cursor-pointer hover:bg-mainColor/90 duration-500 "
+                  >
+                    <div className="img w-12 h-12 flex">
+                      <img
+                        src={product?.images[0]}
+                        alt={product?._id}
+                        className=""
+                      />
+                    </div>
+                    <p className="">{product?.name}</p>
+                  </Link>
+                  <div
+                    className="absolute w-screen h-screen left-0 top-0 -z-[1]"
+                    onClick={() => setSearch("")}
+                  ></div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
       <button

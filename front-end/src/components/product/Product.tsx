@@ -82,15 +82,28 @@ export default function Product({ product }: productProps) {
       toast.error(error.response.data.message);
     }
   };
+  const [reviews, setreviews] = useState([]);
+  const getReviews = async () => {
+    try {
+      const { data } = await customAxios(`/comments/${product._id}`);
+      setreviews(data.data);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data);
+    }
+  };
+  useEffect(() => {
+    getReviews();
+  }, []);
   return (
     <>
       {/* data-aos="fade-down" problem with adding to cart */}
       <div
         style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
-        className="flex rounded-b-xl rounded-t-xl flex-col w-[270px] overflow-hidden"
+        className="flex w-[292px] rounded-b-xl rounded-t-xl flex-col  overflow-hidden"
       >
-        <div className="relative overflow-hidden flex-1 flex w-[280px] h-[150px] items-center justify-center   rounded-t-xl bg-white">
-          <div className="w-[140px] h-[143px] relative  hover:scale-110 duration-300 z-[8] flex justify-center items-center">
+        <div className="relative  overflow-hidden flex-1 flex  items-center justify-center   rounded-t-xl bg-white">
+          <div className="w-[100px] h-[140px] relative  hover:scale-110 duration-300 z-[8] flex justify-center items-center">
             <img
               src={product?.images[0]}
               alt={product?._id}
@@ -115,16 +128,32 @@ export default function Product({ product }: productProps) {
             )}
           </div>
           <div className=" absolute h-[280px] w-[280px] ">
-            <div className="absolute -left-[43px] top-[70px]  flex h-10   w-[120px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
+            <div className="absolute -left-[50px] top-[70px]  flex h-10   w-[120px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
               {product?.promoPercentage}%
             </div>
           </div>
         </div>
         <div className="flex items-center justify-between rounded-b-xl bg-bgColorBlack px-2  leading-loose text-white">
           <div className="left px-2 py-3">
-            <p className="text-sm font-bold line-clamp-1">{product?.name}</p>
+            <p className="text-sm font-bold line-clamp-1">
+              {product?.name?.slice(0, 16)}
+            </p>
             <div className="rating-container my-1">
-              <RatingStars starsNumber={product?.rating} />
+              {reviews?.length != 0 ? (
+                <RatingStars
+                  starsNumber={
+                    +(
+                      reviews?.reduce((acc, curr, ind, arr) => {
+                        return curr.rate + acc;
+                      }, 0) / reviews.length
+                    ).toFixed(2)
+                  }
+                />
+              ) : (
+                <div className="product-rating">
+                  <span className="no-ratings">(No ratings yet)</span>
+                </div>
+              )}
             </div>
             <div className="relative   w-fit text-base font-bold text-red-600">
               $
@@ -136,7 +165,7 @@ export default function Product({ product }: productProps) {
               </del>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal w-[180px]">
+          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal flex-1">
             <button
               onClick={() => addToCart()}
               className="flex  w-full !p-1  items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"
