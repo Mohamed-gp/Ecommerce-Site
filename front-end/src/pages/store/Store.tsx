@@ -47,10 +47,11 @@ const Store = () => {
           b.price * (1 - b.promoPercentage / 100)
       );
     }
-
-    sortedProducts = sortedProducts.filter(
-      (product: Product) => product.category.name == filter.category
-    );
+    if (filter.category != "") {
+      sortedProducts = sortedProducts.filter(
+        (product: Product) => product.category.name == filter.category
+      );
+    }
 
     setProducts(sortedProducts);
   }, [filter]);
@@ -79,7 +80,7 @@ const Store = () => {
             name=""
             id=""
             value={filter.category}
-            className=" px-4 py-2 rounded-xl bg-mainColor text-white"
+            className=" px-4 py-2 rounded-xl bg-mainColor text-white focus:outline-none" 
           >
             <option value="" disabled className="flex ">
               <span>Category</span>
@@ -95,7 +96,7 @@ const Store = () => {
             name=""
             id=""
             value={filter.order}
-            className=" px-4   py-2 rounded-xl bg-mainColor text-white"
+            className=" px-4 focus:outline-none  py-2 rounded-xl bg-mainColor text-white"
           >
             <option value="" disabled className="flex ">
               <span>💵</span>
