@@ -27,7 +27,7 @@ app.use(
     origin:
       process.env.NODE_ENV == "developement"
         ? "http://localhost:5173"
-        : "https://swifybuy.netlify.app",
+        : "https://swiftbuy1.netlify.app",
     // origin: "http://localhost:5173",
     credentials: true,
   })
