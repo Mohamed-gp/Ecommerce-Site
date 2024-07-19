@@ -29,7 +29,7 @@ const Store = () => {
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [location]);
 
   const [filter, setFilter] = useState({ order: "", category: "" });
   useEffect(() => {
