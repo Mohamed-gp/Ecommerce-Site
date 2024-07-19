@@ -80,7 +80,7 @@ const Store = () => {
             name=""
             id=""
             value={filter.category}
-            className=" px-4 py-2 rounded-xl bg-mainColor text-white focus:outline-none" 
+            className=" px-4 py-2 rounded-xl bg-mainColor text-white focus:outline-none"
           >
             <option value="" disabled className="flex ">
               <span>Category</span>
@@ -113,10 +113,24 @@ const Store = () => {
           </select>
         </div>
       </div>
-      <div className="flex gap-8 flex-wrap my-12 justify-center">
-        {products.map((product: Product) => (
-          <ProductComp key={product?._id} product={product} />
-        ))}
+      <div className="flex gap-8 flex-wrap justify-center">
+        {products.length == 0 ? (
+          <div
+            className="container flex flex-col  items-center justify-center py-14"
+            style={{ minHeight: `calc(100vh - 70.94px)` }}
+          >
+            <p className="mb-2 text-3xl font-bold">
+              There Is No Product Match Your Search :(
+            </p>
+            <p className="opacity-60">Try Searching For Another Product!</p>
+          </div>
+        ) : (
+          <>
+            {products.map((product: Product) => (
+              <ProductComp key={product?._id} product={product} />
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
