@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow-x: hidden;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -24,7 +28,6 @@
   scroll-behavior: smooth;
   scrollbar-width: thin;
 } */
-
 
 /* styles/globals.css */
 .flying-img {
