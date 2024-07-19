@@ -95,7 +95,7 @@ const registerController = async (req: Request, res: Response) => {
       maxAge: 1000 * 60 * 60 * 24 * 365,
       httpOnly: true,
       secure: process.env.NODE_ENV == "developement" ? false : true,
-      sameSite: "none",
+      sameSite: "strict",
     })
     .status(201)
     .json({ data: user, message: "created succefully" });
@@ -127,7 +127,7 @@ const googleSignIncontroller = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV == "developement" ? false : true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        sameSite: "none",
+        sameSite: "strict",
       })
       .status(200)
       .json({ data: user, message: "login succefully" });
@@ -156,7 +156,7 @@ const googleSignIncontroller = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV == "developement" ? false : true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        sameSite: "none",
+        sameSite: "strict",
       })
       .status(200)
       .json({ data: user, message: "login succefully" });
