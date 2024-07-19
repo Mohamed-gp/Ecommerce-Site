@@ -24,7 +24,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV == "developement"
+        ? "http://localhost:5173"
+        : "https://swifybuy.netlify.app",
+    // origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -32,7 +36,6 @@ app.use(
 app.listen(PORT, () => {
   console.log("server listening on port ", PORT);
 });
-
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
