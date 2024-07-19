@@ -65,7 +65,7 @@ export default function Cart() {
             <p className="my-6 mt-12 text-center text-xl font-bold">
               My Shopping Cart
             </p>
-            <div className="w-[400px] sm:w-full mx-auto overflow-scroll">
+            <div className="w-[400px] sm:w-screen mx-auto overflow-auto">
               <table className=" mb-24 mt-12 w-screen ">
                 <thead className="bg-mainColor py-2 text-white">
                   <tr className="">
