@@ -86,27 +86,47 @@ import nodemailer from "nodemailer";
 const subscribe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "you must login with this email first with our app",
+        data: null,
+      });
+    }
+
+    if (user.isSubscribe) {
+      return res
+        .status(404)
+        .json({ message: "you already subscribed", data: null });
+    }
+    user.isSubscribe = true;
+    await user.save();
+
     const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
+      // host: "smtp.ethereal.email",
+      host: "smtp.gmail.com",
       port: 587,
       secure: false, // Use `true` for port 465, `false` for all other ports
       auth: {
-        user: "mohamedterba6@gmail.com",
-        pass: "kuxg yvue pwyt tbdc",  
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS_KEY,
       },
     });
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
-      from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-      to: "m_outerbah@estin.dz", // list of receivers
-      subject: "Hello ✔", // Subject line
-      text: "Hello world?", // plain text body
-      html: "<b>Hello world?</b>", // html body
+      from: process.env.EMAIL, // sender address
+      to: email, // list of receivers
+      subject: "SwiftBuy Subscription ✔", // Subject line
+      text: "you successfully subscribed we gonna email with the latest news of our app", // plain text body
+      html: "<b>thanks for joining us</b>", // html body
     });
 
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+    return res
+      .status(200)
+      .json({ data: null, message: "successfully subscribed" });
   } catch (error) {
     next(error);
   }

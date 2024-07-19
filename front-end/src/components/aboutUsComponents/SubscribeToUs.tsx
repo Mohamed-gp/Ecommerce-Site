@@ -9,10 +9,9 @@ const SubscribeToUs = () => {
   const subscribeToUsHandler = async () => {
     try {
       const { data } = await customAxios.post("/users/subscribe", {
-        email: user?.email,
+        email,
       });
-      console.log(data);
-      toast.success(data);
+      toast.success(data.message);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
