@@ -22,6 +22,7 @@ export default function Hero() {
   }, []);
   return (
     <div
+      id="hero"
       className="Hero relative bg-bgColorBlack"
       style={{ minHeight: "calc(100vh - 70.94px)" }}
     >

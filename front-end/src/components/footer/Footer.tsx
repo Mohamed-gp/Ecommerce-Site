@@ -29,24 +29,26 @@ export default function Footer() {
           <p>Quick Links</p>
           <HashLink
             smooth
+            to="/#hero"
+            className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
+          >
+            Hero
+          </HashLink>
+          <HashLink
+            smooth
             to="/#newArrivals"
             className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
           >
             New Arrivals
           </HashLink>
           {}
-          <Link
-            to=""
+          <HashLink
+            smooth
+            to="/#store"
             className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
           >
-            Phones
-          </Link>
-          <Link
-            to=""
-            className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
-          >
-            Daily
-          </Link>
+            Store
+          </HashLink>
         </div>
         <div className="flex w-[30%] flex-col gap-2 text-white">
           <p>Pages</p>

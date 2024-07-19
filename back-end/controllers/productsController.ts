@@ -18,7 +18,6 @@ import { authRequest } from "../interfaces/authInterface";
 const getAllProducts = async (req: Request, res: Response) => {
   let { search, category, newArrivals } = req.query;
   if (search && search != "") {
-    console.log(search);
     const products = await Product.find({
       name: { $regex: search, $options: "i" },
     });
@@ -173,7 +172,7 @@ const toggleWishlist = async (
     } else {
       user.wishlist.push(productId);
     }
-    user.save();
+    await user.save();
     user = await User.findById(userId).populate("wishlist");
     return res
       .status(200)

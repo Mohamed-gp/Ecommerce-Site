@@ -11,10 +11,7 @@ export default function HeaderRight() {
   return (
     <div className="flex items-center justify-between gap-3 text-sm md:text-lg ">
       {user?.role != "admin" ? (
-        <Link
-          to={user?._id ? `/profile/${user?._id}` : `/register`}
-          className=" md:text-xl "
-        >
+        <Link to={user ? `/profile` : `/register`} className=" md:text-xl ">
           <FaUser />
         </Link>
       ) : (

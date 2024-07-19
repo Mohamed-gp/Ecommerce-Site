@@ -4,6 +4,8 @@ import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import GoogleSignIn from "../../components/oauth/GoogleSignInButton";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../redux/slices/authSlice";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -11,6 +13,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const dispatch = useDispatch()
 
   const [isHiddenPassword, setisHiddenPassword] = useState(true);
   const loginHandler = async (e: React.FormEvent) => {
@@ -27,7 +30,9 @@ const Login = () => {
     }
     try {
       const { data } = await customAxios.post("/auth/login", formData);
+      dispatch(authActions.login(data.data))
       toast.success(data.message);
+    
     } catch (error: any) {
       toast.error(error.response.data.message);
       console.log(error.response.data.message);

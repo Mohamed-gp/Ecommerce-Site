@@ -37,6 +37,26 @@ export default function Cart() {
       toast.error(error.response.data.message);
     }
   };
+
+  const addToCart = async (quantity: number, productId: string) => {
+    try {
+      const { data } = await customAxios.post("/cart/add", {
+        userId: user._id,
+        productId: productId,
+        quantity,
+      });
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+  const couponHandler = () => {
+    toast.error("invalid copoun");
+    setCoupon("");
+  };
+
   return (
     <>
       {cart?.length != 0 ? (
@@ -45,50 +65,90 @@ export default function Cart() {
             <p className="my-6 mt-12 text-center text-xl font-bold">
               My Shopping Cart
             </p>
-            <table className="mb-24 mt-12 w-screen ">
-              <thead className="bg-mainColor py-2 text-white">
-                <tr className="">
-                  <th>Product Image</th>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Quanity</th>
-                  <th>Subtotal</th>
-                  <th className="">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cart?.map((ele) => (
-                  <tr className="relative">
-                    <td>
-                      <div className="mx-auto w-fit">
-                        {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
-                        <img
-                          src={ele?.product?.images[0]}
-                          alt="mac"
-                          width={100}
-                          height={100}
-                          />
-                      </div>
-                    </td>
-                    <td>
-                      <p>{ele?.product?.name}</p>
-                    </td>
-                    <td>${(ele?.product?.price).toFixed(2)}</td>
-                    <td>{ele?.quantity}</td>
-                    <td>${(ele?.product?.price * ele?.quantity).toFixed(2)}</td>
-                    <td>
-                      <div className="mx-auto w-fit cursor-pointer  text-bgColorDanger">
-                        <FaTrash
-                          onClick={() =>
-                            removeFromCartHandler(user?._id, ele?.product?._id)
-                          }
-                        />
-                      </div>
-                    </td>
+            <div className="w-[400px] sm:w-full mx-auto overflow-scroll">
+              <table className=" mb-24 mt-12 w-screen ">
+                <thead className="bg-mainColor py-2 text-white">
+                  <tr className="">
+                    <th>Product Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quanity</th>
+                    <th>Subtotal</th>
+                    <th className="">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cart?.map((ele) => (
+                    <tr className="relative">
+                      <td>
+                        <div className="mx-auto w-fit">
+                          {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
+                          <img
+                            src={ele?.product?.images[0]}
+                            alt="mac"
+                            width={100}
+                            height={100}
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <p>{ele?.product?.name}</p>
+                      </td>
+                      <td>
+                        $
+                        {(
+                          ele?.product?.price *
+                          (1 - ele?.product?.promoPercentage / 100)
+                        ).toFixed(2)}
+                      </td>
+
+                      <td className="">
+                        <div className="flex w-fit mx-auto  bg-white border-2 border-solid p-2 rounded-3xl items-center gap-2">
+                          <button
+                            onClick={() =>
+                              addToCart(ele.quantity - 1, ele?.product?._id)
+                            }
+                            disabled={ele?.quantity == 1}
+                            className="bg-[#dadada] w-7 h-7 disabled:cursor-not-allowed  rounded-full flex justify-center items-center disabled:opacity-20"
+                          >
+                            -
+                          </button>
+                          <span>{ele?.quantity}</span>
+                          <button
+                            onClick={() =>
+                              addToCart(ele.quantity + 1, ele?.product?._id)
+                            }
+                            className="bg-[#dadada] w-7 h-7  rounded-full flex justify-center items-center"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        $
+                        {(
+                          ele?.product?.price *
+                          (1 - ele?.product?.promoPercentage / 100) *
+                          ele?.quantity
+                        ).toFixed(2)}
+                      </td>
+                      <td>
+                        <div className="mx-auto w-fit cursor-pointer  text-bgColorDanger">
+                          <FaTrash
+                            onClick={() =>
+                              removeFromCartHandler(
+                                user?._id,
+                                ele?.product?._id
+                              )
+                            }
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="bg-bgColorCartFooter py-6">
             <div className="container my-6 flex lg:flex-row flex-col items-center gap-y-8 justify-between ">
@@ -107,7 +167,8 @@ export default function Cart() {
                   />
                   <button
                     disabled={coupon == ""}
-                    className="rounded-r-xl disabled:opacity-50 disabled:cursor-not-allowed bg-mainColor px-4 text-white"
+                    onClick={() => couponHandler()}
+                    className="rounded-r-xl disabled:opacity-50 disabled:cursor-not-allowed bg-mainColor px-4 text-sm sm:text-base text-white"
                   >
                     Apply Coupon
                   </button>
@@ -127,7 +188,10 @@ export default function Cart() {
                       {cart
                         ?.reduce(
                           (acc, curr) =>
-                            curr?.product?.price * curr?.quantity + acc,
+                            curr?.product?.price *
+                              (1 - curr?.product?.promoPercentage / 100) *
+                              curr?.quantity +
+                            acc,
                           0
                         )
                         .toFixed(2)}{" "}
@@ -138,7 +202,10 @@ export default function Cart() {
                       {cart
                         ?.reduce(
                           (acc, curr) =>
-                            curr?.product?.price * curr?.quantity + acc,
+                            curr?.product?.price *
+                              (1 - curr?.product?.promoPercentage / 100) *
+                              curr?.quantity +
+                            acc,
                           0
                         )
                         .toFixed(2) - 0}{" "}

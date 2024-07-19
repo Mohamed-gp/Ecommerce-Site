@@ -4,8 +4,11 @@ import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import customAxios from "../../utils/axios/customAxios";
 import GoogleSignInButton from "../../components/oauth/GoogleSignInButton";
+import { authActions } from "../../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 export default function Register() {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [formData, setformData] = useState({
     username: "",
@@ -34,8 +37,8 @@ export default function Register() {
       const { data } = await customAxios.post("/auth/register", formData, {
         withCredentials: true,
       });
-      toast.success(data.message)
-      
+      dispatch(authActions.login(data.data));
+      toast.success(data.message);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -43,6 +46,9 @@ export default function Register() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
   return (
     <>
       <div className="flex items-center justify-center">

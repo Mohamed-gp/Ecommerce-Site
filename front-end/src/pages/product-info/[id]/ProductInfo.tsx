@@ -11,7 +11,7 @@ import {
 import { toast } from "react-hot-toast";
 import { MdInsertComment } from "react-icons/md";
 import ZoomedImage from "../../../components/zooomedImage/ZoomedImage";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import customAxios from "../../../utils/axios/customAxios";
 import { Product } from "../../../interfaces/dbInterfaces";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +21,7 @@ import Swal from "sweetalert2";
 
 export default function ProductInfo() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state: IRootState) => state.auth.user);
   const [product, setProduct] = useState<Product>({} as Product);
@@ -52,6 +53,9 @@ export default function ProductInfo() {
   };
   const [quantity, setQuantity] = useState(1);
   const addToCart = async () => {
+    if (!user) {
+      navigate("/register");
+    }
     try {
       const { data } = await customAxios.post("/cart/add", {
         userId: user._id,
@@ -70,7 +74,6 @@ export default function ProductInfo() {
   const getReviews = async () => {
     try {
       const { data } = await customAxios(`/comments/${id}`);
-      console.log("reviews", data);
       setreviews(data.data);
     } catch (error: any) {
       console.log(error);
@@ -139,6 +142,24 @@ export default function ProductInfo() {
       }
     });
   };
+  const toggleWishListHandler = async (userId: string, productId: string) => {
+    if (!user) {
+      navigate("/register");
+      return
+    }
+    try {
+      const { data } = await customAxios.post("/products/wishlist", {
+        userId,
+        productId,
+      });
+      dispatch(authActions.setWishlist(data.data));
+      console.log(data.data);
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <div className="container">
       <div
@@ -185,7 +206,7 @@ export default function ProductInfo() {
                 <RatingStars
                   starsNumber={
                     reviews?.reduce((acc, curr, ind, arr) => {
-                      return curr.rate + acc;
+                      return curr?.rate + acc;
                     }, 0) / reviews.length
                   }
                 />
@@ -219,7 +240,7 @@ export default function ProductInfo() {
               <button
                 onClick={() => setQuantity((prev) => prev - 1)}
                 disabled={quantity == 1}
-                className="bg-[#dadada] w-7 h-7 rounded-full flex justify-center items-center disabled:opacity-20"
+                className="bg-[#dadada] disabled:cursor-not-allowed w-7 h-7 rounded-full flex justify-center items-center disabled:opacity-20"
               >
                 -
               </button>
@@ -242,8 +263,15 @@ export default function ProductInfo() {
               <p>Add To Cart</p>
               <FaCartShopping />
             </button>
-            <button className="bg-mainColor/30 w-8 h-8 flex justify-center items-center rounded-full  ">
-              <FaRegHeart className="text-mainColor" />
+            <button
+              onClick={() => toggleWishListHandler(user?._id, product?._id)}
+              className={`${
+                user?.wishlist.find((ele) => ele?._id == product?._id)
+                  ? "bg-mainColor text-white"
+                  : "bg-white text-mainColor"
+              } w-8 h-8 flex justify-center items-center rounded-full  `}
+            >
+              <FaRegHeart className=" opacity" />
             </button>
             {/* <button
           className="flex w-1/2 items-center justify-center gap-1 rounded-lg bg-white border-1 px-1 py-2 text-mainColor "

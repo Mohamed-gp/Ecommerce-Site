@@ -45,14 +45,14 @@ const AdminProductsRight = () => {
               <p className="pl-4">{product?.name}</p>
             </div>
             <div className="flex items-center gap-4 pr-4 ">
-              <Link
+              {/* <Link
                 to={`/admin/products/edit/${product?._id}`}
                 className="flex items-center gap-2  py-2 px-4  "
                 style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
               >
                 <FaEdit />
                 <span>Edit</span>
-              </Link>
+              </Link> */}
               <button
                 onClick={() => deleteHandler(product._id)}
                 className="flex items-center gap-2 bg-red-500 py-2 px-4 text-white"

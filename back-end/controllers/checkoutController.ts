@@ -15,13 +15,15 @@ const createPayment = async (
     const lineItems = await Promise.all(
       cart.map(async (ele: any) => {
         const product = await Product.findById(ele.product._id);
+        let amount = product?.price * 100 * (1 - product?.promoPercentage / 100);
+        amount = Math.ceil(amount);
         return {
           price_data: {
             currency: "usd",
             product_data: {
               name: product.name,
             },
-            unit_amount: product.price * 100, // Stripe expects the amount in cents
+            unit_amount: amount, // Stripe expects the amount in cents
           },
           quantity: ele.quantity,
         };
@@ -35,7 +37,7 @@ const createPayment = async (
       line_items: lineItems,
     });
 
-    console.log(session)
+    console.log(session);
     res.status(200).json({
       message: "checkout session created successfull",
       data: session.url,

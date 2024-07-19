@@ -17,7 +17,7 @@ const StoreProducts = () => {
     getProducts();
   }, []);
   return (
-    <div className="container pt-6">
+    <div id="store" className="container pt-6">
       <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
         Store
       </p>

@@ -1,5 +1,5 @@
 import { FaCartShopping } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import customAxios from "../../utils/axios/customAxios";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
@@ -13,7 +13,11 @@ interface HeroProductProps {
 export default function HeroProduct({ product }: HeroProductProps) {
   const { user } = useSelector((state: IRootState) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const addToCart = async () => {
+    if (!user) {
+      navigate("/register");
+    }
     try {
       const { data } = await customAxios.post("/cart/add", {
         userId: user._id,

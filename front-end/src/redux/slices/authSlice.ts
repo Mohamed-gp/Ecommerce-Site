@@ -25,7 +25,10 @@ const authSlice = createSlice({
     },
     setWishlist(state, action) {
       state.user.wishlist = action.payload;
-      localStorage.setItem("user", JSON.stringify(state.user));
+      let userParsed = JSON.parse(localStorage.getItem("user") as string);
+      userParsed.wishlist = action.payload;
+      state.user = userParsed;
+      localStorage.setItem("user", JSON.stringify(userParsed));
     },
   },
 });

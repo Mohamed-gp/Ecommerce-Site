@@ -42,7 +42,10 @@ function App() {
           element={user ? <Navigate to="/" /> : <Register />}
         />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-        <Route path="/profile/:id" element={<Profile />} />
+        <Route
+          path="/profile"
+          element={!user ? <Navigate to="/" /> : <Profile />}
+        />
         <Route path="/product/:id" element={<ProductInfo />} />
         <Route path="/admin">
           <Route
@@ -87,12 +90,12 @@ function App() {
               )
             }
           />
-          <Route
+          {/* <Route
             path="coupons"
             element={
               user?.role == "admin" ? <AdminCoupons /> : <Navigate to={"/"} />
             }
-          />
+          /> */}
           {/* <Route
             path="orders"
             element={

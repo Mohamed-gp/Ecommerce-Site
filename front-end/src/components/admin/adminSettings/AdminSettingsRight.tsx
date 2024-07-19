@@ -61,7 +61,7 @@ const AdminSettingsRight = () => {
                   placeholder={user?.username}
                 />
               </div>
-              {user?.provider == "credentials" && (
+              {/* {user?.provider == "credentials" && (
                 <div className="flex flex-col gap-1">
                   <label htmlFor="email">Email:</label>
                   <input
@@ -71,7 +71,7 @@ const AdminSettingsRight = () => {
                     placeholder={user?.email}
                   />
                 </div>
-              )}
+              )} */}
 
               <div className="flex flex-col gap-1">
                 <label htmlFor="email">Role:</label>
@@ -123,7 +123,7 @@ const AdminSettingsRight = () => {
             Save Changes
           </button>
         </div>
-        {user?.provider == "credentials" && (
+        {/* {user?.provider == "credentials" && (
           <div className="my-10 rounded-xl border-2 border-mainColor p-3">
             <p className="border-b-2  pb-1 font-bold">Change Password</p>
             <div className="flex flex-col-reverse items-center justify-between gap-x-32 px-4 py-6 sm:flex-row">
@@ -164,7 +164,7 @@ const AdminSettingsRight = () => {
               Change Password
             </button>
           </div>
-        )}
+        )} */}
         <div className="flex items-center justify-end">
           {user && (
             <button

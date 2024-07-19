@@ -20,8 +20,8 @@ const AdminSideBar = () => {
       <AdminSideBarLink link="dashboard" icon={<MdDashboard />} />
       <AdminSideBarLink link="products" icon={<HiArchiveBox />} />
       <AdminSideBarLink link="categories" icon={<FaLinesLeaning />} />
-      <AdminSideBarLink link="coupons" icon={<RiCoupon3Fill />} />
-      <AdminSideBarLink link="orders" icon={<FaBasketShopping />} />
+      {/* <AdminSideBarLink link="coupons" icon={<RiCoupon3Fill />} /> */}
+      {/* <AdminSideBarLink link="orders" icon={<FaBasketShopping />} /> */}
       <AdminSideBarLink link="admins" icon={<FaUsersGear />} />
       <AdminSideBarLink link="settings" icon={<FaGear />} />
       <AdminLogoutButton />

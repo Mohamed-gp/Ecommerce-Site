@@ -2,7 +2,7 @@ import { FaCartShopping, FaHeart, FaRegHeart } from "react-icons/fa6";
 import RatingStars from "../ratingstars/RatingStars";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
@@ -15,6 +15,7 @@ interface productProps {
 export default function Product({ product }: productProps) {
   const dispatch = useDispatch();
   const user = useSelector((state: IRootState) => state.auth.user);
+  const navigate = useNavigate();
   // const [animate, setanimate] = useState<string>("");
   const toggleWishListHandler = async (userId: string, productId: string) => {
     try {
@@ -23,6 +24,7 @@ export default function Product({ product }: productProps) {
         productId,
       });
       dispatch(authActions.setWishlist(data.data));
+      console.log(data.data);
       toast.success(data.message);
     } catch (error: any) {
       console.log(error);
@@ -70,6 +72,9 @@ export default function Product({ product }: productProps) {
   // };
 
   const addToCart = async () => {
+    if (!user) {
+      navigate("/register");
+    }
     try {
       const { data } = await customAxios.post("/cart/add", {
         userId: user._id,
@@ -110,23 +115,25 @@ export default function Product({ product }: productProps) {
               className="  object-cover "
             />
           </div>
-          <div className="absolute right-4 top-4 ">
-            {user?.wishlist?.find((ele: any) => ele._id == product._id) ? (
-              <div
-                className="relative z-[1] cursor-pointer text-mainColor "
-                onClick={() => toggleWishListHandler(user._id, product._id)}
-              >
-                <FaHeart />
-              </div>
-            ) : (
-              <div
-                className="relative z-[1] cursor-pointer "
-                onClick={() => toggleWishListHandler(user._id, product._id)}
-              >
-                <FaRegHeart />
-              </div>
-            )}
-          </div>
+          {user && (
+            <div className="absolute right-4 top-4 ">
+              {user?.wishlist?.find((ele: any) => ele._id == product._id) ? (
+                <div
+                  className="relative z-[1] cursor-pointer text-mainColor "
+                  onClick={() => toggleWishListHandler(user._id, product._id)}
+                >
+                  <FaHeart />
+                </div>
+              ) : (
+                <div
+                  className="relative z-[1] cursor-pointer "
+                  onClick={() => toggleWishListHandler(user._id, product._id)}
+                >
+                  <FaRegHeart />
+                </div>
+              )}
+            </div>
+          )}
           <div className=" absolute h-[280px] w-[280px] ">
             <div className="absolute -left-[50px] top-[70px]  flex h-10   w-[120px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
               {product?.promoPercentage}%

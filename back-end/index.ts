@@ -12,6 +12,7 @@ import cookieParser from "cookie-parser";
 import cartRouter from "./routes/cartRouter";
 import checkoutRouter from "./routes/checkoutRouter";
 import commentsRouter from "./routes/commentsRouter";
+import { verifyToken } from "./middlewares/verifyToken";
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ app.use(
 app.listen(PORT, () => {
   console.log("server listening on port ", PORT);
 });
+
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
