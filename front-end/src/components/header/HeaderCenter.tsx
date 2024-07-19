@@ -52,7 +52,7 @@ export default function HeaderCenter() {
           {search != "" && (
             <>
               {changeHandlerProducts.map((product) => (
-                <div className="relative">
+                <div className="relative sm:block hidden">
                   <Link
                     to={`/product/${product?._id}`}
                     className="py-2 flex items-center overflow-hidden z-10 bg-white gap-2 px-4 cursor-pointer hover:bg-mainColor/90 duration-500 "
