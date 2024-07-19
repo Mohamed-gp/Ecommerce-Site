@@ -113,8 +113,9 @@ const Store = () => {
           </select>
         </div>
       </div>
-      <div className="flex gap-8 flex-wrap justify-center">
-        {products.length == 0 ? (
+
+      {products.length == 0 ? (
+        <div className="flex gap-8 flex-wrap justify-center">
           <div
             className="container flex flex-col  items-center justify-center py-14"
             style={{ minHeight: `calc(100vh - 70.94px)` }}
@@ -124,14 +125,14 @@ const Store = () => {
             </p>
             <p className="opacity-60">Try Searching For Another Product!</p>
           </div>
-        ) : (
-          <>
-            {products.map((product: Product) => (
-              <ProductComp key={product?._id} product={product} />
-            ))}
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="flex gap-8 flex-wrap my-12 justify-center">
+          {products.map((product: Product) => (
+            <ProductComp key={product?._id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
