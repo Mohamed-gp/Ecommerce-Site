@@ -51,8 +51,8 @@ const addComment = async (
 };
 
 const getComments = async (req: Request, res: Response, next: NextFunction) => {
-  const { productId } = req.params;
   try {
+    const { productId } = req.params;
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "product not found", data: null });
@@ -76,8 +76,8 @@ const deleteComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { commentId, userId } = req.params;
   try {
+    const { commentId, userId } = req.params;
     if (req.user.id != userId) {
       return res
         .status(403)

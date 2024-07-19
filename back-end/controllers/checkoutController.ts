@@ -10,12 +10,13 @@ const createPayment = async (
   next: NextFunction
 ) => {
   // price and info about the product come forom the server and client send only ids to prevent user to put 0 dollar
-  let { cart } = req.body;
   try {
+    let { cart } = req.body;
     const lineItems = await Promise.all(
       cart.map(async (ele: any) => {
         const product = await Product.findById(ele.product._id);
-        let amount = product?.price * 100 * (1 - product?.promoPercentage / 100);
+        let amount =
+          product?.price * 100 * (1 - product?.promoPercentage / 100);
         amount = Math.ceil(amount);
         return {
           price_data: {
@@ -37,7 +38,6 @@ const createPayment = async (
       line_items: lineItems,
     });
 
-    console.log(session);
     res.status(200).json({
       message: "checkout session created successfull",
       data: session.url,

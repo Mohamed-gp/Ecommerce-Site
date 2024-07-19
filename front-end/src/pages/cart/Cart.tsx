@@ -233,7 +233,7 @@ export default function Cart() {
             style={{ minHeight: `calc(100vh - 70.94px)` }}
           >
             <img
-              src="/cart-empty-photo (copy).png"
+              src="/cart-empty-photo.png"
               alt="cart-empty"
               width={300}
               height={300}

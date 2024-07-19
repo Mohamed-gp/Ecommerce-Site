@@ -36,7 +36,8 @@ export default function CategoryProductLine({
         ))}
         <div className="flex w-full justify-end">
           <Link
-            to={`store?category=${category?.name.split(" ").join("+")}`}
+            // to={`store?category=${category?.name.split(" ").join("+")}`}
+            to={`/store`}
             className="bg-mainColor text-white px-6  py-2 rounded-lg "
           >
             See All Products

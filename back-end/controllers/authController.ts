@@ -4,162 +4,187 @@ import { verifyLogin, verifyRegister } from "../utils/joi/authValidation";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const loginController = async (req: Request, res: Response) => {
+const loginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body;
-
-  const { error } = verifyLogin(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  const user = await User.findOne({
-    email,
-  })
-    .populate({
-      path: "cart",
-      populate: {
-        path: "product",
-        model: "Product",
-      },
-    })
-    .populate("wishlist");
-  if (!user) {
-    return res.status(404).json({
-      data: null,
-      message: "user not found",
-    });
-  }
-
-  const isMatched = await bcrypt.compare(password, user.password);
-  if (!isMatched) {
-    return res.status(400).json({
-      data: null,
-      message: "email or password are incorrect",
-    });
-  }
-  user.password = "";
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET as string,
-    {
-      expiresIn: "1y",
+  try {
+    const { error } = verifyLogin(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-  );
-  res
-    .cookie("token", token, {
-      httpOnly: true,
-      sameSite: "None" as "none",
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-      secure: process.env.NODE_ENV == "developement" ? false : true,
+    const user = await User.findOne({
+      email,
     })
-    .status(200)
-    .json({ message: "login succefully", data: user });
+      .populate({
+        path: "cart",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      })
+      .populate("wishlist");
+    if (!user) {
+      return res.status(404).json({
+        data: null,
+        message: "user not found",
+      });
+    }
+
+    const isMatched = await bcrypt.compare(password, user.password);
+    if (!isMatched) {
+      return res.status(400).json({
+        data: null,
+        message: "email or password are incorrect",
+      });
+    }
+    user.password = "";
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "1y",
+      }
+    );
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "None" as "none",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        secure: process.env.NODE_ENV == "developement" ? false : true,
+      })
+      .status(200)
+      .json({ message: "login succefully", data: user });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const registerController = async (req: Request, res: Response) => {
+const registerController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { username, email, password } = req.body;
-  if (!password) {
-    return res.status(400).json({ message: "you must enter a password" });
-  }
-  const { error } = verifyRegister(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  let user = await User.findOne({
-    email,
-  })
-    .populate({
-      path: "cart",
-      populate: {
-        path: "product",
-        model: "Product",
-      },
+  try {
+    if (!password) {
+      return res.status(400).json({ message: "you must enter a password" });
+    }
+    const { error } = verifyRegister(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+    let user = await User.findOne({
+      email,
     })
-    .populate("wishlist");
-  if (user) {
-    return res.status(400).json({ message: "email or password are incorrect" });
-  }
+      .populate({
+        path: "cart",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      })
+      .populate("wishlist");
+    if (user) {
+      return res
+        .status(400)
+        .json({ message: "email or password are incorrect" });
+    }
 
-  user = await User.create({
-    username,
-    email,
-    password: await bcrypt.hash(password, 10),
-  });
-  user.password = "";
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "1y" }
-  );
-  res
-    .cookie("token", token, {
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-      httpOnly: true,
-      secure: process.env.NODE_ENV == "developement" ? false : true,
-      sameSite: "None" as "none",
-    })
-    .status(201)
-    .json({ data: user, message: "created succefully" });
+    user = await User.create({
+      username,
+      email,
+      password: await bcrypt.hash(password, 10),
+    });
+    user.password = "";
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1y" }
+    );
+    res
+      .cookie("token", token, {
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        httpOnly: true,
+        secure: process.env.NODE_ENV == "developement" ? false : true,
+        sameSite: "None" as "none",
+      })
+      .status(201)
+      .json({ data: user, message: "created succefully" });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const googleSignIncontroller = async (req: Request, res: Response) => {
+const googleSignIncontroller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { username, email, photoUrl } = req.body;
-  let user = await User.findOne({ email })
-    .populate({
-      path: "cart",
-      populate: {
-        path: "product",
-        model: "Product",
-      },
-    })
-    .populate("wishlist");
-
-  if (user) {
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
-      {
-        expiresIn: "1y",
-      }
-    );
-    user.password = "";
-    return res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV == "developement" ? false : true,
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-        sameSite: "None" as "none",
+  try {
+    let user = await User.findOne({ email })
+      .populate({
+        path: "cart",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
       })
-      .status(200)
-      .json({ data: user, message: "login succefully" });
-  } else {
-    const generatedPassword =
-      Math.random().toString(36).slice(-8) +
-      Math.random().toString(36).slice(-8);
-    user = await User.create({
-      email: email,
-      photoUrl,
-      username,
-      password: await bcrypt.hash(generatedPassword, 10),
-      provider: "google",
-    });
+      .populate("wishlist");
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
-      {
-        expiresIn: "1y",
-      }
-    );
-    user.password = "";
-    return res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV == "developement" ? false : true,
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-        sameSite: "None" as "none",
-      })
-      .status(200)
-      .json({ data: user, message: "login succefully" });
+    if (user) {
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET as string,
+        {
+          expiresIn: "1y",
+        }
+      );
+      user.password = "";
+      return res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV == "developement" ? false : true,
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+          sameSite: "None" as "none",
+        })
+        .status(200)
+        .json({ data: user, message: "login succefully" });
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      user = await User.create({
+        email: email,
+        photoUrl,
+        username,
+        password: await bcrypt.hash(generatedPassword, 10),
+        provider: "google",
+      });
+
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET as string,
+        {
+          expiresIn: "1y",
+        }
+      );
+      user.password = "";
+      return res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV == "developement" ? false : true,
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+          sameSite: "None" as "none",
+        })
+        .status(200)
+        .json({ data: user, message: "login succefully" });
+    }
+  } catch (error) {
+    next(error);
   }
 };
 

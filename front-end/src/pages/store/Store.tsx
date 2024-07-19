@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import Product from "../../components/product/Product";
+import ProductComp from "../../components/product/Product";
 import customAxios from "../../utils/axios/customAxios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Product } from "../../interfaces/dbInterfaces";
 
 interface Query {
   search: string | null;
@@ -10,27 +11,17 @@ interface Query {
 
 const Store = () => {
   const [products, setProducts] = useState([]);
-  const [query, setQuery] = useState<Query>({ search: "", category: "" });
+  const [savedProducts, setSavedProducts] = useState([]);
   const location = useLocation();
   const urlParams = new URLSearchParams(window.location.search);
-
-  useEffect(() => {
-    const searchParam = urlParams.get("search") || "";
-    const categoryParam = urlParams.get("category") || "";
-
-    setQuery({
-      ...query,
-      search: searchParam,
-      category: categoryParam,
-    });
-  }, [urlParams]);
 
   const getProducts = async () => {
     try {
       const { data } = await customAxios.get(
-        `/products?search=${query.search}&category=${query.category}`
+        `/products?search=${urlParams.get("search") || ""}`
       );
       setProducts(data.data);
+      setSavedProducts(data.data);
     } catch (error) {
       console.log(error);
     }
@@ -38,16 +29,92 @@ const Store = () => {
 
   useEffect(() => {
     getProducts();
-  }, [query]);
+  }, []);
 
+  const [filter, setFilter] = useState({ order: "", category: "" });
+  useEffect(() => {
+    let sortedProducts = [...savedProducts];
+    if (filter.order == "highToLow") {
+      sortedProducts.sort(
+        (a: Product, b: Product) =>
+          b.price * (1 - b.promoPercentage / 100) -
+          a.price * (1 - a.promoPercentage / 100)
+      );
+    } else if (filter.order == "lowToHigh") {
+      sortedProducts.sort(
+        (a: Product, b: Product) =>
+          a.price * (1 - a.promoPercentage / 100) -
+          b.price * (1 - b.promoPercentage / 100)
+      );
+    }
+
+    sortedProducts = sortedProducts.filter(
+      (product: Product) => product.category.name == filter.category
+    );
+
+    setProducts(sortedProducts);
+  }, [filter]);
+
+  const [categories, setCategories] = useState([]);
+  const getCategories = async () => {
+    try {
+      const { data } = await customAxios.get("/categories");
+      setCategories(data.data);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getCategories();
+  });
   return (
     <div className="container pt-6 mt-6">
-      <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
-        {query.category !== "" ? query.category : "Store"}
-      </p>
+      <div className="flex justify-between items-center">
+        <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
+          Store
+        </p>
+        <div className="flex gap-2">
+          <select
+            onChange={(e) => setFilter({ ...filter, category: e.target.value })}
+            name=""
+            id=""
+            value={filter.category}
+            className=" px-4 py-2 rounded-xl bg-mainColor text-white"
+          >
+            <option value="" disabled className="flex ">
+              <span>Category</span>
+            </option>
+            {categories?.map((category: any) => (
+              <option value={category.name} className="flex p-6">
+                {category.name}
+              </option>
+            ))}
+          </select>{" "}
+          <select
+            onChange={(e) => setFilter({ ...filter, order: e.target.value })}
+            name=""
+            id=""
+            value={filter.order}
+            className=" px-4   py-2 rounded-xl bg-mainColor text-white"
+          >
+            <option value="" disabled className="flex ">
+              <span>💵</span>
+              <span>Price</span>
+            </option>
+            <option value="lowToHigh" className="flex p-6">
+              <span>📈</span>
+              <span>Low To High</span>
+            </option>
+            <option value="highToLow" className="flex p-6">
+              <span>📉</span>
+              <span>High To Low</span>
+            </option>
+          </select>
+        </div>
+      </div>
       <div className="flex gap-8 flex-wrap my-12 justify-center">
-        {products.map((product) => (
-          <Product key={product.id} product={product} />
+        {products.map((product: Product) => (
+          <ProductComp key={product?._id} product={product} />
         ))}
       </div>
     </div>

@@ -9,7 +9,7 @@ const NotFound = () => {
       <div className="">
         <img
           alt="Mountains"
-          src="/not-found-page (copy).png"
+          src="/not-found-page.png"
           width={0}
           height={0}
           sizes="100vw"
