@@ -26,7 +26,7 @@ const ContactUs = () => {
               Our friendly team is here to help.
             </p>
             <p className="mt-2 text-sm hover:text-buttonColor duraiton-500 ">
-              krelli@estin.dz
+              swift@buy.dz
             </p>
           </div>
 
@@ -41,7 +41,7 @@ const ContactUs = () => {
               Come say hello at our office HQ.
             </p>
             <p className="mt-2 text-sm hover:text-buttonColor duraiton-500 ">
-              N75, Amizour
+              N75, Algeria
             </p>
           </div>
 

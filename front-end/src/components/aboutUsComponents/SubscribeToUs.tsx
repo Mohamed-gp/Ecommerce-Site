@@ -1,23 +1,24 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-// import customAxios from "../../utils/axios";
-import axios from "axios";
-// import { useSelector } from "react-redux";
-// import { IRootState } from "../../store/store";
+import { IRootState } from "../../redux/store";
+import { useSelector } from "react-redux";
+import customAxios from "../../utils/axios/customAxios";
 
 const SubscribeToUs = () => {
-  // const user = useSelector((state: IRootState) => state.auth.user);
-  // const subscribeToUsHandler = async () => {
-  //   try {
-  //     const {data} = await customAxios.post("/subscribe", {email : user?.email})
-  //     console.log(data)
-  //     toast.success(data);
-  //   } catch (error: any) {
-  //     console.log(error);
-  //     toast.error(error.response.data);
-  //   }
-
-  // };
+  const user = useSelector((state: IRootState) => state.auth.user);
+  const subscribeToUsHandler = async () => {
+    try {
+      const { data } = await customAxios.post("/users/subscribe", {
+        email: user?.email,
+      });
+      console.log(data);
+      toast.success(data);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+  const [email, setEmail] = useState(user?.email);
   return (
     <>
       <section className="py-20 ">
@@ -34,14 +35,14 @@ const SubscribeToUs = () => {
               <input
                 type="text"
                 name="email"
-                // value={user?.email}
-                disabled
-                className="bg-white  py-2 px-6 rounded-full max-lg:border border-gray-300  text-gray-100 max-lg:text-center placeholder:text-gray-400 focus:outline-none flex-1 w-full  lg:w-auto lg:py-2 lg:px-6 "
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-white  py-2 px-6 rounded-full max-lg:border border-gray-300  text-black max-lg:text-center placeholder:text-gray-400 focus:outline-none flex-1 w-full  lg:w-auto lg:py-2 lg:px-6 "
                 placeholder="Enter your email.."
               />
               <button
                 type="submit"
-                // onClick={() => subscribeToUsHandler()}
+                onClick={() => subscribeToUsHandler()}
                 className={`disabled:opacity-50 py-2 px-5 text-sm bg-mainColor/70 shadow-md rounded-full border-white border ml-2  text-white font-semibold hover:bg-mainColor/20`}
               >
                 Subscribe

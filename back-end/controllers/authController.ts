@@ -56,7 +56,7 @@ const loginController = async (
         secure: process.env.NODE_ENV == "developement" ? false : true,
       })
       .status(200)
-      .json({ message: "login succefully", data: user });
+      .json({ message: "login successfully", data: user });
   } catch (error) {
     next(error);
   }
@@ -152,7 +152,7 @@ const googleSignIncontroller = async (
           sameSite: "None" as "none",
         })
         .status(200)
-        .json({ data: user, message: "login succefully" });
+        .json({ data: user, message: "login successfully" });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -181,7 +181,7 @@ const googleSignIncontroller = async (
           sameSite: "None" as "none",
         })
         .status(200)
-        .json({ data: user, message: "login succefully" });
+        .json({ data: user, message: "login successfully" });
     }
   } catch (error) {
     next(error);

@@ -7,8 +7,8 @@ import { useEffect } from "react";
 
 const AboutUs = () => {
   useEffect(() => {
-    scrollTo(0,0)
-  },[])
+    scrollTo(0, 0);
+  }, []);
   return (
     <>
       <HeroAboutSection
@@ -20,13 +20,13 @@ const AboutUs = () => {
         title="About Us"
         description="We're dedicated to revolutionizing the shopping experience for everyone. Our ecommerce platform is designed to meet the unique needs of customers and sellers alike. Our mission is simple: to provide an intuitive and seamless tool that allows you to effortlessly discover, purchase, and manage your favorite products."
         // img="aboutus.webp"
-        img="/aboutus1.webp"
+        img="/2741840.svg"
         order={1}
       />
       <AboutUsTwoGrid
         title="Why Choose SwiftBuy?"
         description="SwiftBuy stands as a beacon of innovation and efficiency in the realm of online shopping. We've engineered a solution that streamlines every aspect of the shopping experience, ensuring seamless interactions for both buyers and sellers. SwiftBuy embodies our commitment to revolutionizing the way ecommerce is conducted, empowering users with intuitive tools and comprehensive features. So, why choose SwiftBuy? Because we redefine convenience and effectiveness in online shopping, making it the ultimate solution for your ecommerce needs."
-        img="/aboutus1.webp"
+        img="/Ecommerce web page-pana.svg"
         order={0}
       />
       <Faq />
