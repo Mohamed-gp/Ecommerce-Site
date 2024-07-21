@@ -68,6 +68,16 @@ const Store = () => {
   useEffect(() => {
     getCategories();
   });
+
+  const removeFiltersHandler = async () => {
+    try {
+      const { data } = await customAxios.get(`/products`);
+      setProducts(data.data);
+      setSavedProducts(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="container pt-6 mt-6">
       <div className="flex justify-between items-center">
@@ -120,10 +130,16 @@ const Store = () => {
             className="container flex flex-col  items-center justify-center py-14"
             style={{ minHeight: `calc(100vh - 70.94px)` }}
           >
-            <p className="mb-2 text-3xl font-bold">
+            <p className="mb-2 text-3xl font-bold text-center">
               There Is No Product Match Your Search :(
             </p>
             <p className="opacity-60">Try Searching For Another Product!</p>
+            <button
+              onClick={() => removeFiltersHandler()}
+              className="my-2 px-6 py-2 rounded-xl bg-mainColor text-white"
+            >
+              Remove Filters
+            </button>
           </div>
         </div>
       ) : (

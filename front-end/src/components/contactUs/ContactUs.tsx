@@ -8,17 +8,17 @@ const ContactUs = () => {
         <div className="flex flex-col items-center">
           <p className="font-medium text-center text-5xl">Contact us</p>
 
-          <p className="mt-3 text-gray-500 dark:text-gray-400">
+          <p className="mt-3 text-gray-500 dark:text-gray-400 text-center">
             Our friendly team would love to hear from you.
           </p>
         </div>
 
-        <div className="flex gap-12 justify-center mt-12">
+        <div className="flex gap-12 justify-center mt-12 flex-wrap    ">
           <div className="flex justify-center items-center flex-col border-buttonColor w-[250px] border-2 p-6 rounded-2xl">
             <span className="inline-block text-buttonColor rounded-full text-2xl">
               <MdEmail />
             </span>
-
+    
             <h2 className="mt-4 text-base font-medium text-buttonColor">
               Email
             </h2>
