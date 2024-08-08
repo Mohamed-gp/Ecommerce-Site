@@ -61,93 +61,95 @@ export default function Cart() {
     <>
       {cart?.length != 0 ? (
         <>
-          <div>
-            <p className="my-6 mt-12 text-center text-xl font-bold">
-              My Shopping Cart
-            </p>
-            <div className="w-[400px] sm:w-screen mx-auto overflow-auto">
-              <table className=" mb-24 mt-12 w-screen ">
-                <thead className="bg-mainColor py-2 text-white">
-                  <tr className="">
-                    <th>Product Image</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quanity</th>
-                    <th>Subtotal</th>
-                    <th className="">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart?.map((ele) => (
-                    <tr className="relative">
-                      <td>
-                        <div className="mx-auto w-fit">
-                          {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
-                          <img
-                            src={ele?.product?.images[0]}
-                            alt="mac"
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <p>{ele?.product?.name}</p>
-                      </td>
-                      <td>
-                        $
-                        {(
-                          ele?.product?.price *
-                          (1 - ele?.product?.promoPercentage / 100)
-                        ).toFixed(2)}
-                      </td>
-
-                      <td className="">
-                        <div className="flex w-fit mx-auto  bg-white border-2 border-solid p-2 rounded-3xl items-center gap-2">
-                          <button
-                            onClick={() =>
-                              addToCart(ele.quantity - 1, ele?.product?._id)
-                            }
-                            disabled={ele?.quantity == 1}
-                            className="bg-[#dadada] w-7 h-7 disabled:cursor-not-allowed  rounded-full flex justify-center items-center disabled:opacity-20"
-                          >
-                            -
-                          </button>
-                          <span>{ele?.quantity}</span>
-                          <button
-                            onClick={() =>
-                              addToCart(ele.quantity + 1, ele?.product?._id)
-                            }
-                            className="bg-[#dadada] w-7 h-7  rounded-full flex justify-center items-center"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </td>
-                      <td>
-                        $
-                        {(
-                          ele?.product?.price *
-                          (1 - ele?.product?.promoPercentage / 100) *
-                          ele?.quantity
-                        ).toFixed(2)}
-                      </td>
-                      <td>
-                        <div className="mx-auto w-fit cursor-pointer  text-bgColorDanger">
-                          <FaTrash
-                            onClick={() =>
-                              removeFromCartHandler(
-                                user?._id,
-                                ele?.product?._id
-                              )
-                            }
-                          />
-                        </div>
-                      </td>
+          <div className="">
+            <div className="text-sm">
+              <p className="my-6 mt-12 text-center text-xl font-bold">
+                My Shopping Cart
+              </p>
+              <div className="min-w-[100px] sm:w-screen mx-auto overflow-auto">
+                <table className=" mb-24 mt-12 w-screen ">
+                  <thead className="bg-mainColor py-2 text-white">
+                    <tr className="">
+                      <th>Product Image</th>
+                      <th>Name</th>
+                      <th>Price</th>
+                      <th>Quanity</th>
+                      <th>Subtotal</th>
+                      <th className="">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {cart?.map((ele) => (
+                      <tr className="relative">
+                        <td>
+                          <div className="mx-auto w-fit">
+                            {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
+                            <img
+                              src={ele?.product?.images[0]}
+                              alt="mac"
+                              width={100}
+                              height={100}
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <p>{ele?.product?.name}</p>
+                        </td>
+                        <td>
+                          $
+                          {(
+                            ele?.product?.price *
+                            (1 - ele?.product?.promoPercentage / 100)
+                          ).toFixed(2)}
+                        </td>
+
+                        <td className="">
+                          <div className="flex w-fit mx-auto  bg-white border-2 border-solid p-2 rounded-3xl items-center gap-2">
+                            <button
+                              onClick={() =>
+                                addToCart(ele.quantity - 1, ele?.product?._id)
+                              }
+                              disabled={ele?.quantity == 1}
+                              className="bg-[#dadada] w-7 h-7 disabled:cursor-not-allowed  rounded-full flex justify-center items-center disabled:opacity-20"
+                            >
+                              -
+                            </button>
+                            <span>{ele?.quantity}</span>
+                            <button
+                              onClick={() =>
+                                addToCart(ele.quantity + 1, ele?.product?._id)
+                              }
+                              className="bg-[#dadada] w-7 h-7  rounded-full flex justify-center items-center"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          $
+                          {(
+                            ele?.product?.price *
+                            (1 - ele?.product?.promoPercentage / 100) *
+                            ele?.quantity
+                          ).toFixed(2)}
+                        </td>
+                        <td>
+                          <div className="mx-auto w-fit cursor-pointer  text-bgColorDanger">
+                            <FaTrash
+                              onClick={() =>
+                                removeFromCartHandler(
+                                  user?._id,
+                                  ele?.product?._id
+                                )
+                              }
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
           <div className="bg-bgColorCartFooter py-6">

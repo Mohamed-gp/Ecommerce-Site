@@ -84,7 +84,7 @@ const Store = () => {
         <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
           Store
         </p>
-        <div className="flex gap-2">
+        <div className="flex  items-center justify-center gap-2">
           <select
             onChange={(e) => setFilter({ ...filter, category: e.target.value })}
             name=""

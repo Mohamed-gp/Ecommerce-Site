@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const env: string = "production";
+const env: string = import.meta.env.ENV;
+
 const customAxios = axios.create({
   baseURL:
     env == "production"

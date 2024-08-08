@@ -33,8 +33,14 @@ const createPayment = async (
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment", // mode payment or subscription or a setup
-      success_url: process.env.SUCCESS_FRONT_URL,
-      cancel_url: process.env.CANCEL_FRONT_URL,
+      success_url:
+        process.env.NODE_ENV == "production"
+          ? process.env.SUCCESS_FRONT_URL
+          : "http://localhost:5173/order/success",
+      cancel_url:
+        process.env.NODE_ENV == "production"
+          ? process.env.CANCEL_FRONT_URL
+          : "http://localhost:5173/cart",
       line_items: lineItems,
     });
 
