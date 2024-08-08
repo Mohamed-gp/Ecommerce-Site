@@ -2,26 +2,36 @@ import { FormEvent, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa6";
 import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { IRootState } from "../../../redux/store";
 
 const AdminAdminsRight = () => {
+  const user = useSelector((state: IRootState) => state.auth.user);
   const [admins, setAdmins] = useState([]);
   const [adminEmail, setAdminEmail] = useState("");
   const getAdmins = async () => {
     try {
       const { data } = await customAxios.get("/admin/admins");
       setAdmins(data.data);
-      
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
-  const addAdminHandler = async (e : FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const addAdminHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
-      const { data } = await customAxios.post("/admin/admins", {
-        adminEmail,
-      });
+      const { data } = await customAxios.post(
+        "/admin/admins",
+        {
+          adminEmail,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       toast.success(data.message);
       setAdminEmail("");
       getAdmins();
@@ -32,7 +42,6 @@ const AdminAdminsRight = () => {
   };
   const deleteHandler = async (id: string) => {
     try {
-      
       const { data } = await customAxios.delete(`/admin/admins/${id}`);
       toast.success(data.message);
       getAdmins();

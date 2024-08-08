@@ -4,8 +4,11 @@ import { FaTrash } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { IRootState } from "../../../redux/store";
 
 const AdminCategoriesRight = () => {
+  const user = useSelector((state: IRootState) => state.auth.user);
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,9 +26,17 @@ const AdminCategoriesRight = () => {
   };
   const createCategoryHandler = async () => {
     try {
-      const { data } = await customAxios.post("/categories", {
-        name: category,
-      });
+      const { data } = await customAxios.post(
+        "/categories",
+        {
+          name: category,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       toast.success(data.message);
       setCategory("");
       getCategories();
@@ -62,7 +73,7 @@ const AdminCategoriesRight = () => {
             </div>
             <div className="flex items-center gap-4 pr-4 ">
               <button
-                onClick={() => deleteHandler(category._id)}
+                onClick={() => deleteHandler(category?._id)}
                 className="flex items-center gap-2 bg-red-500 py-2 px-4 text-white"
                 style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
               >

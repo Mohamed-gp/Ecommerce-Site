@@ -6,7 +6,6 @@ const verifyToken = (req: authRequest, res: Response, next: NextFunction) => {
   // const token = req.cookies["token"];
   const authorization = req.headers.authorization;
   const token = authorization?.split(" ")[1];
-  console.log(token);
   if (token) {
     try {
       const decodedPayload = jwt.verify(

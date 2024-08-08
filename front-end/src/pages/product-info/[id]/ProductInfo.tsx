@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import RatingStars from "../../../components/ratingstars/RatingStars";
 import {
-  FaBasketShopping,
   FaCartShopping,
   FaRegHeart,
   FaShare,
@@ -94,11 +93,19 @@ export default function ProductInfo() {
   }, []);
   const addReviewHandler = async () => {
     try {
-      const { data } = await customAxios.post(`/comments/${id}`, {
-        rating: 6 - review?.rating,
-        content: review?.content,
-        userId: user?._id,
-      });
+      const { data } = await customAxios.post(
+        `/comments/${id}`,
+        {
+          rating: 6 - review?.rating,
+          content: review?.content,
+          userId: user?._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       getReviews();
       console.log(data);
       toast.success(data.message);
@@ -145,7 +152,7 @@ export default function ProductInfo() {
   const toggleWishListHandler = async (userId: string, productId: string) => {
     if (!user) {
       navigate("/register");
-      return
+      return;
     }
     try {
       const { data } = await customAxios.post("/products/wishlist", {

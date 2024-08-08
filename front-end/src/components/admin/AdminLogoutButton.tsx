@@ -1,16 +1,18 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../redux/slices/authSlice";
 import customAxios from "../../utils/axios/customAxios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { IRootState } from "../../redux/store";
 
 const AdminLogoutButton = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state: IRootState) => state.auth.user);
   const logoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
-      dispatch(authActions.logout(null));
+      dispatch(authActions.logout());
       navigate("/");
       toast.success(data.message);
     } catch (error: any) {
