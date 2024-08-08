@@ -84,14 +84,7 @@ const registerController = async (
     let user = await User.findOne({
       email,
     })
-      .populate({
-        path: "cart",
-        populate: {
-          path: "product",
-          model: "Product",
-        },
-      })
-      .populate("wishlist");
+      
 
     if (user) {
       return res
