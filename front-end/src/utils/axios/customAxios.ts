@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const env: string = import.meta.env.ENV;
+const env: string = import.meta.env.VITE_ENV;
+console.log(env);
 
 const customAxios = axios.create({
   baseURL:
