@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const env: string = import.meta.env.VITE_ENV;
-const token = localStorage.getItem("token");
 
 const customAxios = axios.create({
   baseURL:
@@ -10,7 +9,7 @@ const customAxios = axios.create({
       : "http://localhost:3000/api/",
   withCredentials: true,
   headers: {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
