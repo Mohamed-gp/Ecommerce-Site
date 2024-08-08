@@ -81,16 +81,16 @@ const Store = () => {
   return (
     <div className="container pt-6 mt-6">
       <div className="flex justify-between items-center">
-        <p className="pl-3 border-l-mainColor border-l-4 font-bold text-2xl">
+        <p className="pl-3 sm:block hidden border-l-mainColor border-l-4 font-bold text-2xl">
           Store
         </p>
-        <div className="flex  items-center justify-center gap-2">
+        <div className="flex sm:flex-row flex-col w-full items-center justify-center sm:justify-end gap-2">
           <select
             onChange={(e) => setFilter({ ...filter, category: e.target.value })}
             name=""
             id=""
             value={filter.category}
-            className=" px-4 py-2 rounded-xl bg-mainColor text-white focus:outline-none"
+            className=" pl-4 py-2 rounded-xl bg-mainColor text-white focus:outline-none"
           >
             <option value="" disabled className="flex ">
               <span>Category</span>
