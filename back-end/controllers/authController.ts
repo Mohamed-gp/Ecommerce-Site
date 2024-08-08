@@ -83,8 +83,7 @@ const registerController = async (
     }
     let user = await User.findOne({
       email,
-    })
-      
+    });
 
     if (user) {
       return res
@@ -92,17 +91,18 @@ const registerController = async (
         .json({ message: "email or password are incorrect" });
     }
 
+    user = await User.create({
+      username,
+      email,
+      password: await bcrypt.hash(password, 10),
+    });
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "1y" }
     );
-    user = await User.create({
-      username,
-      email,
-      password: await bcrypt.hash(password, 10),
-      token,
-    });
+    user.token = token;
+    await user.save();
     user.password = "";
     //   res
     //     .cookie("token", token, {
@@ -145,8 +145,8 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
-      user.token = token
-      await user.save()
+      user.token = token;
+      await user.save();
       user.password = "";
       return res
 
@@ -165,6 +165,13 @@ const googleSignIncontroller = async (
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
         Math.random().toString(36).slice(-8);
+      user = await User.create({
+        email: email,
+        photoUrl,
+        username,
+        password: await bcrypt.hash(generatedPassword, 10),
+        provider: "google",
+      });
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET as string,
@@ -172,25 +179,23 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
-      user = await User.create({
-        email: email,
-        photoUrl,
-        username,
-        password: await bcrypt.hash(generatedPassword, 10),
-        provider: "google",
-        token,
-      });
+      user.token = token;
+      await user.save();
 
       user.password = "";
       return res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV == "developement" ? false : true,
-          maxAge: 1000 * 60 * 60 * 24 * 365,
-          sameSite: "None" as "none",
-        })
+
         .status(200)
         .json({ data: user, message: "login successfully" });
+      // return res
+      //   .cookie("token", token, {
+      //     httpOnly: true,
+      //     secure: process.env.NODE_ENV == "developement" ? false : true,
+      //     maxAge: 1000 * 60 * 60 * 24 * 365,
+      //     sameSite: "None" as "none",
+      //   })
+      //   .status(200)
+      //   .json({ data: user, message: "login successfully" });
     }
   } catch (error) {
     next(error);
