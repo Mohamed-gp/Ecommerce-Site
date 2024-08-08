@@ -20,6 +20,9 @@ const schema = new mongoose.Schema(
       required: true,
       default: "user", // enum admin and user
     },
+    token: {
+      type: String,
+    },
     provider: {
       type: String,
       required: true,

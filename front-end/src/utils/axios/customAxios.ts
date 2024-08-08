@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const env: string = import.meta.env.VITE_ENV;
-console.log(env);
+const token = localStorage.getItem("token");
 
 const customAxios = axios.create({
   baseURL:
@@ -9,6 +9,9 @@ const customAxios = axios.create({
       ? "https://swiftbuy.onrender.com/api/"
       : "http://localhost:3000/api/",
   withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
 });
 
 export default customAxios;

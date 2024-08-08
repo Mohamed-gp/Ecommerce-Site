@@ -41,7 +41,6 @@ const loginController = async (
         message: "email or password are incorrect",
       });
     }
-    user.password = "";
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
@@ -49,15 +48,20 @@ const loginController = async (
         expiresIn: "1y",
       }
     );
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "None" as "none",
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-        secure: process.env.NODE_ENV == "developement" ? false : true,
-      })
-      .status(200)
-      .json({ message: "login successfully", data: user });
+    user.token = token;
+    await user.save();
+    user.password = "";
+
+    // res
+    //   .cookie("token", token, {
+    //     httpOnly: true,
+    //     sameSite: "None" as "none",
+    //     maxAge: 1000 * 60 * 60 * 24 * 365,
+    //     secure: process.env.NODE_ENV == "developement" ? false : true,
+    //   })
+    //   .status(200)
+    //   .json({ message: "login successfully", data: user });
+    res.status(200).json({ message: "login successfully", data: user });
   } catch (error) {
     next(error);
   }
@@ -95,26 +99,29 @@ const registerController = async (
         .json({ message: "email or password are incorrect" });
     }
 
-    user = await User.create({
-      username,
-      email,
-      password: await bcrypt.hash(password, 10),
-    });
-    user.password = "";
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "1y" }
     );
-    res
-      .cookie("token", token, {
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-        httpOnly: true,
-        secure: process.env.NODE_ENV == "developement" ? false : true,
-        sameSite: "None" as "none",
-      })
-      .status(201)
-      .json({ data: user, message: "created succefully" });
+    user = await User.create({
+      username,
+      email,
+      password: await bcrypt.hash(password, 10),
+      token,
+    });
+    user.password = "";
+    //   res
+    //     .cookie("token", token, {
+    //       maxAge: 1000 * 60 * 60 * 24 * 365,
+    //       httpOnly: true,
+    //       secure: process.env.NODE_ENV == "developement" ? false : true,
+    //       sameSite: "None" as "none",
+    //     })
+    //     .status(201)
+    //     .json({ data: user, message: "created succefully" });
+    // } catch (error) {
+    res.status(201).json({ data: user, message: "created succefully" });
   } catch (error) {
     next(error);
   }
@@ -145,28 +152,26 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
+      user.token = token
+      await user.save()
       user.password = "";
       return res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV == "developement" ? false : true,
-          maxAge: 1000 * 60 * 60 * 24 * 365,
-          sameSite: "None" as "none",
-        })
+
         .status(200)
         .json({ data: user, message: "login successfully" });
+      // return res
+      //   .cookie("token", token, {
+      //     httpOnly: true,
+      //     secure: process.env.NODE_ENV == "developement" ? false : true,
+      //     maxAge: 1000 * 60 * 60 * 24 * 365,
+      //     sameSite: "None" as "none",
+      //   })
+      //   .status(200)
+      //   .json({ data: user, message: "login successfully" });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
         Math.random().toString(36).slice(-8);
-      user = await User.create({
-        email: email,
-        photoUrl,
-        username,
-        password: await bcrypt.hash(generatedPassword, 10),
-        provider: "google",
-      });
-
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET as string,
@@ -174,6 +179,15 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
+      user = await User.create({
+        email: email,
+        photoUrl,
+        username,
+        password: await bcrypt.hash(generatedPassword, 10),
+        provider: "google",
+        token,
+      });
+
       user.password = "";
       return res
         .cookie("token", token, {

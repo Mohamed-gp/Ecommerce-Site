@@ -2,14 +2,17 @@ import { Link } from "react-router-dom";
 import { FaCartShopping, FaHeart, FaUser } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
-import { useState } from "react";
 import { RiAdminFill } from "react-icons/ri";
+import { FaHome } from "react-icons/fa";
 
 export default function HeaderRight() {
-  const user: any = useSelector((state: IRootState) => state.auth.user);
-  const [isCartEmpty, setisCartEmpty] = useState(false);
+  const user = useSelector((state: IRootState) => state.auth.user);
   return (
     <div className="flex items-center justify-between gap-3 text-sm md:text-lg ">
+      <Link to={`/`} className="sm:hidden md:text-xl ">
+        <FaHome />
+      </Link>
+
       {user?.role != "admin" ? (
         <Link to={user ? `/profile` : `/register`} className=" md:text-xl ">
           <FaUser />

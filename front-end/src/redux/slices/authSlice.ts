@@ -12,20 +12,21 @@ const authSlice = createSlice({
     login(state, action) {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
+      localStorage.setItem("token", action.payload.token);
     },
-    logout(state, action) {
+    logout(state) {
       state.user = null;
       localStorage.removeItem("user");
     },
     setCart(state, action) {
-      let userParsed = JSON.parse(localStorage.getItem("user") as string);
+      const userParsed = JSON.parse(localStorage.getItem("user") as string);
       userParsed.cart = action.payload;
       state.user = userParsed;
       localStorage.setItem("user", JSON.stringify(userParsed));
     },
     setWishlist(state, action) {
       state.user.wishlist = action.payload;
-      let userParsed = JSON.parse(localStorage.getItem("user") as string);
+      const userParsed = JSON.parse(localStorage.getItem("user") as string);
       userParsed.wishlist = action.payload;
       state.user = userParsed;
       localStorage.setItem("user", JSON.stringify(userParsed));
