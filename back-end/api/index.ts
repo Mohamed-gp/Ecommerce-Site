@@ -18,7 +18,7 @@ dotenv.config();
 const app = express();
 
 connectToDB(process.env.MONGODB_URI as string);
-const PORT = 3000;
+const PORT = process.env.PORT as string | 3000;
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -49,3 +49,5 @@ app.use("/api/comments", commentsRouter);
 
 app.use(notFound);
 app.use(errorHandler);
+
+export default app;
