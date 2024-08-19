@@ -1,18 +1,18 @@
-import express from "express";
-import authRouter from "./routes/authRouter";
-import userRouter from "./routes/usersRouter";
-import productsRouter from "./routes/productsRouter";
-import categoriesRouter from "./routes/categoriesRouter";
-import adminRouter from "./routes/adminRouter";
-import connectToDB from "./lib/connectToDB";
+import express, { Request, Response } from "express";
+import authRouter from "../routes/authRouter";
+import userRouter from "../routes/usersRouter";
+import productsRouter from "../routes/productsRouter";
+import categoriesRouter from "../routes/categoriesRouter";
+import adminRouter from "../routes/adminRouter";
+import connectToDB from "../lib/connectToDB";
 import dotenv from "dotenv";
 import cors from "cors";
-import { notFound, errorHandler } from "./middlewares/errors";
+import { notFound, errorHandler } from "../middlewares/errors";
 import cookieParser from "cookie-parser";
-import cartRouter from "./routes/cartRouter";
-import checkoutRouter from "./routes/checkoutRouter";
-import commentsRouter from "./routes/commentsRouter";
-import { verifyToken } from "./middlewares/verifyToken";
+import cartRouter from "../routes/cartRouter";
+import checkoutRouter from "../routes/checkoutRouter";
+import commentsRouter from "../routes/commentsRouter";
+import { verifyToken } from "../middlewares/verifyToken";
 
 dotenv.config();
 const app = express();
@@ -33,6 +33,7 @@ app.use(
   })
 );
 
+app.get("/", (req: Request, res: Response) => res.send("Express on Vercel"));
 app.listen(PORT, () => {
   console.log("server listening on port ", PORT);
 });
