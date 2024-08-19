@@ -1,7 +1,7 @@
 {
   "functions": {
     "index.ts": {
-      "runtime": "20.x"
+      "runtime": "20.14.9"
     }
   },
   "rewrites": [
