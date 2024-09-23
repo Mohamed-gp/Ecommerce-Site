@@ -37,7 +37,13 @@ export default function HeaderCenter() {
       <div className="flex items-center justify-center rounded-l-xl p-2">
         <FaMagnifyingGlass />
       </div>
-      <div className="relative">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          searchHandler();
+        }}
+        className="relative"
+      >
         <input
           type="text"
           value={search}
@@ -75,7 +81,7 @@ export default function HeaderCenter() {
             </>
           )}
         </div>
-      </div>
+      </form>
       <button
         onClick={() => searchHandler()}
         disabled={search == ""}

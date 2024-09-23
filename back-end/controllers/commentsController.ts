@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { authRequest } from "../interfaces/authInterface";
 import Product from "../models/Product";
 import Comment from "../models/Comment";
+import { Console } from "console";
 
 const addComment = async (
   req: authRequest,
@@ -53,6 +54,7 @@ const addComment = async (
 const getComments = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { productId } = req.params;
+
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "product not found", data: null });
@@ -60,6 +62,7 @@ const getComments = async (req: Request, res: Response, next: NextFunction) => {
     const comments = await Comment.find({ product: productId }).populate(
       "user"
     );
+    // console.log(comments);
     comments.map((comment) => {
       comment.user.password = "";
     });

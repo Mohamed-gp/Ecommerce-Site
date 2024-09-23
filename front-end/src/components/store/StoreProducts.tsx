@@ -23,7 +23,7 @@ const StoreProducts = () => {
       </p>
       <div className="flex gap-8 flex-wrap my-12 justify-center">
         {products.map((product) => (
-          <Product product={product} />
+          <Product product={product} key={"storeProducts" + product._id} />
         ))}
       </div>
       <div className="flex w-full justify-end">

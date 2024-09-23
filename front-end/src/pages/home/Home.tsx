@@ -34,7 +34,10 @@ export default function Home() {
         {/* Toys and Gamess */}
         {/* Home and Kitchen */}
         {categories?.map((category) => (
-          <CategoryProductLine category={category} />
+          <CategoryProductLine
+            category={category}
+            key={"home" + category._id}
+          />
         ))}
       </div>
     </>

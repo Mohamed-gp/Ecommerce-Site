@@ -49,13 +49,15 @@ const updateUserData = async (
         .json({ message: error.details[0].message, data: null });
     }
     const file = req.file as Express.Multer.File;
-    let user = await User.findById(req.params.id).populate({
-      path: "cart",
-      populate: {
-        path: "product",
-        model: "Product",
-      },
-    });
+    let user = await User.findById(req.params.id)
+      .populate({
+        path: "cart",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      })
+      .populate("wishlist");
 
     if (file) {
       try {

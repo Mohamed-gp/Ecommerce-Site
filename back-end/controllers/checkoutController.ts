@@ -35,12 +35,12 @@ const createPayment = async (
       mode: "payment", // mode payment or subscription or a setup
       success_url:
         process.env.NODE_ENV == "production"
-          ? process.env.SUCCESS_FRONT_URL
-          : "http://localhost:5173/order/success",
+          ? process.env.PRODUCTION_SUCCESS_FRONT_URL
+          : process.env.DEV_SUCCESS_FRONT_URL,
       cancel_url:
         process.env.NODE_ENV == "production"
-          ? process.env.CANCEL_FRONT_URL
-          : "http://localhost:5173/cart",
+          ? process.env.PRODUCTION_CANCEL_FRONT_URL
+          : process.env.DEV_CANCEL_FRONT_URL,
       line_items: lineItems,
     });
 

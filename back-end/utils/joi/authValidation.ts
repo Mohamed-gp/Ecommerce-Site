@@ -6,14 +6,16 @@ const verifyRegister = (obj: object) => {
   const schema = joi.object({
     username: joi.string().min(8).max(50).required(),
     email: joi.string().min(8).max(50).required().email(),
-    password: joiPasswordComplexity(),
+    password: joi.string().required().min(8),
+    // password: joiPasswordComplexity(),
   });
   return schema.validate(obj);
 };
 const verifyLogin = (obj: object) => {
   const schema = joi.object({
     email: joi.string().min(8).max(50).required().email(),
-    password: joiPasswordComplexity(),
+    password: joi.string().required().min(8),
+    // password: joiPasswordComplexity(),
   });
   return schema.validate(obj);
 };

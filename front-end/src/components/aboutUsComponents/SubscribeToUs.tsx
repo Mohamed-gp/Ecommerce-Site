@@ -30,7 +30,13 @@ const SubscribeToUs = () => {
               Join our community of subscribers and receive regular updates
               delivered straight to your inbox. It's quick, easy, and free
             </p>
-            <div className="max-w-md mx-auto lg:bg-transparent lg:border border-gray-300 rounded-3xl max-lg:py-3 lg:rounded-full lg:h-12 lg:p-1.5 lg:flex-row gap-6 lg:gap-0 flex-col flex items-center justify-between">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                subscribeToUsHandler();
+              }}
+              className="max-w-md mx-auto lg:bg-transparent lg:border border-gray-300 rounded-3xl max-lg:py-3 lg:rounded-full lg:h-12 lg:p-1.5 lg:flex-row gap-6 lg:gap-0 flex-col flex items-center justify-between"
+            >
               <input
                 type="text"
                 name="email"
@@ -39,14 +45,12 @@ const SubscribeToUs = () => {
                 className="bg-white  py-2 px-6 rounded-full max-lg:border border-gray-300  text-black max-lg:text-center placeholder:text-gray-400 focus:outline-none flex-1 w-full  lg:w-auto lg:py-2 lg:px-6 "
                 placeholder="Enter your email.."
               />
-              <button
+              <input
+                value={"Submit"}
                 type="submit"
-                onClick={() => subscribeToUsHandler()}
                 className={`disabled:opacity-50 py-2 px-5 text-sm bg-mainColor/70 shadow-md rounded-full border-white border ml-2  text-white font-semibold hover:bg-mainColor/20`}
-              >
-                Subscribe
-              </button>
-            </div>
+              />
+            </form>
           </div>
         </div>
       </section>

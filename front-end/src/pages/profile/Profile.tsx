@@ -1,5 +1,4 @@
-import { Link, useParams } from "react-router-dom";
-import { FaDoorOpen, FaPersonWalkingArrowRight } from "react-icons/fa6";
+import { FaPersonWalkingArrowRight } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
@@ -32,13 +31,16 @@ const Profile = () => {
   const logoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
-      dispatch(authActions.logout(null));
+      dispatch(authActions.logout());
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
   return (
     <>
       <div

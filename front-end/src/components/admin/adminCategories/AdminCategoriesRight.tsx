@@ -18,7 +18,7 @@ const AdminCategoriesRight = () => {
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
       setLoading(false);
@@ -40,7 +40,7 @@ const AdminCategoriesRight = () => {
       toast.success(data.message);
       setCategory("");
       getCategories();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -50,7 +50,7 @@ const AdminCategoriesRight = () => {
       const { data } = await customAxios.delete(`categories/${id}`);
       toast.success(data.message);
       getCategories();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }

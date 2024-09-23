@@ -48,20 +48,21 @@ const loginController = async (
         expiresIn: "1y",
       }
     );
-    user.token = token;
-    await user.save();
     user.password = "";
 
-    // res
-    //   .cookie("token", token, {
-    //     httpOnly: true,
-    //     sameSite: "None" as "none",
-    //     maxAge: 1000 * 60 * 60 * 24 * 365,
-    //     secure: process.env.NODE_ENV == "developement" ? false : true,
-    //   })
-    //   .status(200)
-    //   .json({ message: "login successfully", data: user });
-    res.status(200).json({ message: "login successfully", data: user });
+    res
+      .cookie("swiftbuy-token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        secure: process.env.NODE_ENV == "development" ? false : true,
+        domain:
+          process.env.NODE_ENV == "development"
+            ? "localhost"
+            : "production-server.tech",
+      })
+      .status(200)
+      .json({ message: "login successfully", data: user });
   } catch (error) {
     next(error);
   }
@@ -101,20 +102,20 @@ const registerController = async (
       process.env.JWT_SECRET as string,
       { expiresIn: "1y" }
     );
-    user.token = token;
-    await user.save();
     user.password = "";
-    //   res
-    //     .cookie("token", token, {
-    //       maxAge: 1000 * 60 * 60 * 24 * 365,
-    //       httpOnly: true,
-    //       secure: process.env.NODE_ENV == "developement" ? false : true,
-    //       sameSite: "None" as "none",
-    //     })
-    //     .status(201)
-    //     .json({ data: user, message: "created succefully" });
-    // } catch (error) {
-    res.status(201).json({ data: user, message: "created succefully" });
+    res
+      .cookie("swiftbuy-token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        secure: process.env.NODE_ENV == "development" ? false : true,
+        domain:
+          process.env.NODE_ENV == "development"
+            ? "localhost"
+            : "production-server.tech",
+      })
+      .status(201)
+      .json({ data: user, message: "created successfully" });
   } catch (error) {
     next(error);
   }
@@ -145,22 +146,20 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
-      user.token = token;
-      await user.save();
       user.password = "";
       return res
-
+        .cookie("swiftbuy-token", token, {
+          httpOnly: true,
+          sameSite: "none",
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+          secure: process.env.NODE_ENV == "development" ? false : true,
+          domain:
+            process.env.NODE_ENV == "development"
+              ? "localhost"
+              : "production-server.tech",
+        })
         .status(200)
-        .json({ data: user, message: "login successfully" });
-      // return res
-      //   .cookie("token", token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV == "developement" ? false : true,
-      //     maxAge: 1000 * 60 * 60 * 24 * 365,
-      //     sameSite: "None" as "none",
-      //   })
-      //   .status(200)
-      //   .json({ data: user, message: "login successfully" });
+        .json({ message: "login successfully", data: user });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -179,23 +178,21 @@ const googleSignIncontroller = async (
           expiresIn: "1y",
         }
       );
-      user.token = token;
-      await user.save();
 
       user.password = "";
       return res
-
-        .status(200)
-        .json({ data: user, message: "login successfully" });
-      // return res
-      //   .cookie("token", token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV == "developement" ? false : true,
-      //     maxAge: 1000 * 60 * 60 * 24 * 365,
-      //     sameSite: "None" as "none",
-      //   })
-      //   .status(200)
-      //   .json({ data: user, message: "login successfully" });
+        .cookie("swiftbuy-token", token, {
+          httpOnly: true,
+          sameSite: "none",
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+          secure: process.env.NODE_ENV == "development" ? false : true,
+          domain:
+            process.env.NODE_ENV == "development"
+              ? "localhost"
+              : "production-server.tech",
+        })
+        .status(201)
+        .json({ message: "user created successfully", data: user });
     }
   } catch (error) {
     next(error);
@@ -204,7 +201,15 @@ const googleSignIncontroller = async (
 
 const logoutController = (req: Request, res: Response, next: NextFunction) => {
   res
-    .clearCookie("token")
+    .clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV == "development" ? false : true,
+      domain:
+        process.env.NODE_ENV == "development"
+          ? "localhost"
+          : "production-server.tech",
+    })
     .status(200)
     .json({ data: null, message: "logout successfully" });
 };

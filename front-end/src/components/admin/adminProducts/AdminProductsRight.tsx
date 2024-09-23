@@ -12,7 +12,7 @@ const AdminProductsRight = () => {
     try {
       const { data } = await customAxios.get("/products");
       setProducts(data.data);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -26,7 +26,7 @@ const AdminProductsRight = () => {
       const { data } = await customAxios.delete(`/products/${id}`);
       getAllProducts();
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }

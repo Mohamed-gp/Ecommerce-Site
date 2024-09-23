@@ -36,7 +36,7 @@ export default function Hero() {
         }}
       >
         {products?.map((product) => (
-          <HeroProduct product={product} />
+          <HeroProduct product={product} key={product._id + "heroPage"} />
         ))}
       </div>
     </div>

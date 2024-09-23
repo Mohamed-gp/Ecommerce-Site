@@ -13,7 +13,7 @@ const AdminAdminsRight = () => {
     try {
       const { data } = await customAxios.get("/admin/admins");
       setAdmins(data.data);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -35,7 +35,7 @@ const AdminAdminsRight = () => {
       toast.success(data.message);
       setAdminEmail("");
       getAdmins();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -45,7 +45,7 @@ const AdminAdminsRight = () => {
       const { data } = await customAxios.delete(`/admin/admins/${id}`);
       toast.success(data.message);
       getAdmins();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }

@@ -33,9 +33,9 @@ const Login = () => {
       dispatch(authActions.login(data.data))
       toast.success(data.message);
     
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response.data.message);
-      console.log(error.response.data.message);
+      console.log(error);
     }
     setLoading(false);
   };
@@ -80,7 +80,7 @@ const Login = () => {
               className="mb-2 mt-1 rounded-lg border-2 py-1 pl-2 focus:outline-none"
             />
             <div className="flex justify-between">
-              <label htmlFor="email" className="">
+              <label htmlFor="password" className="">
                 Password
               </label>
               <div className="mr-2 flex cursor-pointer gap-2 text-lg opacity-60">
@@ -113,7 +113,7 @@ const Login = () => {
             </button>
             <div className="mt-2 flex items-center justify-center gap-2">
               <p className="opacity-50">Don't Have An Account ? </p>
-              <Link to="/register" className="text-mainColor underline">
+              <Link to="/login" className="text-mainColor underline">
                 Register
               </Link>
             </div>

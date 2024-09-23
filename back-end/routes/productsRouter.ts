@@ -10,18 +10,25 @@ import {
 import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
 import upload from "../config/multer";
 import verifyObjectId from "../middlewares/verifyObjectId";
+import demoAdmin from "../middlewares/demoAdmin";
 
 const router = Router();
 
 router
   .route("/")
   .get(getAllProducts)
-  .post(upload.array("images"), verifyToken, verifyAdmin, createProduct);
+  .post(
+    upload.array("images"),
+    verifyToken,
+    verifyAdmin,
+    demoAdmin,
+    createProduct
+  );
 router.route("/featured").get(getFeaturedProducts);
 router.route("/wishlist").post(verifyToken, toggleWishlist);
 router
   .route("/:id")
   .get(verifyObjectId, getProduct)
-  .delete(verifyToken, verifyAdmin, deleteProduct);
+  .delete(verifyToken, verifyAdmin, demoAdmin, deleteProduct);
 
 export default router;

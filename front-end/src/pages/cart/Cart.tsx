@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { FaArrowRight, FaTrash, FaXmark } from "react-icons/fa6";
+import { FaArrowRight, FaTrash } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import customAxios from "../../utils/axios/customAxios";
 import toast from "react-hot-toast";
-import ZoomedImageStatic from "../../components/zooomedImage/ZoomedImageStatic";
 
 export default function Cart() {
   const cart: any[] = useSelector((state: IRootState) => state.auth.user?.cart);
@@ -29,10 +28,10 @@ export default function Cart() {
   const checkoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/checkout", { cart });
-      // window.open(data.data, "_blank");
+      // window.open(data.data, "_blank"); /// some browser gonna stop the popup and ask the user...
       window.open(data.data, "_self");
       // dispatch(authActions.setCart([]));
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -47,7 +46,7 @@ export default function Cart() {
       });
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -57,6 +56,9 @@ export default function Cart() {
     setCoupon("");
   };
 
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
   return (
     <>
       {cart?.length != 0 ? (

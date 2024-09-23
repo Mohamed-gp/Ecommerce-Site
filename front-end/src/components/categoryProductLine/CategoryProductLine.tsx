@@ -32,7 +32,10 @@ export default function CategoryProductLine({
       </p>
       <div className="flex gap-8 flex-wrap my-12 justify-center">
         {products.map((product) => (
-          <ProductComp product={product} />
+          <ProductComp
+            product={product}
+            key={"categoryProductLine" + product._id}
+          />
         ))}
         <div className="flex w-full justify-end">
           <Link

@@ -30,9 +30,12 @@ export default function HeroSlider({
         <FaArrowRight />
       </button>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3 z-[2000]">
-        {emptyArray.map((element) => (
+        {emptyArray.map((element, index) => (
           <div
-            className={`cursor-pointer bg-white h-3 w-3 rounded-full  ${element === slideIndex ? "opacity-100" : "opacity-40"}`}
+            key={index + "emptyArraySlider"}
+            className={`cursor-pointer bg-white h-3 w-3 rounded-full  ${
+              element === slideIndex ? "opacity-100" : "opacity-40"
+            }`}
             onClick={() => setslideIndex(element)}
           ></div>
         ))}

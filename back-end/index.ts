@@ -1,18 +1,18 @@
 import express, { Request, Response } from "express";
-import authRouter from "../routes/authRouter";
-import userRouter from "../routes/usersRouter";
-import productsRouter from "../routes/productsRouter";
-import categoriesRouter from "../routes/categoriesRouter";
-import adminRouter from "../routes/adminRouter";
-import connectToDB from "../lib/connectToDB";
+import authRouter from "./routes/authRouter";
+import userRouter from "./routes/usersRouter";
+import productsRouter from "./routes/productsRouter";
+import categoriesRouter from "./routes/categoriesRouter";
+import adminRouter from "./routes/adminRouter";
+import connectToDB from "./lib/connectToDB";
 import dotenv from "dotenv";
 import cors from "cors";
-import { notFound, errorHandler } from "../middlewares/errors";
+import { notFound, errorHandler } from "./middlewares/errors";
 import cookieParser from "cookie-parser";
-import cartRouter from "../routes/cartRouter";
-import checkoutRouter from "../routes/checkoutRouter";
-import commentsRouter from "../routes/commentsRouter";
-import { verifyToken } from "../middlewares/verifyToken";
+import cartRouter from "./routes/cartRouter";
+import checkoutRouter from "./routes/checkoutRouter";
+import commentsRouter from "./routes/commentsRouter";
+import { verifyToken } from "./middlewares/verifyToken";
 
 dotenv.config();
 const app = express();
@@ -25,10 +25,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     origin:
-      process.env.NODE_ENV == "developement"
-        ? "http://localhost:5173"
-        : "https://swiftbuy1.netlify.app",
-    // origin: "http://localhost:5173",
+      process.env.NODE_ENV == "development"
+        ? "http://localhost:5000"
+        : "https://swiftbuy.production-server.tech",
     credentials: true,
   })
 );
@@ -49,5 +48,3 @@ app.use("/api/comments", commentsRouter);
 
 app.use(notFound);
 app.use(errorHandler);
-
-export default app;

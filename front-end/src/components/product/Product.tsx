@@ -14,7 +14,7 @@ interface productProps {
 // product props
 export default function Product({ product }: productProps) {
   const dispatch = useDispatch();
-  const user = useSelector((state: IRootState) => state.auth.user);
+  const {user} = useSelector((state: IRootState) => state.auth);
   const navigate = useNavigate();
   // const [animate, setanimate] = useState<string>("");
   const toggleWishListHandler = async (userId: string, productId: string) => {
@@ -24,9 +24,8 @@ export default function Product({ product }: productProps) {
         productId,
       });
       dispatch(authActions.setWishlist(data.data));
-      console.log(data.data);
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -82,7 +81,7 @@ export default function Product({ product }: productProps) {
       });
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -92,9 +91,9 @@ export default function Product({ product }: productProps) {
     try {
       const { data } = await customAxios(`/comments/${product._id}`);
       setreviews(data.data);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
     }
   };
   useEffect(() => {

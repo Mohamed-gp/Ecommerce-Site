@@ -3,14 +3,14 @@ import { FaCartShopping, FaHeart, FaUser } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { RiAdminFill } from "react-icons/ri";
-import { FaHome } from "react-icons/fa";
+import { AiFillHome } from "react-icons/ai";
 
 export default function HeaderRight() {
   const user = useSelector((state: IRootState) => state.auth.user);
   return (
     <div className="flex items-center justify-between gap-3 text-sm md:text-lg ">
       <Link to={`/`} className="sm:hidden md:text-xl ">
-        <FaHome />
+        <AiFillHome />
       </Link>
 
       {user?.role != "admin" ? (

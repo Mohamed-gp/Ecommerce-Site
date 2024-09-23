@@ -59,7 +59,7 @@ export default function Footer() {
             Home
           </Link>
           <Link
-            to={user?._id ? `/profile/${user?._id}` : `/register`}
+            to={user?._id ? `/profile` : `/register`}
             className="cursor-pointer opacity-30 duration-1000 hover:opacity-100"
           >
             My Account
