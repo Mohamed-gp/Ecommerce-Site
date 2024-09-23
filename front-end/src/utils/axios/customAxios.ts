@@ -2,11 +2,10 @@ import axios from "axios";
 // import store from "../../redux/store";
 
 const env = import.meta.env.VITE_ENV;
-
 const customAxios = axios.create({
   baseURL:
     env === "production"
-      ? "https://krelli1.production-server.tech/api/"
+      ? "https://swiftbuy1.production-server.tech/api/"
       : "http://localhost:3000/api/",
   withCredentials: true,
 });
