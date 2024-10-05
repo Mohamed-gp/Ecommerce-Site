@@ -201,7 +201,7 @@ const googleSignIncontroller = async (
 
 const logoutController = (req: Request, res: Response, next: NextFunction) => {
   res
-    .clearCookie("token", {
+    .clearCookie("swiftbuy-token", {
       httpOnly: true,
       sameSite: "none",
       secure: process.env.NODE_ENV == "development" ? false : true,
