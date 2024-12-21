@@ -7,7 +7,7 @@ const customAxios = axios.create({
     env === "production"
       ? "https://swiftbuy1.production-server.tech/api/"
       : "http://localhost:3000/api/",
-  withCredentials: true,
+  withCredentials: true, 
 });
 
 // // Add a request interceptor
