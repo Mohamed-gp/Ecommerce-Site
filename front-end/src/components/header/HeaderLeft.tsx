@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
-import { FaBagShopping, FaShop, FaStore } from "react-icons/fa6";
+import { FaBagShopping } from "react-icons/fa6";
 
-export default function HeaderLeft() {
+interface HeaderLeftProps {
+  isFooter?: boolean;
+}
+
+export default function HeaderLeft({ isFooter }: HeaderLeftProps) {
   return (
-    <Link to="/" className="text-base sm:text-xl font-bold sm:flex  hidden   items-center gap-1">
-      {/* <img src="/logo-symbol.png" alt="logo" width={20} height={20}/> */}
-      <span className="flex items-center justify-center text-white bg-mainColor p-2  rounded-xl text-lg">
+    <Link to="/" className={`text-base sm:text-xl font-bold sm:flex hidden items-center gap-1 ${isFooter ? 'text-white' : 'text-gray-900'}`}>
+      <span className={`flex items-center justify-center ${isFooter ? 'bg-white text-mainColor' : 'bg-mainColor text-white'} p-2 rounded-xl text-lg`}>
         <FaBagShopping/>  
       </span>
       SwiftBuy

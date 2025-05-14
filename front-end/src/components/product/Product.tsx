@@ -1,6 +1,5 @@
-import { FaCartShopping, FaHeart, FaRegHeart } from "react-icons/fa6";
-import RatingStars from "../ratingstars/RatingStars";
-import { useEffect, useState } from "react";
+import { FaCartShopping, FaHeart, FaRegHeart, FaStar } from "react-icons/fa6";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,16 +7,41 @@ import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
 import customAxios from "../../utils/axios/customAxios";
 
-interface productProps {
-  product: any;
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  promoPercentage: number;
+  images: string[];
+  isNew?: boolean;
 }
-// product props
-export default function Product({ product }: productProps) {
+
+interface Review {
+  _id: string;
+  rate: number;
+  comment: string;
+  userId: string;
+}
+
+interface ProductProps {
+  product: Product;
+}
+
+export default function Product({ product }: ProductProps) {
   const dispatch = useDispatch();
-  const {user} = useSelector((state: IRootState) => state.auth);
+  const { user } = useSelector((state: IRootState) => state.auth);
   const navigate = useNavigate();
-  // const [animate, setanimate] = useState<string>("");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const productRef = useRef<HTMLDivElement>(null);
+
   const toggleWishListHandler = async (userId: string, productId: string) => {
+    if (!user) {
+      navigate("/register");
+      return;
+    }
     try {
       const { data } = await customAxios.post("/products/wishlist", {
         userId,
@@ -26,53 +50,17 @@ export default function Product({ product }: productProps) {
       dispatch(authActions.setWishlist(data.data));
       toast.success(data.message);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      if (error instanceof Error) {
+        console.error(error);
+        toast.error(error.message);
+      }
     }
   };
-
-  // const addProductHandler = (e) => {
-  //   const cart = document.querySelector(".cart-icon");
-
-  //   const product =
-  //     e.currentTarget.parentElement.parentElement.parentElement.children[0]
-  //       .children[0];
-  //   // finding first grand parent of target button
-  //   let target_parent = product.parentNode;
-  //   // target_parent.style.zIndex = "100";
-  //   // Creating separate Image
-  //   // let img = target_parent.querySelector('img');
-  //   let flying_img = product.cloneNode();
-  //   flying_img.classList.add("flying-img");
-
-  //   target_parent.appendChild(flying_img);
-  //   // Finding position of flying image
-  //   const flying_img_pos = flying_img.getBoundingClientRect();
-  //   const shopping_cart_pos = cart.getBoundingClientRect();
-
-  //   let data = {
-  //     left:
-  //       shopping_cart_pos.left -
-  //       (shopping_cart_pos.width / 2 +
-  //         flying_img_pos.left +
-  //         flying_img_pos.width / 2),
-  //     top: shopping_cart_pos.bottom - flying_img_pos.bottom + 30,
-  //   };
-
-  //   flying_img.style.cssText = `
-  //                             --left : ${data.left.toFixed(2)}px;
-  //                             --top : ${data.top.toFixed(2)}px;
-  //                             `;
-
-  //   setTimeout(() => {
-  //     // target_parent.style.zIndex = "";
-  //     target_parent.removeChild(flying_img);
-  //   }, 1000);
-  // };
 
   const addToCart = async () => {
     if (!user) {
       navigate("/register");
+      return;
     }
     try {
       const { data } = await customAxios.post("/cart/add", {
@@ -82,112 +70,188 @@ export default function Product({ product }: productProps) {
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      if (error instanceof Error) {
+        console.error(error);
+        toast.error(error.message);
+      }
     }
   };
-  const [reviews, setreviews] = useState([]);
+
   const getReviews = async () => {
     try {
       const { data } = await customAxios(`/comments/${product._id}`);
-      setreviews(data.data);
+      setReviews(data.data);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      console.error(error);
     }
   };
+
   useEffect(() => {
     getReviews();
-  }, []);
+    const currentRef = productRef.current;
+
+    // Intersection Observer for lazy loading
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const img = new Image();
+          img.src = product?.images[0];
+          img.onload = () => setIsImageLoaded(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [product._id, product.images]);
+
+  // Calculate average rating
+  const averageRating = reviews.length
+    ? reviews.reduce((acc, curr) => acc + curr.rate, 0) / reviews.length
+    : 0;
+
   return (
-    <>
-      {/* data-aos="fade-down" problem with adding to cart */}
-      <div
-        style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
-        className="flex w-[292px] rounded-b-xl rounded-t-xl flex-col  overflow-hidden"
-      >
-        <div className="relative  overflow-hidden flex-1 flex  items-center justify-center   rounded-t-xl bg-white">
-          <div className="w-[100px] h-[140px] relative  hover:scale-110 duration-300 z-[8] flex justify-center items-center">
-            <img
-              src={product?.images[0]}
-              alt={product?._id}
-              className="  object-cover "
-            />
+    <div
+      ref={productRef}
+      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Product Image Section */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
+        <div
+          className={`absolute inset-0 bg-gray-200 animate-pulse ${
+            isImageLoaded ? "hidden" : "block"
+          }`}
+        />
+        <div className="absolute inset-0 flex items-center justify-center p-4">
+          <img
+            src={product?.images[0]}
+            alt={product?.name}
+            className={`w-full h-full object-contain transform transition-all duration-500 ${
+              isHovered ? "scale-110" : "scale-100"
+            } ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
+            loading="lazy"
+            onLoad={() => setIsImageLoaded(true)}
+          />
+        </div>
+
+        {/* Promotion Badge */}
+        {product?.promoPercentage > 0 && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full z-20">
+            {product.promoPercentage}% OFF
           </div>
-          {user && (
-            <div className="absolute right-4 top-4 ">
-              {user?.wishlist?.find((ele: any) => ele._id == product._id) ? (
-                <div
-                  className="relative z-[1] cursor-pointer text-mainColor "
-                  onClick={() => toggleWishListHandler(user._id, product._id)}
-                >
-                  <FaHeart />
-                </div>
+        )}
+
+        {/* New Badge */}
+        {product?.isNew && (
+          <div className="absolute top-2 left-2 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full z-20">
+            New
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        {user && (
+          <div
+            className={`absolute right-3 flex flex-col gap-2 transition-all duration-300 ${
+              isHovered ? "opacity-100 top-14" : "opacity-0 -top-10"
+            }`}
+          >
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleWishListHandler(user._id, product._id);
+              }}
+              className="p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors group/btn"
+            >
+              {user?.wishlist?.find(
+                (item: Product) => item._id === product._id
+              ) ? (
+                <FaHeart className="text-mainColor transform group-hover/btn:scale-110 transition-transform" />
               ) : (
-                <div
-                  className="relative z-[1] cursor-pointer "
-                  onClick={() => toggleWishListHandler(user._id, product._id)}
-                >
-                  <FaRegHeart />
-                </div>
+                <FaRegHeart className="text-gray-600 transform group-hover/btn:scale-110 transition-transform" />
               )}
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                addToCart();
+              }}
+              className="p-2 rounded-full bg-mainColor text-white shadow-md hover:bg-opacity-90 transition-colors group/btn"
+            >
+              <FaCartShopping className="transform group-hover/btn:scale-110 transition-transform" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Product Info Section */}
+      <div className="p-4">
+        {/* Title and Rating */}
+        <div className="mb-4">
+          <Link to={`/product/${product._id}`} className="block group">
+            <h3 className="font-medium text-gray-900 group-hover:text-mainColor transition-colors line-clamp-1">
+              {product?.name}
+            </h3>
+          </Link>
+
+          <div className="flex items-center mt-2">
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={`transform transition-transform ${
+                    i < Math.round(averageRating)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  } ${isHovered ? "scale-110" : "scale-100"}`}
+                  size={14}
+                />
+              ))}
             </div>
-          )}
-          <div className=" absolute h-[280px] w-[280px] ">
-            <div className="absolute -left-[50px] top-[70px]  flex h-10   w-[120px] -rotate-45 items-center justify-center bg-bgColorDanger text-xs  text-white ">
-              {product?.promoPercentage}%
-            </div>
+            <span className="ml-2 text-sm text-gray-500">
+              {reviews.length > 0 ? `(${reviews.length})` : ""}
+            </span>
           </div>
         </div>
-        <div className="flex items-center justify-between rounded-b-xl bg-bgColorBlack px-2  leading-loose text-white">
-          <div className="left px-2 py-3">
-            <p className="text-sm font-bold line-clamp-1">
-              {product?.name?.slice(0, 16)}
-            </p>
-            <div className="rating-container my-1">
-              {reviews?.length != 0 ? (
-                <RatingStars
-                  starsNumber={
-                    +(
-                      reviews?.reduce((acc, curr, ind, arr) => {
-                        return curr.rate + acc;
-                      }, 0) / reviews.length
-                    ).toFixed(2)
-                  }
-                />
-              ) : (
-                <div className="product-rating">
-                  <span className="no-ratings">(No ratings yet)</span>
-                </div>
-              )}
-            </div>
-            <div className="relative   w-fit text-base font-bold text-red-600">
-              $
-              {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
-                2
-              )}
-              <del className="absolute bottom-0 left-full text-xs text-white">
-                ${product?.price}
-              </del>
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-3 text-xs font-bold lg:justify-normal flex-1">
-            <button
-              onClick={() => addToCart()}
-              className="flex  w-full !p-1  items-center justify-center gap-1 rounded-lg bg-mainColor  px-1 py-1 text-white"
+
+        {/* Price and Action */}
+        <div className="flex items-center justify-between h-10">
+          <div className="flex flex-col">
+            <span
+              className={`text-xl font-bold text-mainColor transition-all duration-300 ${
+                isHovered ? "scale-110" : "scale-100"
+              }`}
             >
-              <p>Add To Cart</p>
-              <FaCartShopping />
-            </button>
-            <Link
-              to={`/product/${product?._id}`}
-              className="w-full rounded-lg !p-1 bg-white px-1 py-1 text-center text-[#201F20]"
-            >
-              Read More
-            </Link>
+              ${(product?.price * (1 - product?.promoPercentage / 100)).toFixed(2)}
+            </span>
+            {product?.promoPercentage > 0 && (
+              <span className="text-sm text-gray-400 line-through -mt-1">
+                ${product?.price.toFixed(2)}
+              </span>
+            )}
           </div>
+
+          <Link
+            to={`/product/${product._id}`}
+            className={`py-2 px-4 text-sm border border-gray-200 rounded-lg transition-all duration-300 ${
+              isHovered
+                ? "bg-mainColor text-white border-mainColor"
+                : "text-gray-700 hover:border-mainColor hover:text-mainColor"
+            }`}
+          >
+            View Details
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

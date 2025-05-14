@@ -1,3 +1,10 @@
 .vercel
 todos.txt
 .env
+/node_modules
+frontend/.env
+backend/.env
+frontend/build
+frontend/.next
+frontend/out
+backend/dist

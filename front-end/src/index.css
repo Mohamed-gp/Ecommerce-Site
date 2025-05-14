@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --header-height: 5rem;
+  --swiper-theme-color: #00c2ff;
+  --swiper-pagination-bullet-size: 14px;
+  --swiper-pagination-bullet-inactive-color: rgba(255, 255, 255, 0.3);
+  --swiper-pagination-bullet-inactive-opacity: 1;
+}
+
 body {
   overflow-x: hidden;
 }
@@ -123,4 +131,179 @@ table tbody tr::after {
 thead,
 tr:not(:last-child) {
   border-bottom: 1px solid #00c2ff;
+}
+
+/* Wishlist animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sequential animation delays for grid items */
+.group:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.group:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.group:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.group:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.group:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.group:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.group:nth-child(7) {
+  animation-delay: 0.7s;
+}
+.group:nth-child(8) {
+  animation-delay: 0.8s;
+}
+
+/* Hero section styles */
+.heroSwiper {
+  width: 100%;
+  height: 80vh;
+  overflow: hidden;
+}
+
+.heroSwiper .swiper-slide {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.heroSwiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+}
+
+/* Enhanced swiper bullets */
+.swiper-pagination-bullet {
+  width: var(--swiper-pagination-bullet-size) !important;
+  height: var(--swiper-pagination-bullet-size) !important;
+  background: var(--swiper-pagination-bullet-inactive-color) !important;
+  opacity: var(--swiper-pagination-bullet-inactive-opacity) !important;
+  transition: all 0.3s ease !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--swiper-theme-color) !important;
+  transform: scale(1.2) !important;
+}
+
+.swiper-pagination-bullets {
+  bottom: 2rem !important;
+}
+
+.swiper-pagination-bullet:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  width: 50px !important;
+  height: 50px !important;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: var(--swiper-theme-color);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px !important;
+  font-weight: bold;
+}
+
+/* Enhanced hero pagination */
+.hero-pagination {
+  position: absolute;
+  bottom: 140px !important;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: auto !important;
+}
+
+.hero-pagination .swiper-pagination-bullet {
+  width: var(--swiper-pagination-bullet-size) !important;
+  height: var(--swiper-pagination-bullet-size) !important;
+  margin: 0 !important;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: transparent !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+}
+
+.hero-pagination .swiper-pagination-bullet-active {
+  background: var(--swiper-theme-color) !important;
+  border-color: var(--swiper-theme-color) !important;
+  transform: scale(1.2) !important;
+}
+
+.hero-pagination .swiper-pagination-bullet:hover {
+  border-color: var(--swiper-theme-color);
+}
+
+/* Hero content animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-content-animate {
+  animation: fadeUp 0.8s ease forwards;
 }

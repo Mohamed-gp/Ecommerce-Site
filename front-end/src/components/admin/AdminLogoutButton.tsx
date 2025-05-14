@@ -1,47 +1,77 @@
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
 import { authActions } from "../../redux/slices/authSlice";
 import customAxios from "../../utils/axios/customAxios";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { IRootState } from "../../redux/store";
+import { toast } from "react-hot-toast";
 
-const AdminLogoutButton = () => {
-  const dispatch = useDispatch();
+interface AdminLogoutButtonProps {
+  expanded: boolean;
+}
+
+const AdminLogoutButton: React.FC<AdminLogoutButtonProps> = ({ expanded }) => {
   const navigate = useNavigate();
-  const user = useSelector((state: IRootState) => state.auth.user);
-  const logoutHandler = async () => {
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
-      dispatch(authActions.logout());
-      navigate("/");
-      toast.success(data.message);
+
+      if (data.success) {
+        dispatch(authActions.logoutHandler());
+        localStorage.removeItem("user");
+        toast.success("Logged out successfully");
+        navigate("/login");
+      }
     } catch (error: any) {
-      console.log(error.response.data.message);
-      toast.error(error.response.data.message);
+      console.error("Logout failed:", error);
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   };
+
+  // Animation variants for text
+  const textVariants = {
+    expanded: {
+      opacity: 1,
+      display: "block",
+      transition: {
+        delay: 0.1,
+        duration: 0.2,
+      },
+    },
+    collapsed: {
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+      },
+      transitionEnd: {
+        display: "none",
+      },
+    },
+  };
+
   return (
     <button
-      onClick={() => logoutHandler()}
-      className="flex items-center admin-logout-button p-1 lg:p-2 justify-center lg:justify-normal rounded-xl lg:rounded-l-lg"
+      onClick={handleLogout}
+      className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-colors hover:bg-red-50 text-red-600 ${
+        expanded ? "" : "justify-center"
+      }`}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        width={20}
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-6 h-6"
+      <div className="text-xl min-w-[24px]">
+        <FiLogOut />
+      </div>
+
+      <motion.span
+        variants={textVariants}
+        animate={expanded ? "expanded" : "collapsed"}
+        className="font-medium text-sm ml-3"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-        />
-      </svg>
-      <span className="hidden lg:inline">Logout</span>
+        Logout
+      </motion.span>
     </button>
   );
 };
+
 export default AdminLogoutButton;
