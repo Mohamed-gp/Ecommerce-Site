@@ -52,7 +52,7 @@ export default function Home() {
         <Features />
 
         <NewArrivals />
-        
+
         <StoreProducts />
 
         {isLoading ? (
@@ -71,7 +71,7 @@ export default function Home() {
         )}
 
         {/* Newsletter Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

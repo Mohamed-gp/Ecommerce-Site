@@ -43,9 +43,7 @@ const Hero = () => {
     return (
       <section className="relative h-screen bg-black flex items-center justify-center">
         <div className="text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">
-            Welcome to SwiftBuy
-          </h2>
+          <h2 className="text-2xl font-bold mb-4">Welcome to SwiftBuy</h2>
           <p className="text-white/80 mb-6">
             Discover amazing products in our store
           </p>
@@ -74,7 +72,7 @@ const Hero = () => {
           renderBullet: function (_, className) {
             return '<span class="' + className + ' !bg-mainColor"></span>';
           },
-          el: '.hero-pagination'
+          el: ".hero-pagination",
         }}
         navigation={{
           nextEl: ".swiper-button-next",

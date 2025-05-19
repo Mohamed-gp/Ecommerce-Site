@@ -36,7 +36,9 @@ export default function StoreProducts() {
               <FaStore className="text-mainColor text-2xl" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold leading-tight">Featured Products</h2>
+              <h2 className="text-2xl font-bold leading-tight">
+                Featured Products
+              </h2>
               <p className="text-gray-600 text-sm mt-1">
                 Hand-picked products just for you
               </p>
@@ -66,15 +68,19 @@ export default function StoreProducts() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="bg-white rounded-lg shadow-md p-4 transition-shadow hover:shadow-lg">
-                  <img 
-                    src={product.images[0]} 
-                    alt={product.name} 
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
                     className="w-full h-48 object-contain mb-4"
                   />
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between">
                     <div className="text-mainColor font-bold">
-                      ${(product.price * (1 - (product.promoPercentage || 0) / 100)).toFixed(2)}
+                      $
+                      {(
+                        product.price *
+                        (1 - (product.promoPercentage || 0) / 100)
+                      ).toFixed(2)}
                     </div>
                     {product.promoPercentage > 0 && (
                       <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">

@@ -231,7 +231,10 @@ export default function Product({ product }: ProductProps) {
                 isHovered ? "scale-110" : "scale-100"
               }`}
             >
-              ${(product?.price * (1 - product?.promoPercentage / 100)).toFixed(2)}
+              $
+              {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
+                2
+              )}
             </span>
             {product?.promoPercentage > 0 && (
               <span className="text-sm text-gray-400 line-through -mt-1">

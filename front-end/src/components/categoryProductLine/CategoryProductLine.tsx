@@ -43,7 +43,7 @@ export default function CategoryProductLine({
       }`}
     >
       <div className="container">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -55,7 +55,9 @@ export default function CategoryProductLine({
               <FaList className="text-mainColor text-2xl" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold leading-tight capitalize">{category?.name}</h2>
+              <h2 className="text-3xl font-bold leading-tight capitalize">
+                {category?.name}
+              </h2>
               <p className="text-gray-600 mt-1">
                 Discover our selection of {category?.name.toLowerCase()}
               </p>

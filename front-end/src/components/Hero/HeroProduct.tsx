@@ -66,7 +66,10 @@ export default function HeroProduct({ product }: HeroProductProps) {
 
           <div className="flex flex-col md:flex-row items-center gap-4 justify-center lg:justify-start">
             <div className="text-5xl font-bold text-mainColor">
-              ${(product?.price * (1 - product?.promoPercentage / 100)).toFixed(2)}
+              $
+              {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
+                2
+              )}
             </div>
 
             {product?.promoPercentage > 0 && (
