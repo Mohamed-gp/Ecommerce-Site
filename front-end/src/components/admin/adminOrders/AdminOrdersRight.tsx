@@ -1,17 +1,49 @@
 import { useEffect, useState } from "react";
-import { FaCheck, FaSpinner, FaTimes, FaSearch } from "react-icons/fa";
+import {
+  FaCheck,
+  FaSpinner,
+  FaTimes,
+  FaSearch,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 import customAxios from "../../../utils/axios/customAxios";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import defaultAvatar from "/websiteavatar.png";
+
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  photoUrl?: string;
+}
+
+interface OrderProduct {
+  product: {
+    name: string;
+    price: number;
+    images: string[];
+  };
+  quantity: number;
+}
 
 interface Order {
   _id: string;
-  user: any;
-  products: any[];
+  user: User;
+  products: OrderProduct[];
   totalPrice: number;
   createdAt: string;
   status: string;
   isPaid: boolean;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 }
 
 const AdminOrdersRight = () => {
@@ -19,6 +51,8 @@ const AdminOrdersRight = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const getOrders = async () => {
     try {
@@ -26,9 +60,10 @@ const AdminOrdersRight = () => {
       const { data } = await customAxios.get("/orders");
       setOrders(data.data);
       setFilteredOrders(data.data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Error fetching orders");
+      const apiError = error as ApiError;
+      toast.error(apiError.response?.data?.message || "Error fetching orders");
     } finally {
       setIsLoading(false);
     }
@@ -49,19 +84,24 @@ const AdminOrdersRight = () => {
         order.user?.username
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        order._id?.toLowerCase().includes(searchTerm.toLowerCase())
+        order._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.status?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredOrders(filtered);
   }, [searchTerm, orders]);
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
+      setUpdatingStatus(orderId);
       await customAxios.patch(`/orders/${orderId}`, { status: newStatus });
       toast.success("Order status updated successfully");
       getOrders();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Error updating order");
+      const apiError = error as ApiError;
+      toast.error(apiError.response?.data?.message || "Error updating order");
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
@@ -76,6 +116,11 @@ const AdminOrdersRight = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
+  };
+
+  const detailsVariants = {
+    hidden: { height: 0, opacity: 0 },
+    show: { height: "auto", opacity: 1 },
   };
 
   return (
@@ -129,87 +174,159 @@ const AdminOrdersRight = () => {
                   Payment
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Details
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredOrders.map((order) => (
-                <motion.tr
-                  key={order._id}
-                  variants={itemVariants}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    #{order._id.slice(-6)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-100">
-                        <img
-                          src={order.user?.photoUrl || "/default-avatar.png"}
-                          alt={order.user?.username}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.user?.username}
+                <>
+                  <motion.tr
+                    key={order._id}
+                    variants={itemVariants}
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      #{order._id.slice(-6)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-100">
+                          <img
+                            src={order.user?.photoUrl || defaultAvatar}
+                            alt={order.user?.username}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = defaultAvatar;
+                            }}
+                          />
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {order.user?.email}
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {order.user?.username}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {order.user?.email}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${order.totalPrice.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                        ${
-                          order.status === "delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "processing"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : order.status === "cancelled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {order.isPaid ? (
-                      <span className="inline-flex items-center text-green-500">
-                        <FaCheck className="mr-1" /> Paid
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ${order.totalPrice.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                          ${
+                            order.status === "delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "processing"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                      >
+                        {order.status}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center text-red-500">
-                        <FaTimes className="mr-1" /> Unpaid
-                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {order.isPaid ? (
+                        <span className="inline-flex items-center text-green-500">
+                          <FaCheck className="mr-1" /> Paid
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center text-red-500">
+                          <FaTimes className="mr-1" /> Unpaid
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() =>
+                          setExpandedOrder(
+                            expandedOrder === order._id ? null : order._id
+                          )
+                        }
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        {expandedOrder === order._id ? (
+                          <FaChevronUp />
+                        ) : (
+                          <FaChevronDown />
+                        )}
+                      </button>
+                    </td>
+                  </motion.tr>
+                  <AnimatePresence>
+                    {expandedOrder === order._id && (
+                      <motion.tr
+                        initial="hidden"
+                        animate="show"
+                        exit="hidden"
+                        variants={detailsVariants}
+                      >
+                        <td colSpan={7} className="px-6 py-4 bg-gray-50">
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">
+                                Order Status
+                              </h4>
+                              <select
+                                value={order.status}
+                                onChange={(e) =>
+                                  updateOrderStatus(order._id, e.target.value)
+                                }
+                                disabled={updatingStatus === order._id}
+                                className="rounded-md border-gray-200 text-sm focus:ring-mainColor focus:border-mainColor disabled:opacity-50"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                              {updatingStatus === order._id && (
+                                <FaSpinner className="inline ml-2 animate-spin text-mainColor" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">
+                                Products
+                              </h4>
+                              <div className="space-y-2">
+                                {order.products.map((item, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between text-sm"
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 mr-3">
+                                        <img
+                                          src={item.product.images[0]}
+                                          alt={item.product.name}
+                                          className="h-full w-full object-cover"
+                                        />
+                                      </div>
+                                      <span>{item.product.name}</span>
+                                    </div>
+                                    <div className="text-gray-500">
+                                      {item.quantity} × $
+                                      {item.product.price.toFixed(2)}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </motion.tr>
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        updateOrderStatus(order._id, e.target.value)
-                      }
-                      className="rounded-md border-gray-200 text-sm focus:ring-mainColor focus:border-mainColor"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="processing">Processing</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </td>
-                </motion.tr>
+                  </AnimatePresence>
+                </>
               ))}
             </tbody>
           </table>

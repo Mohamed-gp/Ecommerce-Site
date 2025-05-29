@@ -369,7 +369,8 @@ const AdminProductsEditRight = () => {
             </div>
 
             <div className="text-sm text-gray-500 mb-6">
-              <p>• You can upload multiple images</p>
+              <p>• You can upload multiple images for a slider</p>
+              <p>• At least one image is required</p>
               <p>• Removing an image will delete it when you save changes</p>
             </div>
           </div>

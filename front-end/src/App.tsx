@@ -20,6 +20,7 @@ import AdminCategories from "./pages/admin/AdminCategories";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAdmins from "./pages/admin/AdminAdmins";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminUsers from "./pages/admin/AdminUsers";
 import Store from "./pages/store/Store";
 import Wishlist from "./pages/wishlist/Wishlist";
 import OrderConfirmed from "./pages/order-confirmed/OrderConfirmed";
@@ -90,18 +91,18 @@ function App() {
               )
             }
           />
-          {/* <Route
-            path="coupons"
+          <Route
+            path="users"
             element={
-              user?.role == "admin" ? <AdminCoupons /> : <Navigate to={"/"} />
+              user?.role == "admin" ? <AdminUsers /> : <Navigate to={"/"} />
             }
-          /> */}
-          {/* <Route
+          />
+          <Route
             path="orders"
             element={
               user?.role == "admin" ? <AdminOrders /> : <Navigate to={"/"} />
             }
-          /> */}
+          />
           <Route
             path="admins"
             element={
@@ -112,6 +113,12 @@ function App() {
             path="settings"
             element={
               user?.role == "admin" ? <AdminSettings /> : <Navigate to={"/"} />
+            }
+          />
+          <Route
+            path="coupons"
+            element={
+              user?.role === "admin" ? <AdminCoupons /> : <Navigate to={"/"} />
             }
           />
         </Route>

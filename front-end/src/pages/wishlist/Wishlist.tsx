@@ -16,6 +16,12 @@ import customAxios from "../../utils/axios/customAxios";
 import { authActions } from "../../redux/slices/authSlice";
 import toast from "react-hot-toast";
 
+interface SortedProduct extends Product {
+  promoPercentage: number;
+  price: number;
+  name: string;
+}
+
 export default function Wishlist() {
   const { wishlist } = useSelector((state: IRootState) => state.auth.user);
   const user = useSelector((state: IRootState) => state.auth.user);
@@ -24,7 +30,9 @@ export default function Wishlist() {
   const [fadeIn, setFadeIn] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<string>("");
-  const [displayWishlist, setDisplayWishlist] = useState(wishlist || []);
+  const [displayWishlist, setDisplayWishlist] = useState<Product[]>(
+    wishlist || []
+  );
 
   const toggleWishListHandler = async (productId: string) => {
     try {
@@ -44,25 +52,24 @@ export default function Wishlist() {
   };
 
   useEffect(() => {
-    // Apply sorting to wishlist items
-    let sorted = [...(wishlist || [])];
+    let sorted = [...(wishlist || [])] as SortedProduct[];
 
     if (sortBy === "price-asc") {
       sorted.sort(
-        (a: any, b: any) =>
+        (a, b) =>
           a.price * (1 - a.promoPercentage / 100) -
           b.price * (1 - b.promoPercentage / 100)
       );
     } else if (sortBy === "price-desc") {
       sorted.sort(
-        (a: any, b: any) =>
+        (a, b) =>
           b.price * (1 - b.promoPercentage / 100) -
           a.price * (1 - a.promoPercentage / 100)
       );
     } else if (sortBy === "name-asc") {
-      sorted.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "name-desc") {
-      sorted.sort((a: any, b: any) => b.name.localeCompare(a.name));
+      sorted.sort((a, b) => b.name.localeCompare(a.name));
     }
 
     setDisplayWishlist(sorted);

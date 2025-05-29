@@ -320,6 +320,10 @@ const AdminProductsAddRight = () => {
 
           <div className="text-sm text-gray-500 mb-6">
             <p>• Upload at least one product image</p>
+            <p>
+              • You can upload multiple images for a slider (recommended: 2-6
+              images)
+            </p>
             <p>• Recommended size: 800x800 pixels</p>
             <p>• Maximum size: 5MB per image</p>
           </div>

@@ -1,26 +1,25 @@
 import { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { IRootState } from "../../../redux/store";
-import { FaBell, FaCog, FaRegEnvelope } from "react-icons/fa";
+import { FaCog, FaRegEnvelope, FaPlus } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import customAxios from "../../../utils/axios/customAxios";
+import { authActions } from "../../../redux/slices/authSlice";
+import { toast } from "react-hot-toast";
 
 const AdminDashboardHeader = () => {
   const { user } = useSelector((state: IRootState) => state.auth);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const dispatch = useDispatch();
   const [showProfile, setShowProfile] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const notificationRef = useRef(null);
-  const profileRef = useRef(null);
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const contactFormRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  // Mock notifications - in a real app, these would come from your backend
-  const notifications = [
-    { id: 1, text: "New order received", time: "5 minutes ago", isNew: true },
-    { id: 2, text: "Product stock low", time: "1 hour ago", isNew: true },
-    { id: 3, text: "New user registered", time: "2 hours ago", isNew: false },
-  ];
 
   // Get unread messages count
   const getUnreadMessagesCount = async () => {
@@ -41,21 +40,56 @@ const AdminDashboardHeader = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
       ) {
-        setShowNotifications(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfile(false);
+      }
+      if (
+        contactFormRef.current &&
+        !contactFormRef.current.contains(event.target as Node)
+      ) {
+        setShowContactForm(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSubmitMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || !subject.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await customAxios.post("/messages/send", {
+        subject,
+        message,
+        userId: user?._id,
+      });
+      toast.success("Message sent successfully!");
+      setMessage("");
+      setSubject("");
+      setShowContactForm(false);
+      getUnreadMessagesCount(); // Refresh unread count
+    } catch (error: unknown) {
+      console.error(error);
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : "Failed to send message";
+      toast.error(errorMessage || "Failed to send message");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white shadow-sm rounded-xl p-4">
@@ -71,61 +105,71 @@ const AdminDashboardHeader = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <div className="relative" ref={notificationRef}>
+          {/* Contact Form */}
+          <div className="relative" ref={contactFormRef}>
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={() => setShowContactForm(!showContactForm)}
               className="relative p-2 text-gray-400 hover:text-mainColor transition-colors"
+              title="Send Message"
             >
-              <FaBell className="text-xl" />
-              {notifications.some((n) => n.isNew) && (
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
-              )}
+              <FaPlus className="text-xl" />
             </button>
 
             <AnimatePresence>
-              {showNotifications && (
+              {showContactForm && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg py-2 z-50"
+                  className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg p-6 z-50"
                 >
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800">
-                      Notifications
-                    </h3>
-                  </div>
-
-                  <div className="max-h-64 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                    Send Message
+                  </h3>
+                  <form onSubmit={handleSubmitMessage} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Subject
+                      </label>
+                      <input
+                        type="text"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mainColor focus:border-transparent"
+                        placeholder="Enter message subject"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Message
+                      </label>
+                      <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mainColor focus:border-transparent"
+                        placeholder="Type your message here..."
+                        required
+                      ></textarea>
+                    </div>
+                    <div className="flex space-x-3">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 bg-mainColor text-white py-2 px-4 rounded-lg hover:bg-mainColor/90 transition-colors disabled:opacity-50"
                       >
-                        <p className="text-sm text-gray-800">
-                          {notification.text}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {notification.time}
-                        </p>
-                        {notification.isNew && (
-                          <span className="inline-block px-2 py-0.5 text-xs bg-mainColor/10 text-mainColor rounded-full mt-1">
-                            New
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="px-4 py-2 border-t border-gray-100">
-                    <Link
-                      to="/admin/notifications"
-                      className="text-xs text-mainColor hover:underline"
-                    >
-                      View all notifications
-                    </Link>
-                  </div>
+                        {loading ? "Sending..." : "Send Message"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowContactForm(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -189,8 +233,32 @@ const AdminDashboardHeader = () => {
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
                   <button
-                    onClick={() => {
-                      // Add logout handler
+                    onClick={async () => {
+                      try {
+                        const { data } = await customAxios.post("/auth/logout");
+                        dispatch(authActions.logout());
+                        localStorage.removeItem("user");
+                        toast.success(
+                          data.message || "Logged out successfully"
+                        );
+                        navigate("/login");
+                      } catch (error: unknown) {
+                        console.error("Logout failed:", error);
+                        dispatch(authActions.logout());
+                        localStorage.removeItem("user");
+                        const errorMessage =
+                          error &&
+                          typeof error === "object" &&
+                          "response" in error
+                            ? (
+                                error as {
+                                  response?: { data?: { message?: string } };
+                                }
+                              ).response?.data?.message
+                            : "Logout failed";
+                        toast.error(errorMessage || "Logout failed");
+                        navigate("/login");
+                      }
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
                   >

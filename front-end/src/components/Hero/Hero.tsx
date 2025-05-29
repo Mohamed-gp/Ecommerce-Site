@@ -86,13 +86,6 @@ const Hero = () => {
         {featuredProducts.map((product) => (
           <SwiperSlide key={product._id}>
             <div className="relative w-full h-full bg-gradient-to-r from-black to-gray-900">
-              <div className="absolute inset-0 opacity-40">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <HeroProduct product={product} />
             </div>
           </SwiperSlide>

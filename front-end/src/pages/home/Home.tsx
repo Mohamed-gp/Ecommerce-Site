@@ -4,6 +4,7 @@ import Features from "../../components/Hero/Features";
 import NewArrivals from "../../components/arrivals/NewArrivals";
 import CategoryProductLine from "../../components/categoryProductLine/CategoryProductLine";
 import StoreProducts from "../../components/store/StoreProducts";
+import ContactForm from "../../components/contactUs/ContactForm";
 import customAxios from "../../utils/axios/customAxios";
 import { FaArrowRight, FaEnvelope } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -69,6 +70,25 @@ export default function Home() {
             ))}
           </div>
         )}
+
+        {/* Contact Form Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="container mx-auto py-16"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Get in Touch</h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Have questions, feedback, or need support? We'd love to hear from
+              you. Send us a message and we'll get back to you as soon as
+              possible.
+            </p>
+          </div>
+          <ContactForm />
+        </motion.div>
 
         {/* Newsletter Section */}
         <motion.div

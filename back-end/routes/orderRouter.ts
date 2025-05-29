@@ -8,7 +8,7 @@ import {
   getRevenueStats,
 } from "../controllers/orderController";
 import { verifyToken } from "../middlewares/verifyToken";
-import { verifyObjectId } from "../middlewares/verifyObjectId";
+import verifyObjectId from "../middlewares/verifyObjectId";
 
 const router = express.Router();
 
@@ -17,14 +17,14 @@ router.post("/", createOrder);
 
 // Protected routes
 router.get("/user/:userId", verifyToken, getUserOrders);
-router.get("/:orderId", verifyToken, verifyObjectId("orderId"), getOrderById);
+router.get("/:orderId", verifyToken, verifyObjectId, getOrderById);
 
 // Admin routes
 router.get("/", verifyToken, getAllOrders);
 router.patch(
   "/:orderId/status",
   verifyToken,
-  verifyObjectId("orderId"),
+  verifyObjectId,
   updateOrderStatus
 );
 router.get("/stats/revenue", verifyToken, getRevenueStats);

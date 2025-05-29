@@ -6,7 +6,9 @@ interface Product {
   category: Category;
   description: string;
   images: string[];
-  comments: object[];
+  comments: Comment[];
+  isFeatured?: boolean;
+  isNew?: boolean;
 }
 
 interface Category {
@@ -14,4 +16,26 @@ interface Category {
   _id: string;
 }
 
-export type { Product };
+interface Comment {
+  _id: string;
+  rate: number;
+  content: string;
+  user: {
+    _id: string;
+    username: string;
+    photoUrl?: string;
+  };
+  createdAt: string;
+}
+
+interface Coupon {
+  _id: string;
+  code: string;
+  discount: number;
+  expiresAt: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type { Product, Category, Comment, Coupon };

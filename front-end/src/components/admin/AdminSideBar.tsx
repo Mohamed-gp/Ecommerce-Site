@@ -13,6 +13,7 @@ import {
   FiChevronRight,
   FiLogOut,
   FiMail,
+  FiTag,
 } from "react-icons/fi";
 import AdminSideBarLink from "./AdminSideBarLink";
 import AdminLogoutButton from "./AdminLogoutButton";
@@ -25,6 +26,7 @@ const AdminSideBar: React.FC = () => {
     { to: "/admin/dashboard", icon: <FiHome />, text: "Dashboard" },
     { to: "/admin/products", icon: <FiShoppingBag />, text: "Products" },
     { to: "/admin/categories", icon: <FiGrid />, text: "Categories" },
+    { to: "/admin/coupons", icon: <FiTag />, text: "Coupons" },
     { to: "/admin/users", icon: <FiUsers />, text: "Users" },
     { to: "/admin/orders", icon: <FiBarChart2 />, text: "Orders" },
     { to: "/admin/messages", icon: <FiMail />, text: "Messages" },

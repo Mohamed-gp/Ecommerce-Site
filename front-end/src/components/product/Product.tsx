@@ -1,4 +1,11 @@
-import { FaCartShopping, FaHeart, FaRegHeart, FaStar } from "react-icons/fa6";
+import {
+  FaCartShopping,
+  FaHeart,
+  FaRegHeart,
+  FaStar,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa6";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,6 +22,7 @@ interface Product {
   promoPercentage: number;
   images: string[];
   isNew?: boolean;
+  isFeatured?: boolean;
 }
 
 interface Review {
@@ -35,6 +43,7 @@ export default function Product({ product }: ProductProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const productRef = useRef<HTMLDivElement>(null);
 
   const toggleWishListHandler = async (userId: string, productId: string) => {
@@ -86,6 +95,16 @@ export default function Product({ product }: ProductProps) {
     }
   };
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + product.images.length) % product.images.length
+    );
+  };
+
   useEffect(() => {
     getReviews();
     const currentRef = productRef.current;
@@ -134,7 +153,7 @@ export default function Product({ product }: ProductProps) {
         />
         <div className="absolute inset-0 flex items-center justify-center p-4">
           <img
-            src={product?.images[0]}
+            src={product?.images[currentImageIndex]}
             alt={product?.name}
             className={`w-full h-full object-contain transform transition-all duration-500 ${
               isHovered ? "scale-110" : "scale-100"
@@ -143,6 +162,46 @@ export default function Product({ product }: ProductProps) {
             onLoad={() => setIsImageLoaded(true)}
           />
         </div>
+
+        {/* Image Navigation - only show if more than 1 image and on hover */}
+        {product?.images.length > 1 && isHovered && (
+          <>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                prevImage();
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+            >
+              <FaChevronLeft size={12} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                nextImage();
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+            >
+              <FaChevronRight size={12} />
+            </button>
+
+            {/* Image Indicators */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {product.images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentImageIndex ? "bg-mainColor" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Promotion Badge */}
         {product?.promoPercentage > 0 && (
@@ -155,6 +214,13 @@ export default function Product({ product }: ProductProps) {
         {product?.isNew && (
           <div className="absolute top-2 left-2 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full z-20">
             New
+          </div>
+        )}
+
+        {/* Featured Badge */}
+        {product?.isFeatured && (
+          <div className="absolute top-2 left-2 bg-yellow-500 text-white text-sm font-bold px-3 py-1 rounded-full z-20">
+            Featured
           </div>
         )}
 

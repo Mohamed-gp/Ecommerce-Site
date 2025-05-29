@@ -19,15 +19,18 @@ const AdminLogoutButton: React.FC<AdminLogoutButtonProps> = ({ expanded }) => {
     try {
       const { data } = await customAxios.post("/auth/logout");
 
-      if (data.success) {
-        dispatch(authActions.logoutHandler());
-        localStorage.removeItem("user");
-        toast.success("Logged out successfully");
-        navigate("/login");
-      }
+      // Clear user data and redirect
+      dispatch(authActions.logout());
+      localStorage.removeItem("user");
+      toast.success(data.message || "Logged out successfully");
+      navigate("/login");
     } catch (error: any) {
       console.error("Logout failed:", error);
+      // Even if logout fails on server, clear local data
+      dispatch(authActions.logout());
+      localStorage.removeItem("user");
       toast.error(error.response?.data?.message || "Logout failed");
+      navigate("/login");
     }
   };
 

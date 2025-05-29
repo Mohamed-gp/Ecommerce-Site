@@ -4,6 +4,7 @@ import customAxios from "../../utils/axios/customAxios";
 import { FaArrowRight, FaStore } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Product } from "../../interfaces/dbInterfaces";
+import ProductComp from "../product/Product";
 
 export default function StoreProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,7 +14,8 @@ export default function StoreProducts() {
   const getProducts = async () => {
     try {
       setIsLoading(true);
-      const { data } = await customAxios.get("/products");
+      // Fetch only featured products instead of all products
+      const { data } = await customAxios.get("/products/featured");
       setProducts(data.data.slice(0, 4));
     } catch (error) {
       console.log(error);
@@ -28,7 +30,11 @@ export default function StoreProducts() {
   }, []);
 
   return (
-    <section className={`py-8 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
+    <section
+      className={`py-8 transition-opacity duration-500 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}
+    >
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8">
           <div className="flex items-center mb-4 md:mb-0">
@@ -57,38 +63,27 @@ export default function StoreProducts() {
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-mainColor"></div>
           </div>
+        ) : products.length === 0 ? (
+          <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+            <p className="text-gray-500">No featured products available yet.</p>
+            <Link
+              to="/store"
+              className="text-mainColor hover:underline inline-block mt-2"
+            >
+              Browse our full catalog
+            </Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <motion.div
                 key={product._id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="bg-white rounded-lg shadow-md p-4 transition-shadow hover:shadow-lg">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-48 object-contain mb-4"
-                  />
-                  <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="text-mainColor font-bold">
-                      $
-                      {(
-                        product.price *
-                        (1 - (product.promoPercentage || 0) / 100)
-                      ).toFixed(2)}
-                    </div>
-                    {product.promoPercentage > 0 && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        {product.promoPercentage}% OFF
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <ProductComp product={product} />
               </motion.div>
             ))}
           </div>

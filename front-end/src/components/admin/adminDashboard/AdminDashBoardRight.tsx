@@ -24,6 +24,15 @@ import {
 } from "recharts";
 import customAxios from "../../../utils/axios/customAxios";
 
+const COLORS = [
+  "#00C2FF",
+  "#FF6B6B",
+  "#4ECDC4",
+  "#45B7D1",
+  "#96CEB4",
+  "#FFEAA7",
+];
+
 const AdminDashBoardRight = () => {
   const { user } = useSelector((state: IRootState) => state.auth);
   const [salesData, setSalesData] = useState([]);
@@ -31,47 +40,43 @@ const AdminDashBoardRight = () => {
   const [summaryStats, setSummaryStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
-    averageOrderValue: 0,
     totalCustomers: 0,
+    averageOrderValue: 0,
+    revenueGrowth: 0,
+    ordersGrowth: 0,
+    customersGrowth: 0,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await customAxios.get("/admin/analytics");
+      const analytics = data.data;
 
-  // Fetch dashboard data
+      setSummaryStats(analytics.summaryStats);
+      setSalesData(analytics.salesData);
+      setCategoryData(analytics.categoryData);
+    } catch (error) {
+      console.error("Error fetching dashboard analytics:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        // In a real app, these would be actual API calls
-        // For now using mock data
-        setSalesData([
-          { name: "Jan", sales: 4000 },
-          { name: "Feb", sales: 3000 },
-          { name: "Mar", sales: 2000 },
-          { name: "Apr", sales: 2780 },
-          { name: "May", sales: 1890 },
-          { name: "Jun", sales: 2390 },
-        ]);
-
-        setCategoryData([
-          { name: "Electronics", value: 400 },
-          { name: "Clothing", value: 300 },
-          { name: "Books", value: 300 },
-          { name: "Home", value: 200 },
-        ]);
-
-        setSummaryStats({
-          totalRevenue: 45890,
-          totalOrders: 156,
-          averageOrderValue: 294,
-          totalCustomers: 89,
-        });
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
-
     fetchDashboardData();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 p-6 bg-gray-50">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-mainColor"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 bg-gray-50 p-6">
@@ -94,7 +99,9 @@ const AdminDashBoardRight = () => {
           <div className="mt-4">
             <div className="flex items-center text-sm">
               <FaChartLine className="text-green-500 mr-2" />
-              <span className="text-green-500">+12.5%</span>
+              <span className="text-green-500">
+                {summaryStats.revenueGrowth.toFixed(1)}%
+              </span>
               <span className="text-gray-500 ml-2">from last month</span>
             </div>
           </div>
@@ -115,7 +122,9 @@ const AdminDashBoardRight = () => {
           <div className="mt-4">
             <div className="flex items-center text-sm">
               <FaChartLine className="text-green-500 mr-2" />
-              <span className="text-green-500">+8.2%</span>
+              <span className="text-green-500">
+                {summaryStats.ordersGrowth.toFixed(1)}%
+              </span>
               <span className="text-gray-500 ml-2">from last month</span>
             </div>
           </div>
@@ -157,7 +166,9 @@ const AdminDashBoardRight = () => {
           <div className="mt-4">
             <div className="flex items-center text-sm">
               <FaChartLine className="text-green-500 mr-2" />
-              <span className="text-green-500">+5.8%</span>
+              <span className="text-green-500">
+                {summaryStats.customersGrowth.toFixed(1)}%
+              </span>
               <span className="text-gray-500 ml-2">from last month</span>
             </div>
           </div>
@@ -175,7 +186,7 @@ const AdminDashBoardRight = () => {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={salesData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Area

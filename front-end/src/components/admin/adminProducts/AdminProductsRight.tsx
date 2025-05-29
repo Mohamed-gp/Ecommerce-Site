@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { FaEdit, FaSearch, FaPlus } from "react-icons/fa";
+import {
+  FaEdit,
+  FaSearch,
+  FaPlus,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import { FaTrash } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import customAxios from "../../../utils/axios/customAxios";
@@ -13,6 +19,9 @@ const AdminProductsRight = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState<{
+    [key: string]: number;
+  }>({});
 
   const getAllProducts = async () => {
     try {
@@ -70,7 +79,20 @@ const AdminProductsRight = () => {
     });
   };
 
-  // Animation variants
+  const nextImage = (productId: string, totalImages: number) => {
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) + 1) % totalImages,
+    }));
+  };
+
+  const prevImage = (productId: string, totalImages: number) => {
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) - 1 + totalImages) % totalImages,
+    }));
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -148,21 +170,81 @@ const AdminProductsRight = () => {
               variants={itemVariants}
               className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="aspect-video bg-gray-100 overflow-hidden">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative aspect-square bg-gray-50 overflow-hidden group">
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <img
+                    src={product.images[currentImageIndex[product._id] || 0]}
+                    alt={product.name}
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                {product.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() =>
+                        prevImage(product._id, product.images.length)
+                      }
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                    >
+                      <FaChevronLeft size={12} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        nextImage(product._id, product.images.length)
+                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                    >
+                      <FaChevronRight size={12} />
+                    </button>
+
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {product.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() =>
+                            setCurrentImageIndex((prev) => ({
+                              ...prev,
+                              [product._id]: index,
+                            }))
+                          }
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            index === (currentImageIndex[product._id] || 0)
+                              ? "bg-mainColor"
+                              : "bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {product.promoPercentage > 0 && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {product.promoPercentage}% OFF
+                  </div>
+                )}
+                {product.isFeatured && (
+                  <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    Featured
+                  </div>
+                )}
               </div>
 
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-2 line-clamp-1">
+                <h3
+                  className="font-semibold text-gray-800 mb-2 line-clamp-2"
+                  title={product.name}
+                >
                   {product.name}
                 </h3>
 
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  {product.description}
+                </p>
+
                 <div className="flex justify-between items-center mb-3">
-                  <div>
+                  <div className="flex flex-col">
                     <span className="text-mainColor font-bold">
                       $
                       {(
@@ -171,39 +253,33 @@ const AdminProductsRight = () => {
                       ).toFixed(2)}
                     </span>
                     {product.promoPercentage > 0 && (
-                      <span className="text-gray-400 text-sm line-through ml-2">
+                      <span className="text-gray-400 text-xs line-through">
                         ${product.price.toFixed(2)}
                       </span>
                     )}
                   </div>
 
-                  {product.isFeatured && (
-                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                      Featured
-                    </span>
-                  )}
+                  <div className="text-xs text-gray-500 text-right">
+                    <div>Images: {product.images.length}</div>
+                    <div className="font-medium">
+                      {product.category?.name || "Unknown"}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="text-xs text-gray-500 mb-4">
-                  Category:{" "}
-                  <span className="font-medium">
-                    {product.category?.name || "Unknown"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <Link
                     to={`/admin/products/edit/${product._id}`}
-                    className="inline-flex items-center text-xs text-gray-600 hover:text-mainColor"
+                    className="flex-1 text-center py-2 px-3 text-xs bg-mainColor text-white rounded-lg hover:bg-blue-600 transition-colors"
                   >
-                    <FaEdit className="mr-1" /> Edit
+                    <FaEdit className="inline mr-1" /> Edit
                   </Link>
 
                   <button
                     onClick={() => deleteHandler(product._id)}
-                    className="inline-flex items-center text-xs text-red-500 hover:text-red-700"
+                    className="flex-1 py-2 px-3 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   >
-                    <FaTrash className="mr-1" /> Delete
+                    <FaTrash className="inline mr-1" /> Delete
                   </button>
                 </div>
               </div>

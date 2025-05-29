@@ -4,6 +4,7 @@ import userRouter from "./routes/usersRouter";
 import productsRouter from "./routes/productsRouter";
 import categoriesRouter from "./routes/categoriesRouter";
 import adminRouter from "./routes/adminRouter";
+import orderRouter from "./routes/orderRouter";
 import connectToDB from "./lib/connectToDB";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -12,6 +13,7 @@ import cookieParser from "cookie-parser";
 import cartRouter from "./routes/cartRouter";
 import checkoutRouter from "./routes/checkoutRouter";
 import commentsRouter from "./routes/commentsRouter";
+import couponsRouter from "./routes/couponsRouter";
 import { verifyToken } from "./middlewares/verifyToken";
 
 dotenv.config();
@@ -45,6 +47,8 @@ app.use("/api/cart", cartRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/checkout", checkoutRouter);
 app.use("/api/comments", commentsRouter);
+app.use("/api/orders", orderRouter);
+app.use("/api/coupons", couponsRouter);
 
 app.use(notFound);
 app.use(errorHandler);

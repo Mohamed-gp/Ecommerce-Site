@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import { FaArrowRight, FaTrash } from "react-icons/fa6";
+import { FaArrowRight, FaTrash, FaPercent } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { authActions } from "../../redux/slices/authSlice";
 import { Link } from "react-router-dom";
 import customAxios from "../../utils/axios/customAxios";
 import toast from "react-hot-toast";
+import { Coupon } from "../../interfaces/dbInterfaces";
 
 export default function Cart() {
   const cart: any[] = useSelector((state: IRootState) => state.auth.user?.cart);
   const user = useSelector((state: IRootState) => state.auth.user);
   const dispatch = useDispatch();
   const [coupon, setCoupon] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const removeFromCartHandler = async (userId: string, productId: string) => {
     try {
       const { data } = await customAxios.delete(
@@ -20,18 +25,6 @@ export default function Cart() {
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
-    }
-  };
-
-  const checkoutHandler = async () => {
-    try {
-      const { data } = await customAxios.post("/checkout", { cart });
-      // window.open(data.data, "_blank"); /// some browser gonna stop the popup and ask the user...
-      window.open(data.data, "_self");
-      // dispatch(authActions.setCart([]));
-    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -51,14 +44,72 @@ export default function Cart() {
       toast.error(error.response.data.message);
     }
   };
-  const couponHandler = () => {
-    toast.error("invalid copoun");
-    setCoupon("");
+
+  const validateCoupon = async () => {
+    if (!coupon.trim()) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    try {
+      setIsValidating(true);
+      const { data } = await customAxios.post("/coupons/validate", {
+        code: coupon.trim().toUpperCase(),
+      });
+      setAppliedCoupon(data.data);
+      toast.success("Coupon applied successfully!");
+      setCoupon("");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Invalid coupon code");
+      setAppliedCoupon(null);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const calculateSubtotal = () => {
+    return (
+      cart?.reduce(
+        (acc, curr) =>
+          curr?.product?.price *
+            (1 - curr?.product?.promoPercentage / 100) *
+            curr?.quantity +
+          acc,
+        0
+      ) || 0
+    );
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    if (appliedCoupon && subtotal > 0) {
+      const discount = (subtotal * appliedCoupon.discount) / 100;
+      return subtotal - discount;
+    }
+    return subtotal;
+  };
+
+  const checkoutHandler = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await customAxios.post("/checkout", {
+        cart,
+        couponId: appliedCoupon?._id,
+      });
+      window.open(data.data, "_self");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Checkout failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     scrollTo(0, 0);
   }, []);
+
   return (
     <>
       {cart?.length != 0 ? (
@@ -85,7 +136,6 @@ export default function Cart() {
                       <tr className="relative">
                         <td>
                           <div className="mx-auto w-fit">
-                            {/* <ZoomedImageStatic imageSrc={ele?.product?.images[0]} /> */}
                             <img
                               src={ele?.product?.images[0]}
                               alt="mac"
@@ -155,78 +205,88 @@ export default function Cart() {
             </div>
           </div>
           <div className="bg-bgColorCartFooter py-6">
-            <div className="container my-6 flex lg:flex-row flex-col items-center gap-y-8 justify-between ">
-              <div className="flex flex-col text-center ">
+            <div className="container my-6 flex lg:flex-row flex-col items-center gap-y-8 justify-between">
+              <div className="flex flex-col text-center">
                 <p className="text-xl font-bold">Discount Codes</p>
                 <p className="opacity-60">
                   Enter your coupon code if you have one
                 </p>
                 <div className="my-2 flex border-solid border-mainColor">
                   <input
-                    placeholder="enter your coupon"
-                    className="rounded-l-xl  py-2 pl-3 focus:outline-none"
+                    placeholder="Enter your coupon"
+                    className="rounded-l-xl py-2 pl-3 focus:outline-none"
                     type="text"
-                    onChange={(e) => setCoupon(e.target.value)}
                     value={coupon}
+                    onChange={(e) => setCoupon(e.target.value.toUpperCase())}
                   />
                   <button
-                    disabled={coupon == ""}
-                    onClick={() => couponHandler()}
-                    className="rounded-r-xl disabled:opacity-50 disabled:cursor-not-allowed bg-mainColor px-4 text-sm sm:text-base text-white"
+                    onClick={validateCoupon}
+                    disabled={isValidating || !coupon.trim()}
+                    className="rounded-r-xl bg-mainColor px-4 text-sm sm:text-base text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-mainColor/90 transition-colors"
                   >
-                    Apply Coupon
+                    {isValidating ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                        Validating...
+                      </div>
+                    ) : (
+                      "Apply Coupon"
+                    )}
                   </button>
                 </div>
+                {appliedCoupon && (
+                  <div className="mt-2 text-green-600 flex items-center justify-center gap-2">
+                    <FaPercent className="text-xs" />
+                    <span className="text-sm font-medium">
+                      {appliedCoupon.discount}% discount applied!
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col items-center gap-5 rounded-xl border-2 border-mainColor px-9 py-3">
                 <p className="font-bold">Order Summary</p>
                 <div className="flex flex-row gap-3">
                   <div className="flex flex-col gap-2">
-                    <p>Sub Total </p>
+                    <p>Subtotal </p>
+                    {appliedCoupon && <p>Discount</p>}
                     <p>Shipping</p>
-                    <p>Grand Total</p>
+                    <p className="font-bold">Total</p>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <p>
-                      $
-                      {cart
-                        ?.reduce(
-                          (acc, curr) =>
-                            curr?.product?.price *
-                              (1 - curr?.product?.promoPercentage / 100) *
-                              curr?.quantity +
-                            acc,
-                          0
-                        )
-                        .toFixed(2)}{" "}
-                    </p>
-                    <p className="">Free</p>
-                    <p>
-                      $
-                      {cart
-                        ?.reduce(
-                          (acc, curr) =>
-                            curr?.product?.price *
-                              (1 - curr?.product?.promoPercentage / 100) *
-                              curr?.quantity +
-                            acc,
-                          0
-                        )
-                        .toFixed(2) - 0}{" "}
-                      {/* minus 0 becase the shiping is free*/}
-                    </p>
+                    <p>${calculateSubtotal().toFixed(2)}</p>
+                    {appliedCoupon && (
+                      <p className="text-green-600">
+                        -$
+                        {(
+                          (calculateSubtotal() * appliedCoupon.discount) /
+                          100
+                        ).toFixed(2)}
+                      </p>
+                    )}
+                    <p>Free</p>
+                    <p className="font-bold">${calculateTotal().toFixed(2)}</p>
                   </div>
                 </div>
               </div>
             </div>
             <button
-              onClick={() => checkoutHandler()}
-              className="animation-right-arrow-father mx-auto flex items-center gap-2 rounded-xl bg-mainColor px-4 py-2 text-sm text-white"
+              onClick={checkoutHandler}
+              disabled={isLoading}
+              className="animation-right-arrow-father mx-auto flex items-center gap-2 rounded-xl bg-mainColor px-4 py-2 text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <p>Proceed To Checkout</p>
-              <div className="animation-right-arrow">
-                <FaArrowRight />
-              </div>
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Processing...
+                </div>
+              ) : (
+                <>
+                  <p>Proceed To Checkout</p>
+                  <div className="animation-right-arrow">
+                    <FaArrowRight />
+                  </div>
+                </>
+              )}
             </button>
           </div>
         </>

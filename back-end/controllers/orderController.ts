@@ -4,6 +4,30 @@ import User from "../models/User";
 import Cart from "../models/Cart";
 import Product from "../models/Product";
 
+type OrderStatus = "pending" | "processing" | "delivered";
+
+interface OrderStatusCounts {
+  pending: number;
+  processing: number;
+  delivered: number;
+  [key: string]: number; // Allow string indexing
+}
+
+interface OrderStats {
+  count: number;
+  status: OrderStatusCounts;
+}
+
+interface OrderStatusCount {
+  _id: "pending" | "processing" | "delivered" | "shipped" | "canceled";
+  count: number;
+}
+
+interface AggregatedOrder {
+  _id: string;
+  count: number;
+}
+
 // Create a new order after successful payment
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -267,6 +291,86 @@ const getRevenueStats = async (
   }
 };
 
+// Get order statistics
+const getOrderStats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const today = new Date();
+    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(today.setHours(23, 59, 59, 999));
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    // Get orders for different time periods with status breakdown
+    const todayStats = await getOrderStatsForPeriod(startOfToday, endOfToday);
+    const weekStats = await getOrderStatsForPeriod(startOfWeek, endOfToday);
+    const monthStats = await getOrderStatsForPeriod(startOfMonth, endOfToday);
+
+    return res.status(200).json({
+      message: "Order statistics fetched successfully",
+      data: {
+        today: todayStats,
+        week: weekStats,
+        month: monthStats,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getOrderStatsForPeriod = async (startDate: Date, endDate: Date) => {
+  const orders = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startDate, $lte: endDate },
+      },
+    },
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const stats = {
+    count: 0,
+    status: {
+      pending: 0,
+      processing: 0,
+      delivered: 0,
+      shipped: 0,
+      canceled: 0,
+    },
+  };
+
+  orders.forEach((order) => {
+    stats.count += order.count;
+    if (
+      order._id &&
+      typeof order._id === "string" &&
+      order._id in stats.status
+    ) {
+      stats.status[order._id as keyof typeof stats.status] = order.count;
+    }
+  });
+
+  return stats;
+};
+
+function isValidOrderStatus(
+  status: any
+): status is "pending" | "processing" | "delivered" | "shipped" | "canceled" {
+  return ["pending", "processing", "delivered", "shipped", "canceled"].includes(
+    status
+  );
+}
+
 export {
   createOrder,
   getAllOrders,
@@ -274,4 +378,5 @@ export {
   getOrderById,
   updateOrderStatus,
   getRevenueStats,
+  getOrderStats,
 };
