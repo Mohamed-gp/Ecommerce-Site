@@ -69,7 +69,7 @@ const Hero = () => {
         loop={true}
         pagination={{
           clickable: true,
-          renderBullet: function (_, className) {
+          renderBullet: function (_index: number, className: string) {
             return '<span class="' + className + ' !bg-mainColor"></span>';
           },
           el: ".hero-pagination",

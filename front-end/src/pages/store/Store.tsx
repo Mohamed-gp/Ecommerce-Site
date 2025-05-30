@@ -232,7 +232,9 @@ export default function Store() {
                     value={[priceRange.min, priceRange.max]}
                     min={0}
                     max={10000}
-                    onChange={([min, max]) => setPriceRange({ min, max })}
+                    onChange={([min, max]: [number, number]) =>
+                      setPriceRange({ min, max })
+                    }
                     pearling
                     minDistance={10}
                   />
