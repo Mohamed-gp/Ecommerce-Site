@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import customAxios from "../../../utils/axios/customAxios";
-import {
-  FaCloudUploadAlt,
-  FaImage,
-  FaTrash,
-  FaSpinner,
-  FaPlus,
-} from "react-icons/fa";
+import { FaCloudUploadAlt, FaTrash, FaSpinner, FaPlus } from "react-icons/fa";
 import { motion } from "framer-motion";
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 const AdminProductsAddRight = () => {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const [data, setData] = useState({
     name: "",
@@ -22,7 +21,7 @@ const AdminProductsAddRight = () => {
     promotionPercentage: 1,
     price: 0,
     isFeatured: false,
-    images: [],
+    images: [] as File[],
     loading: false,
   });
 
@@ -40,7 +39,8 @@ const AdminProductsAddRight = () => {
     getCategories();
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
     const files = Array.from(e.target.files);
 
     // Add new images to the existing ones
@@ -55,7 +55,7 @@ const AdminProductsAddRight = () => {
     setImagePreviewUrls(updatedPreviewUrls);
   };
 
-  const removeImage = (index) => {
+  const removeImage = (index: number) => {
     const updatedImages = [...data.images];
     updatedImages.splice(index, 1);
 

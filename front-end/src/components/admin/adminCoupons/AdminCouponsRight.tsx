@@ -9,7 +9,6 @@ import Swal from "sweetalert2";
 const AdminCouponsRight = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newCoupon, setNewCoupon] = useState({
     code: "",
     discount: 0,
@@ -30,26 +29,12 @@ const AdminCouponsRight = () => {
 
   const createCouponHandler = async () => {
     try {
-      setIsSubmitting(true);
-
-      if (!newCoupon.code || !newCoupon.discount || !newCoupon.expiresAt) {
-        toast.error("Please fill all fields");
-        return;
-      }
-
-      if (newCoupon.discount <= 0 || newCoupon.discount > 100) {
-        toast.error("Discount must be between 1 and 100");
-        return;
-      }
-
-      const { data } = await customAxios.post("/coupons", newCoupon);
-      toast.success("Coupon created successfully");
+      await customAxios.post("/coupons", newCoupon);
+      toast.success("Coupon created successfully!");
       setNewCoupon({ code: "", discount: 0, expiresAt: "" });
       getCoupons();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to create coupon");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -167,15 +152,12 @@ const AdminCouponsRight = () => {
           <button
             onClick={createCouponHandler}
             disabled={
-              isSubmitting ||
-              !newCoupon.code ||
-              !newCoupon.discount ||
-              !newCoupon.expiresAt
+              !newCoupon.code || !newCoupon.discount || !newCoupon.expiresAt
             }
             className="mt-4 w-full flex items-center justify-center gap-2 bg-mainColor text-white py-2 rounded-lg hover:bg-mainColor/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaPlus />
-            {isSubmitting ? "Creating..." : "Create Coupon"}
+            Create Coupon
           </button>
         </div>
 

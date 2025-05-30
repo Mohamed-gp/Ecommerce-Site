@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { FaSearch, FaStar, FaHeart, FaSpinner, FaFilter } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { motion, AnimatePresence } from "framer-motion";
+import { FaSearch, FaStar, FaSpinner, FaFilter } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import ReactSlider from "react-slider";
 import { toast } from "react-hot-toast";
 import customAxios from "../../utils/axios/customAxios";
-import { IRootState } from "../../redux/store";
-import { authActions } from "../../redux/slices/authSlice";
 import { Product as ProductInterface } from "../../interfaces/dbInterfaces";
 import Product from "../../components/product/Product";
 
@@ -29,14 +26,20 @@ const itemVariants = {
   },
 };
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
+interface ProductWithRating extends ProductInterface {
+  avgRating?: number;
+}
+
 export default function Store() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
-  const user = useSelector((state: IRootState) => state.auth.user);
 
   const [products, setProducts] = useState<ProductInterface[]>([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
@@ -87,7 +90,7 @@ export default function Store() {
       }
 
       const { data } = await customAxios.get(url);
-      let filteredProducts = data.data;
+      const filteredProducts = data.data;
 
       // Client-side sorting
       switch (sortBy) {
@@ -107,8 +110,8 @@ export default function Store() {
           break;
         case "rating":
           filteredProducts.sort((a: ProductInterface, b: ProductInterface) => {
-            const aRating = (a as any).avgRating || 0;
-            const bRating = (b as any).avgRating || 0;
+            const aRating = (a as ProductWithRating).avgRating || 0;
+            const bRating = (b as ProductWithRating).avgRating || 0;
             return bRating - aRating;
           });
           break;
@@ -129,28 +132,11 @@ export default function Store() {
 
   useEffect(() => {
     getProducts();
-  }, [selectedCategory, priceRange, sortBy, selectedRating]);
+  }, [selectedCategory, priceRange, sortBy, selectedRating, getProducts]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     getProducts();
-  };
-
-  const toggleWishListHandler = async (userId: string, productId: string) => {
-    if (!user) {
-      navigate("/register");
-      return;
-    }
-    try {
-      const { data } = await customAxios.post("/products/wishlist", {
-        userId,
-        productId,
-      });
-      dispatch(authActions.setWishlist(data.data));
-      toast.success(data.message);
-    } catch (error) {
-      toast.error("Failed to update wishlist");
-    }
   };
 
   return (
@@ -214,7 +200,7 @@ export default function Store() {
                       All Categories
                     </label>
                   </div>
-                  {categories.map((category: any) => (
+                  {categories.map((category: Category) => (
                     <div key={category._id} className="flex items-center">
                       <input
                         type="radio"

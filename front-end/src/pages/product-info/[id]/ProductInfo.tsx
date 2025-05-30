@@ -432,7 +432,7 @@ export default function ProductInfo() {
             <motion.button
               onClick={() => toggleWishListHandler(user?._id, product?._id)}
               className={`p-3 rounded-xl border-2 transition-all ${
-                user?.wishlist?.find((ele) => ele?._id === product?._id)
+                user?.wishlist?.find((ele: any) => ele?._id === product?._id)
                   ? "bg-mainColor text-white border-mainColor"
                   : "bg-white text-mainColor border-mainColor hover:bg-mainColor/5"
               }`}

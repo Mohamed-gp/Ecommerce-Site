@@ -32,35 +32,10 @@ const AdminSettingsRight = () => {
   const logoutHandler = async () => {
     try {
       const { data } = await customAxios.post("/auth/logout");
-      dispatch(authActions.logout(null));
+      dispatch(authActions.logout());
       toast.success(data.message);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to logout");
-    }
-  };
-
-  const getSettings = async () => {
-    try {
-      const { data } = await customAxios.get("/admin/settings");
-      setFormData(data.data);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load settings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { data } = await customAxios.put("/admin/settings", formData);
-      toast.success("Settings updated successfully!");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update settings");
-    } finally {
-      setLoading(false);
     }
   };
 

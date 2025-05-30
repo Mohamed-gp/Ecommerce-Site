@@ -1,6 +1,6 @@
-import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 
+// Simple auth provider wrapper - replace with actual auth provider if needed
 export const NextAuthProvider = ({ children }: { children: ReactNode }) => {
-  return <SessionProvider>{children}</SessionProvider>;
+  return <>{children}</>;
 };

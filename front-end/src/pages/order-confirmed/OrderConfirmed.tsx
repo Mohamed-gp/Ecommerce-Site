@@ -1,6 +1,3 @@
-import { FaRegHeart } from "react-icons/fa6";
-import { Link } from "react-router-dom";
-
 const OrderConfirmed = () => {
   return (
     <div

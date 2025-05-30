@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   FaSpinner,
   FaSearch,
-  FaUser,
   FaClock,
   FaTrash,
   FaEnvelope,

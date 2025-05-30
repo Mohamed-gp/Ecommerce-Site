@@ -1,27 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  FaCloudUploadAlt,
-  FaTrash,
-  FaSpinner,
-  FaPlus,
-  FaSave,
-} from "react-icons/fa";
+import { FaTrash, FaSpinner, FaPlus, FaSave } from "react-icons/fa";
 import { motion } from "framer-motion";
 import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
-import { Product } from "../../../interfaces/dbInterfaces";
 import Swal from "sweetalert2";
+
+interface Category {
+  _id: string;
+  name: string;
+}
 
 const AdminProductsEditRight = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
-  const [newImages, setNewImages] = useState([]);
-  const [removedImageIndices, setRemovedImageIndices] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [removedImageIndices, setRemovedImageIndices] = useState<number[]>([]);
 
   const [data, setData] = useState({
     name: "",
@@ -30,7 +28,7 @@ const AdminProductsEditRight = () => {
     promoPercentage: 0,
     price: 0,
     isFeatured: false,
-    images: [],
+    images: [] as string[],
   });
 
   const getCategories = async () => {
@@ -71,7 +69,8 @@ const AdminProductsEditRight = () => {
     getCategories();
   }, [id]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
     const files = Array.from(e.target.files);
     const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
 
@@ -79,7 +78,7 @@ const AdminProductsEditRight = () => {
     setNewImages((prev) => [...prev, ...files]);
   };
 
-  const removeImage = (index) => {
+  const removeImage = (index: number) => {
     // If it's an original image, mark it for removal
     if (index < data.images.length) {
       setRemovedImageIndices((prev) => [...prev, index]);
@@ -136,16 +135,6 @@ const AdminProductsEditRight = () => {
       toast.error("Failed to update product");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const deleteProductHandler = async () => {
-    try {
-      const { data } = await customAxios.delete(`/admin/products/${id}`);
-      toast.success(data.message);
-      navigate("/admin/products");
-    } catch (error) {
-      toast.error("Failed to delete product");
     }
   };
 

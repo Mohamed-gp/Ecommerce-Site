@@ -35,7 +35,7 @@ const AdminProductsRight = () => {
       const { data } = await customAxios.get("/admin/products");
       setProducts(data.data);
       setFilteredProducts(data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load products");
     } finally {
       setIsLoading(false);

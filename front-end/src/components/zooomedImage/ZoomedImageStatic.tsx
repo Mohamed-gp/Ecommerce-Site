@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 interface ZoomedImageStaticProps {
-  imageSrc: string | FileList;
+  imageSrc: string | File;
 }
 
 const ZoomedImageStatic = ({ imageSrc }: ZoomedImageStaticProps) => {
@@ -40,7 +40,9 @@ const ZoomedImageStatic = ({ imageSrc }: ZoomedImageStaticProps) => {
       <img
         ref={magnifyingImg}
         src={
-          typeof imageSrc == "string" ? imageSrc : URL.createObjectURL(imageSrc)
+          typeof imageSrc === "string"
+            ? imageSrc
+            : URL.createObjectURL(imageSrc)
         }
         alt=""
         className="cursor-zoom-in"

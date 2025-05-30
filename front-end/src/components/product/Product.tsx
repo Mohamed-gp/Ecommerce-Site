@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa6";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
 import { cartActions } from "../../redux/slices/cartSlice";
@@ -39,7 +39,6 @@ interface ProductProps {
 export default function Product({ product }: ProductProps) {
   const dispatch = useDispatch();
   const { user } = useSelector((state: IRootState) => state.auth);
-  const navigate = useNavigate();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -80,20 +79,6 @@ export default function Product({ product }: ProductProps) {
       toast.success("Product added to wishlist!");
     } catch (error) {
       toast.error("Failed to add product to wishlist");
-    }
-  };
-
-  const buyNow = async () => {
-    if (!user) {
-      toast.error("Please login to purchase");
-      return;
-    }
-
-    try {
-      await addToCart();
-      navigate("/cart");
-    } catch (error) {
-      toast.error("Failed to proceed to checkout");
     }
   };
 

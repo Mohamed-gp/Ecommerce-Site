@@ -1,8 +1,5 @@
-import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { IRootState } from "../../../redux/store";
 import AdminDashboardHeader from "./AdminDashboardHeader";
-import AdminCount from "./AdminCount";
 import {
   FaBoxOpen,
   FaChartLine,
@@ -25,6 +22,17 @@ import {
 import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
 
+interface SalesData {
+  month: string;
+  sales: number;
+  orders: number;
+}
+
+interface CategoryData {
+  name: string;
+  value: number;
+}
+
 const COLORS = [
   "#00C2FF",
   "#FF6B6B",
@@ -35,9 +43,8 @@ const COLORS = [
 ];
 
 const AdminDashBoardRight = () => {
-  const { user } = useSelector((state: IRootState) => state.auth);
-  const [salesData, setSalesData] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  const [salesData, setSalesData] = useState<SalesData[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [summaryStats, setSummaryStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -220,7 +227,7 @@ const AdminDashBoardRight = () => {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {categoryData.map((entry, index) => (
+                  {categoryData.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}

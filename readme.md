@@ -27,12 +27,14 @@ For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 ### Quick Start (Development)
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/your-username/swiftbuy.git
    cd swiftbuy
    ```
 
 2. **Backend Setup:**
+
    ```bash
    cd back-end
    npm install
@@ -87,10 +89,12 @@ SwiftBuy/
 ## 🔐 Demo Accounts
 
 **Admin User (Demo - Limited Permissions):**
+
 - Email: admin@admin.com
 - Password: admin@admin.com
 
 **Regular User:**
+
 - Email: user@demo.com
 - Password: user@demo.com
 
@@ -111,6 +115,7 @@ If you encounter any issues or have any questions, please reach out to me on Lin
 ## 📊 Features Overview
 
 ### For Customers:
+
 - Browse products with advanced filtering and search
 - Add items to cart and wishlist
 - Secure checkout with Stripe integration
@@ -119,6 +124,7 @@ If you encounter any issues or have any questions, please reach out to me on Lin
 - User profile management
 
 ### For Admins:
+
 - Product management (CRUD operations)
 - Category management
 - Order management and status updates
@@ -127,6 +133,7 @@ If you encounter any issues or have any questions, please reach out to me on Lin
 - Coupon and discount management
 
 ### For Demo Admin:
+
 - View-only access to most admin features
 - Cannot perform destructive operations
 - Ideal for showcasing admin capabilities safely

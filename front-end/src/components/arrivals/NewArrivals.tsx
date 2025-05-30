@@ -5,9 +5,10 @@ import Product from "../product/Product";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { Product as ProductType } from "../../interfaces/dbInterfaces";
 
 export default function NewArrivals() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
 

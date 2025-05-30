@@ -1,14 +1,17 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa6";
 import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
-import { IRootState } from "../../../redux/store";
+
+interface Admin {
+  _id: string;
+  email: string;
+}
 
 const AdminAdminsRight = () => {
-  const user = useSelector((state: IRootState) => state.auth.user);
-  const [admins, setAdmins] = useState([]);
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [adminEmail, setAdminEmail] = useState("");
+
   const getAdmins = async () => {
     try {
       const { data } = await customAxios.get("/admin/admins");
@@ -18,7 +21,7 @@ const AdminAdminsRight = () => {
     }
   };
 
-  const addAdminHandler = async (adminData: any) => {
+  const addAdminHandler = async (adminData: { adminEmail: string }) => {
     try {
       const { data } = await customAxios.post("/admin/users", adminData);
       toast.success(data.message);
@@ -35,16 +38,6 @@ const AdminAdminsRight = () => {
       toast.success(data.message);
     } catch (error) {
       toast.error("Failed to delete admin");
-    }
-  };
-
-  const updateAdminHandler = async (id: string, adminData: any) => {
-    try {
-      const { data } = await customAxios.put(`/admin/users/${id}`, adminData);
-      toast.success(data.message);
-      getAdmins();
-    } catch (error) {
-      toast.error("Failed to update admin");
     }
   };
 
