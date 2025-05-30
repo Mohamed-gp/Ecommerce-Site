@@ -22,7 +22,7 @@ const AdminSettingsRight = () => {
       const result = await customAxios.post(`/users/${user?._id}`, formData);
       dispatch(authActions.login(result.data.data));
       toast.success(result.data.message);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to update user info"
       );
@@ -34,7 +34,7 @@ const AdminSettingsRight = () => {
       const { data } = await customAxios.post("/auth/logout");
       dispatch(authActions.logout());
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to logout");
     }
   };

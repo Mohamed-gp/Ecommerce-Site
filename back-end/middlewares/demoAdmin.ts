@@ -8,31 +8,35 @@ const demoAdmin = (
   res: Response,
   next: NextFunction
 ): Response | void => {
+  // Only apply restrictions to the specific demo admin user
   if (req.user && req.user.id === DEMO_ADMIN_ID) {
     const action = req.method.toLowerCase();
-    const path = req.path;
 
+    // Allow ONLY GET requests (viewing data) for demo admin
+    if (action === "get") {
+      return next();
+    }
+
+    // Block ALL other HTTP methods for demo admin
     let message = "Demo Admin - This action is restricted in demo mode.";
 
     // Customize messages based on the action
-    if (action === "delete") {
-      message = "Demo Admin - Delete operations are not allowed in demo mode.";
-    } else if (action === "post" || action === "put" || action === "patch") {
-      if (path.includes("product")) {
+    switch (action) {
+      case "post":
         message =
-          "Demo Admin - Product modifications are restricted in demo mode.";
-      } else if (path.includes("category")) {
+          "Demo Admin - Create operations are not allowed in demo mode.";
+        break;
+      case "put":
+      case "patch":
         message =
-          "Demo Admin - Category modifications are restricted in demo mode.";
-      } else if (path.includes("user")) {
-        message = "Demo Admin - User management is restricted in demo mode.";
-      } else if (path.includes("order")) {
+          "Demo Admin - Update operations are not allowed in demo mode.";
+        break;
+      case "delete":
         message =
-          "Demo Admin - Order modifications are restricted in demo mode.";
-      } else {
-        message =
-          "Demo Admin - Create/Update operations are restricted in demo mode.";
-      }
+          "Demo Admin - Delete operations are not allowed in demo mode.";
+        break;
+      default:
+        message = "Demo Admin - This action is restricted in demo mode.";
     }
 
     return res.status(403).json({
@@ -41,6 +45,8 @@ const demoAdmin = (
       isDemo: true,
     });
   }
+
+  // Allow all operations for non-demo admins
   return next();
 };
 

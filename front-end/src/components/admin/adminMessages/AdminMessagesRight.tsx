@@ -37,7 +37,7 @@ const AdminMessagesRight = () => {
       const { data } = await customAxios.get("/messages");
       setMessages(data.data);
       setFilteredMessages(data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Error fetching messages");
     } finally {
       setIsLoading(false);
@@ -82,7 +82,7 @@ const AdminMessagesRight = () => {
         toast.success("Message deleted successfully");
         getMessages();
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Error deleting message");
     }
   };
@@ -91,7 +91,7 @@ const AdminMessagesRight = () => {
     try {
       await customAxios.patch(`/messages/${messageId}/read`);
       getMessages();
-    } catch (error: any) {
+    } catch (error) {
       toast.error(
         error.response?.data?.message || "Error marking message as read"
       );

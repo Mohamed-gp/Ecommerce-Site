@@ -37,7 +37,7 @@ export default function HeroProduct({ product }: HeroProductProps) {
       });
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response.data.message);
     }
   };

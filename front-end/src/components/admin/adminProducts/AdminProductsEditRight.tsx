@@ -58,7 +58,7 @@ const AdminProductsEditRight = () => {
 
       setImagePreviewUrls(product.images || []);
       setIsLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       toast.error("Failed to load product");
       setIsLoading(false);
     }

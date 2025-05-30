@@ -38,7 +38,7 @@ const AdminCommentsRight: React.FC = () => {
     try {
       const response = await customAxios.get("/admin/comments");
       setComments(response.data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch comments");
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ const AdminCommentsRight: React.FC = () => {
       await customAxios.delete(`/admin/comments/${commentId}`);
       setComments(comments.filter((comment) => comment._id !== commentId));
       toast.success("Comment deleted successfully");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete comment");
     } finally {
       setDeleting(null);

@@ -23,7 +23,7 @@ const AdminLogoutButton: React.FC<AdminLogoutButtonProps> = ({ expanded }) => {
       localStorage.removeItem("user");
       toast.success(data.message || "Logged out successfully");
       navigate("/login");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Logout failed:", error);
       // Even if logout fails on server, clear local data
       dispatch(authActions.logout());

@@ -1,0 +1,55 @@
+name: Deploy SwiftBuy Backend to VPS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "back-end/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch: # Enable manual triggering
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [18.x] # Use Node.js 18.x as specified in package.json
+    steps:
+      # Step 1: Check out the repository
+      - uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Step 3: Pull the latest code from the main branch
+      - name: Pull latest code
+        run: |
+          cd ~/apps/Ecommerce-Site
+          git pull origin main
+
+      # Step 4: Install dependencies and build the Express backend
+      - name: Build SwiftBuy Backend
+        run: |
+          cd ~/apps/Ecommerce-Site/back-end
+          npm install
+          npm run build
+
+      # Step 5: Ensure PM2 is available
+      - name: Install PM2 Globally
+        run: |
+          npm install -g pm2
+          export PATH=$(npm bin -g):$PATH
+
+      # Step 6: Restart the backend application using PM2
+      - name: Restart SwiftBuy Backend
+        run: |
+          pm2 restart swiftbuy-backend || pm2 start ~/apps/Ecommerce-Site/back-end/dist/index.js --name swiftbuy-backend
+
+      # Step 7: Show PM2 status
+      - name: Show PM2 Status
+        run: |
+          pm2 status
+          pm2 logs swiftbuy-backend --lines 10

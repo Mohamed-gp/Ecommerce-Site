@@ -29,7 +29,7 @@ const AdminProductsAddRight = () => {
     try {
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -107,7 +107,7 @@ const AdminProductsAddRight = () => {
         loading: false,
       });
       setImagePreviewUrls([]);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     } finally {

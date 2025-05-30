@@ -69,7 +69,7 @@ const AdminProductsRight = () => {
       await customAxios.delete(`/admin/products/${id}`);
       toast.success("Product deleted successfully!");
       getProducts();
-    } catch (error: any) {
+    } catch (error) {
       if (error.response?.data?.isDemo) {
         toast.error(error.response.data.message);
       } else {

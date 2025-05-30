@@ -19,6 +19,7 @@ export interface DecodedUser {
 
 export interface AuthRequest extends Request {
   user?: DecodedUser;
+  isDemo?: boolean; // Flag for demo admin restrictions
 }
 
 export {

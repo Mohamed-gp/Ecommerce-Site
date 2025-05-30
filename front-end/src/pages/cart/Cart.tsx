@@ -24,7 +24,7 @@ export default function Cart() {
       );
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response.data.message);
     }
   };
@@ -57,7 +57,7 @@ export default function Cart() {
       setAppliedCoupon(data.data);
       toast.success("Coupon applied successfully!");
       setCoupon("");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Invalid coupon code");
       setAppliedCoupon(null);
     } finally {
@@ -95,7 +95,7 @@ export default function Cart() {
         couponId: appliedCoupon?._id,
       });
       window.open(data.data, "_self");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Checkout failed");
     } finally {
       setIsLoading(false);

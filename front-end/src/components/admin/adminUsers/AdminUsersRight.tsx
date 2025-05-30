@@ -29,7 +29,7 @@ const AdminUsersRight = () => {
       const { data } = await customAxios.get("/admin/users");
       setUsers(data.data);
       setFilteredUsers(data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Error fetching users");
     } finally {
       setIsLoading(false);
@@ -75,7 +75,7 @@ const AdminUsersRight = () => {
           });
           toast.success(`User role updated to ${newRole} successfully`);
           getUsers();
-        } catch (error: any) {
+        } catch (error) {
           toast.error(
             error.response?.data?.message || "Error updating user role"
           );
@@ -99,7 +99,7 @@ const AdminUsersRight = () => {
           await customAxios.delete(`/admin/users/${userId}`);
           toast.success("User deleted successfully");
           getUsers();
-        } catch (error: any) {
+        } catch (error) {
           toast.error(error.response?.data?.message || "Error deleting user");
         }
       }

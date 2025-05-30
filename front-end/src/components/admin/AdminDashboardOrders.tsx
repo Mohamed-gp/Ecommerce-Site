@@ -10,7 +10,7 @@ const AdminDashboardOrders = () => {
     try {
       const { data } = await customAxios.get("/admin/orders");
       setOrders(data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load orders");
     } finally {
       setLoading(false);

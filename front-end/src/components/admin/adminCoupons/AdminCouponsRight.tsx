@@ -20,7 +20,7 @@ const AdminCouponsRight = () => {
       setLoading(true);
       const { data } = await customAxios.get("/coupons");
       setCoupons(data.data);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch coupons");
     } finally {
       setLoading(false);
@@ -33,7 +33,7 @@ const AdminCouponsRight = () => {
       toast.success("Coupon created successfully!");
       setNewCoupon({ code: "", discount: 0, expiresAt: "" });
       getCoupons();
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create coupon");
     }
   };
@@ -53,7 +53,7 @@ const AdminCouponsRight = () => {
           await customAxios.delete(`/coupons/${couponId}`);
           toast.success("Coupon deleted successfully");
           getCoupons();
-        } catch (error: any) {
+        } catch (error) {
           toast.error(
             error.response?.data?.message || "Failed to delete coupon"
           );
