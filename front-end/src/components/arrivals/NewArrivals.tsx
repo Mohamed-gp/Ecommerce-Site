@@ -4,19 +4,19 @@ import customAxios from "../../utils/axios/customAxios";
 import Product from "../product/Product";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
 
-  const getProducts = async () => {
+  const getNewArrivals = async () => {
     try {
-      setIsLoading(true);
-      const { data } = await customAxios.get("/products?newArrivals=true");
-      setProducts(data.data.slice(0, 4));
+      const { data } = await customAxios.get("/products/new-arrivals");
+      setProducts(data.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load new arrivals");
     } finally {
       setIsLoading(false);
       setTimeout(() => setFadeIn(true), 100);
@@ -24,7 +24,7 @@ export default function NewArrivals() {
   };
 
   useEffect(() => {
-    getProducts();
+    getNewArrivals();
   }, []);
 
   return (

@@ -1,4 +1,23 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
+
+export interface IUser extends Document {
+  username: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  provider: "credentials" | "google";
+  photoUrl: string;
+  cart: mongoose.Types.ObjectId[];
+  wishlist: mongoose.Types.ObjectId[];
+  comments: mongoose.Types.ObjectId[];
+  isSubscribe: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface UserModel extends Model<IUser> {
+  build(attrs: Partial<IUser>): IUser;
+}
 
 const schema = new mongoose.Schema(
   {
@@ -18,34 +37,36 @@ const schema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      default: "user", // enum admin and user
+      enum: ["user", "admin"],
+      default: "user",
     },
     provider: {
       type: String,
       required: true,
+      enum: ["credentials", "google"],
       default: "credentials",
     },
     photoUrl: {
       type: String,
       required: true,
       default:
-        "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?w=740&t=st=1720114109~exp=1720114709~hmac=a7a50bf745c8017e3f9827b2d1a5f9a37ea13abea449d49a5e83e69d8fdd4382",
+        "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg",
     },
     cart: [
       {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Cart",
       },
     ],
     wishlist: [
       {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
     comments: [
       {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Comment",
       },
     ],
@@ -55,9 +76,22 @@ const schema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform(_doc: any, ret: { [key: string]: any }) {
+        ret["id"] = ret["_id"];
+        delete ret["_id"];
+        delete ret["__v"];
+      },
+    },
+  }
 );
 
-const User = mongoose.models.User || mongoose.model("User", schema);
+schema.statics["build"] = (attrs: Partial<IUser>) => {
+  return new User(attrs);
+};
+
+const User = mongoose.model<IUser, UserModel>("User", schema);
 
 export default User;

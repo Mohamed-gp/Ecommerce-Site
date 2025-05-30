@@ -13,7 +13,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [isHiddenPassword, setisHiddenPassword] = useState(true);
   const loginHandler = async (e: React.FormEvent) => {
@@ -30,12 +30,10 @@ const Login = () => {
     }
     try {
       const { data } = await customAxios.post("/auth/login", formData);
-      dispatch(authActions.login(data.data))
+      dispatch(authActions.login(data.data));
       toast.success(data.message);
-    
     } catch (error) {
-      toast.error(error.response.data.message);
-      console.log(error);
+      toast.error("Login failed. Please check your credentials.");
     }
     setLoading(false);
   };

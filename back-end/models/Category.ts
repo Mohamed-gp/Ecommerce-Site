@@ -1,5 +1,10 @@
-import { required } from "joi";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+interface ICategory extends Document {
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const Schema = new mongoose.Schema(
   {
@@ -12,6 +17,7 @@ const Schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Category = mongoose.models.Category || mongoose.model("Category", Schema);
+const Category =
+  mongoose.models.Category || mongoose.model<ICategory>("Category", Schema);
 
 export default Category;

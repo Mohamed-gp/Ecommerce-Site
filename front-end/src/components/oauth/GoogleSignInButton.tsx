@@ -1,38 +1,47 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { googleProvider, auth } from "../../fireBase";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 import customAxios from "../../utils/axios/customAxios";
-import { app } from "../../fireBase";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../redux/slices/authSlice";
 import toast from "react-hot-toast";
 
-const GoogleSignIn = () => {
+const GoogleSignInButton = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleGoogleSignIn = async () => {
+
+  const signInWithGoogle = async () => {
     try {
-      const provider = new GoogleAuthProvider();
-      const auth = getAuth(app);
-      const result = await signInWithPopup(auth, provider);
-      const { displayName, email, photoURL } = result.user;
-      const { data } = await customAxios.post("/auth/google", {
-        username: displayName,
-        email,
-        photoUrl: photoURL,
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      const response = await customAxios.post("/auth/google", {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
       });
 
-      toast.success(data.message);
-      dispatch(authActions.login(data.data));
+      // Handle successful authentication
+      dispatch(authActions.login(response.data.data));
+      localStorage.setItem("user", JSON.stringify(response.data.data));
+      toast.success("Successfully signed in with Google!");
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to sign in with Google");
     }
   };
+
   return (
     <button
-      onClick={() => handleGoogleSignIn()}
+      onClick={() => signInWithGoogle()}
       className="my-2 flex w-full justify-center gap-2 rounded-xl   border-2 py-2 text-mainColor"
     >
-      <img src="/Google.svg" alt="google" width={20} height={20} />
+      <FcGoogle size={20} />
       <p>Continue With Google</p>
     </button>
   );
 };
-export default GoogleSignIn;
+
+export default GoogleSignInButton;

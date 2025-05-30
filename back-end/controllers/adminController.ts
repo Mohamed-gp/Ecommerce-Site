@@ -6,7 +6,7 @@ import Comment from "../models/Comment";
 import Category from "../models/Category";
 import Order from "../models/Order";
 
-const getAdmins = async (req: Request, res: Response, next: NextFunction) => {
+const getAdmins = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     let admins: any = await User.find({ role: "admin" });
     admins.forEach((admin: any) => {
@@ -17,9 +17,10 @@ const getAdmins = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .json({ message: "fetched successfully", data: admins });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
 const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const email = req.body.adminEmail;
@@ -43,7 +44,7 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -76,69 +77,72 @@ const deleteAdmin = async (
         .json({ data: null, message: "admin deleted successfully" });
     }
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 const getUsersCount = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const usersCount = await User.find().countDocuments();
+    const usersCount = await User.countDocuments();
     return res
       .status(200)
       .json({ data: usersCount, message: "fetched successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
 const getProductsCount = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const productsCount = await Product.find().countDocuments();
+    const productsCount = await Product.countDocuments();
     return res
       .status(200)
       .json({ data: productsCount, message: "fetched successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
 const getCategoriesCount = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const categoriesCount = await Category.find().countDocuments();
+    const categoriesCount = await Category.countDocuments();
     return res
       .status(200)
       .json({ data: categoriesCount, message: "fetched successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
 const getCommentsCount = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const commentsCount = await Comment.find().countDocuments();
+    const commentsCount = await Comment.countDocuments();
     return res
       .status(200)
       .json({ data: commentsCount, message: "fetched successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 const getDashboardAnalytics = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -270,11 +274,15 @@ const getDashboardAnalytics = async (
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getAllUsers = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const users = await User.find().select("-password").sort({ createdAt: -1 });
     return res.status(200).json({
@@ -282,7 +290,7 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
       data: users,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -318,7 +326,7 @@ const updateUserRole = async (
       data: user,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -349,12 +357,12 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
       data: null,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 const getAllComments = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -369,7 +377,7 @@ const getAllComments = async (
       data: comments,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -396,7 +404,32 @@ const deleteCommentAsAdmin = async (
       data: null,
     });
   } catch (error) {
-    next(error);
+    return next(error);
+  }
+};
+
+/**
+ * @method GET
+ * @route /api/admin/products
+ * @access admin
+ * @desc get all products for admin management
+ */
+const getAllProductsForAdmin = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const products = await Product.find()
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Products fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -414,4 +447,5 @@ export {
   deleteUser,
   getAllComments,
   deleteCommentAsAdmin,
+  getAllProductsForAdmin,
 };

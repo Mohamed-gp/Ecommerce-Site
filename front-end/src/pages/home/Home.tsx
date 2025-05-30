@@ -8,6 +8,7 @@ import ContactForm from "../../components/contactUs/ContactForm";
 import customAxios from "../../utils/axios/customAxios";
 import { FaArrowRight, FaEnvelope } from "react-icons/fa";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface Category {
   _id: string;
@@ -25,7 +26,7 @@ export default function Home() {
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load categories");
     } finally {
       setIsLoading(false);
     }

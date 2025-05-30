@@ -12,8 +12,10 @@ const loginController = async (
   const { email, password } = req.body;
   try {
     const { error } = verifyLogin(req.body);
-    if (error) {
+    if (error && error.details && error.details[0]) {
       return res.status(400).json({ message: error.details[0].message });
+    } else if (error) {
+      return res.status(400).json({ message: "Invalid input" });
     }
     const user = await User.findOne({
       email,
@@ -43,7 +45,7 @@ const loginController = async (
     }
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
+      process.env["JWT_SECRET"] as string,
       {
         expiresIn: "1y",
       }
@@ -55,16 +57,18 @@ const loginController = async (
         httpOnly: true,
         sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        secure: process.env.NODE_ENV == "development" ? false : true,
+        secure: process.env["NODE_ENV"] == "development" ? false : true,
         domain:
-          process.env.NODE_ENV == "development"
+          process.env["NODE_ENV"] == "development"
             ? "localhost"
             : "production-server.tech",
       })
       .status(200)
       .json({ message: "login successfully", data: user });
+    return null;
   } catch (error) {
     next(error);
+    return null;
   }
 };
 
@@ -79,8 +83,10 @@ const registerController = async (
       return res.status(400).json({ message: "you must enter a password" });
     }
     const { error } = verifyRegister(req.body);
-    if (error) {
+    if (error && error.details && error.details[0]) {
       return res.status(400).json({ message: error.details[0].message });
+    } else if (error) {
+      return res.status(400).json({ message: "Invalid input" });
     }
     let user = await User.findOne({
       email,
@@ -99,7 +105,7 @@ const registerController = async (
     });
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
+      process.env["JWT_SECRET"] as string,
       { expiresIn: "1y" }
     );
     user.password = "";
@@ -108,16 +114,18 @@ const registerController = async (
         httpOnly: true,
         sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        secure: process.env.NODE_ENV == "development" ? false : true,
+        secure: process.env["NODE_ENV"] == "development" ? false : true,
         domain:
-          process.env.NODE_ENV == "development"
+          process.env["NODE_ENV"] == "development"
             ? "localhost"
             : "production-server.tech",
       })
       .status(201)
       .json({ data: user, message: "created successfully" });
+    return null;
   } catch (error) {
     next(error);
+    return null;
   }
 };
 
@@ -141,25 +149,26 @@ const googleSignIncontroller = async (
     if (user) {
       const token = jwt.sign(
         { id: user._id, role: user.role },
-        process.env.JWT_SECRET as string,
+        process.env["JWT_SECRET"] as string,
         {
           expiresIn: "1y",
         }
       );
       user.password = "";
-      return res
+      res
         .cookie("swiftbuy-token", token, {
           httpOnly: true,
           sameSite: "none",
           maxAge: 1000 * 60 * 60 * 24 * 365,
-          secure: process.env.NODE_ENV == "development" ? false : true,
+          secure: process.env["NODE_ENV"] == "development" ? false : true,
           domain:
-            process.env.NODE_ENV == "development"
+            process.env["NODE_ENV"] == "development"
               ? "localhost"
               : "production-server.tech",
         })
         .status(200)
         .json({ message: "login successfully", data: user });
+      return null;
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -173,40 +182,42 @@ const googleSignIncontroller = async (
       });
       const token = jwt.sign(
         { id: user._id, role: user.role },
-        process.env.JWT_SECRET as string,
+        process.env["JWT_SECRET"] as string,
         {
           expiresIn: "1y",
         }
       );
 
       user.password = "";
-      return res
+      res
         .cookie("swiftbuy-token", token, {
           httpOnly: true,
           sameSite: "none",
           maxAge: 1000 * 60 * 60 * 24 * 365,
-          secure: process.env.NODE_ENV == "development" ? false : true,
+          secure: process.env["NODE_ENV"] == "development" ? false : true,
           domain:
-            process.env.NODE_ENV == "development"
+            process.env["NODE_ENV"] == "development"
               ? "localhost"
               : "production-server.tech",
         })
         .status(201)
         .json({ message: "user created successfully", data: user });
+      return null;
     }
   } catch (error) {
     next(error);
+    return null;
   }
 };
 
-const logoutController = (req: Request, res: Response, next: NextFunction) => {
+const logoutController = (_req: Request, res: Response) => {
   res
     .clearCookie("swiftbuy-token", {
       httpOnly: true,
       sameSite: "none",
-      secure: process.env.NODE_ENV == "development" ? false : true,
+      secure: process.env["NODE_ENV"] == "development" ? false : true,
       domain:
-        process.env.NODE_ENV == "development"
+        process.env["NODE_ENV"] == "development"
           ? "localhost"
           : "production-server.tech",
     })

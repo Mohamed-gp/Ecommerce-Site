@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import customAxios from "../../utils/axios/customAxios";
 import HeroProduct from "./HeroProduct";
 import { Product } from "../../interfaces/dbInterfaces";
+import toast from "react-hot-toast";
 
 const Hero = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -17,11 +18,10 @@ const Hero = () => {
 
   const getFeaturedProducts = async () => {
     try {
-      setIsLoading(true);
       const { data } = await customAxios.get("/products/featured");
       setFeaturedProducts(data.data);
     } catch (error) {
-      console.error("Error fetching featured products:", error);
+      toast.error("Failed to load featured products");
     } finally {
       setIsLoading(false);
     }

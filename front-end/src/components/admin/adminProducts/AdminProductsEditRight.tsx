@@ -37,9 +37,8 @@ const AdminProductsEditRight = () => {
     try {
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch (error) {
+      toast.error("Failed to load categories");
     }
   };
 
@@ -62,8 +61,7 @@ const AdminProductsEditRight = () => {
       setImagePreviewUrls(product.images || []);
       setIsLoading(false);
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message || "Failed to load product");
+      toast.error("Failed to load product");
       setIsLoading(false);
     }
   };
@@ -134,11 +132,20 @@ const AdminProductsEditRight = () => {
 
       // Navigate back to products list
       navigate("/admin/products");
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message || "Failed to update product");
+    } catch (error) {
+      toast.error("Failed to update product");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const deleteProductHandler = async () => {
+    try {
+      const { data } = await customAxios.delete(`/admin/products/${id}`);
+      toast.success(data.message);
+      navigate("/admin/products");
+    } catch (error) {
+      toast.error("Failed to delete product");
     }
   };
 

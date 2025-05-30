@@ -1,5 +1,4 @@
 import joi from "joi";
-import joiPasswordComplexity from "joi-password-complexity";
 // import {loginInterface, registerInterface} from "../../interfaces/authInterface"
 
 const verifyRegister = (obj: object) => {

@@ -6,15 +6,15 @@ const getAllCoupons = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const coupons = await Coupon.find().sort({ createdAt: -1 });
-    res.status(200).json({
+    return res.status(200).json({
       message: "Coupons fetched successfully",
       data: coupons,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -23,7 +23,7 @@ const createCoupon = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const { code, discount, expiresAt } = req.body;
 
@@ -42,12 +42,12 @@ const createCoupon = async (
       expiresAt,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Coupon created successfully",
       data: coupon,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -56,7 +56,7 @@ const deleteCoupon = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const { id } = req.params;
     const coupon = await Coupon.findByIdAndDelete(id);
@@ -66,12 +66,12 @@ const deleteCoupon = async (
         data: null,
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       message: "Coupon deleted successfully",
       data: null,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -80,7 +80,7 @@ const validateCoupon = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const { code } = req.body;
     const coupon = await Coupon.findOne({ code: code.toUpperCase() });
@@ -108,12 +108,12 @@ const validateCoupon = async (
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Coupon is valid",
       data: coupon,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

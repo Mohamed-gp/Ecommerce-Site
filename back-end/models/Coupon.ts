@@ -1,4 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+export interface ICoupon extends Document {
+  code: string;
+  discount: number;
+  expiresAt: Date;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const couponSchema = new mongoose.Schema(
   {
@@ -26,5 +35,7 @@ const couponSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Coupon = mongoose.model("Coupon", couponSchema);
+const Coupon =
+  mongoose.models.Coupon || mongoose.model<ICoupon>("Coupon", couponSchema);
+
 export default Coupon;

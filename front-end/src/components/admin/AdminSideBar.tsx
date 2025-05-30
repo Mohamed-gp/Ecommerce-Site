@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -10,8 +10,6 @@ import {
   FiSettings,
   FiMessageSquare,
   FiChevronLeft,
-  FiChevronRight,
-  FiLogOut,
   FiMail,
   FiTag,
 } from "react-icons/fi";

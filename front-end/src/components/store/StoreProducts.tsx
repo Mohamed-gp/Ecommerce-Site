@@ -5,6 +5,7 @@ import { FaArrowRight, FaStore } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Product } from "../../interfaces/dbInterfaces";
 import ProductComp from "../product/Product";
+import toast from "react-hot-toast";
 
 export default function StoreProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,12 +14,10 @@ export default function StoreProducts() {
 
   const getProducts = async () => {
     try {
-      setIsLoading(true);
-      // Fetch only featured products instead of all products
-      const { data } = await customAxios.get("/products/featured");
-      setProducts(data.data.slice(0, 4));
+      const { data } = await customAxios.get("/products");
+      setProducts(data.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
       setTimeout(() => setFadeIn(true), 100);

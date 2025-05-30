@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import RatingStars from "../../../components/ratingstars/RatingStars";
 import {
   FaCartShopping,
@@ -20,7 +20,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../../redux/store";
 import { authActions } from "../../../redux/slices/authSlice";
 import Swal from "sweetalert2";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+
+interface ReviewFormData {
+  rating: number;
+  content: string;
+}
+
+interface ReviewWithUser extends Review {
+  user: {
+    _id: string;
+    username: string;
+    photoUrl?: string;
+  };
+}
 
 export default function ProductInfo() {
   const { id } = useParams();
@@ -48,23 +61,22 @@ export default function ProductInfo() {
     };
   }, []);
 
-  const getProductById = async () => {
+  const getProductById = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data } = await customAxios.get(`/products/${id}`);
       setProduct(data.data);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Failed to load product");
+    } catch (error) {
+      toast.error("Failed to load product");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     getProductById();
     scrollTo(0, 0);
-  }, []);
+  }, [getProductById]);
 
   const copy = () => {
     navigator.clipboard
@@ -98,29 +110,27 @@ export default function ProductInfo() {
       });
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Failed to add to cart");
+    } catch (error) {
+      toast.error("Failed to add to cart");
     }
   };
 
-  const [reviews, setReviews] = useState([]);
-  const getReviews = async () => {
+  const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
+  const getReviews = useCallback(async () => {
     try {
       const { data } = await customAxios(`/comments/${id}`);
       setReviews(data.data);
-    } catch (error: any) {
-      console.log(error);
+    } catch (error) {
       toast.error("Failed to load reviews");
     }
-  };
+  }, [id]);
 
-  const [review, setReview] = useState({
+  const [review, setReview] = useState<ReviewFormData>({
     rating: 5,
     content: "",
   });
 
-  const [emptyArray, setEmptyArray] = useState<any[]>([]);
+  const [emptyArray, setEmptyArray] = useState<number[]>([]);
 
   useEffect(() => {
     setEmptyArray([]);
@@ -128,7 +138,7 @@ export default function ProductInfo() {
       setEmptyArray((prev) => prev.concat(index));
     }
     getReviews();
-  }, []);
+  }, [getReviews]);
 
   const addReviewHandler = async () => {
     try {
@@ -148,9 +158,8 @@ export default function ProductInfo() {
       getReviews();
       setReview({ rating: 5, content: "" });
       toast.success(data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Failed to post review");
+    } catch (error) {
+      toast.error("Failed to post review");
     }
   };
 
@@ -176,11 +185,8 @@ export default function ProductInfo() {
             text: "Review Deleted Successfully",
             icon: "success",
           });
-        } catch (error: any) {
-          console.log(error);
-          toast.error(
-            error?.response?.data?.message || "Failed to delete review"
-          );
+        } catch (error) {
+          toast.error("Failed to delete review");
         }
       }
     });
@@ -198,9 +204,8 @@ export default function ProductInfo() {
       });
       dispatch(authActions.setWishlist(data.data));
       toast.success(data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Failed to update wishlist");
+    } catch (error) {
+      toast.error("Failed to update wishlist");
     }
   };
 
@@ -262,24 +267,16 @@ export default function ProductInfo() {
                 </motion.div>
               </motion.div>
             ) : (
-              <motion.div
+              <div
                 className="relative aspect-square bg-white rounded-2xl overflow-hidden shadow-lg cursor-zoom-in"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.3 }}
                 onClick={openZoomModal}
               >
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeProductImageIndex}
-                    src={product?.images?.[activeProductImageIndex]}
-                    alt={product?.name}
-                    className="w-full h-full object-contain"
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </AnimatePresence>
+                <img
+                  key={activeProductImageIndex}
+                  src={product?.images?.[activeProductImageIndex]}
+                  alt={product?.name}
+                  className="w-full h-full object-contain transition-opacity duration-100"
+                />
 
                 {/* Navigation Arrows */}
                 {product?.images?.length > 1 && (
@@ -289,7 +286,7 @@ export default function ProductInfo() {
                         e.stopPropagation();
                         prevImage();
                       }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors duration-150"
                     >
                       <FaChevronLeft className="text-gray-700" />
                     </button>
@@ -298,7 +295,7 @@ export default function ProductInfo() {
                         e.stopPropagation();
                         nextImage();
                       }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors duration-150"
                     >
                       <FaChevronRight className="text-gray-700" />
                     </button>
@@ -308,11 +305,11 @@ export default function ProductInfo() {
                 {/* Expand Icon */}
                 <button
                   onClick={openZoomModal}
-                  className="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200"
+                  className="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors duration-150"
                 >
                   <FaExpand className="text-gray-700" />
                 </button>
-              </motion.div>
+              </div>
             )}
           </div>
 
@@ -320,23 +317,21 @@ export default function ProductInfo() {
           {product?.images?.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2 w-full max-w-lg">
               {product.images.map((image: string, index: number) => (
-                <motion.button
+                <button
                   key={index}
                   onClick={() => setActiveProductImageIndex(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-150 ${
                     index === activeProductImageIndex
                       ? "border-mainColor shadow-lg"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <img
                     src={image}
                     alt={`${product.name} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
-                </motion.button>
+                </button>
               ))}
             </div>
           )}
@@ -370,7 +365,7 @@ export default function ProductInfo() {
               <RatingStars
                 starsNumber={
                   reviews.reduce(
-                    (acc: number, curr: any) => curr?.rate + acc,
+                    (acc: number, curr: ReviewWithUser) => curr?.rate + acc,
                     0
                   ) / reviews.length
                 }
@@ -437,7 +432,7 @@ export default function ProductInfo() {
             <motion.button
               onClick={() => toggleWishListHandler(user?._id, product?._id)}
               className={`p-3 rounded-xl border-2 transition-all ${
-                user?.wishlist?.find((ele: any) => ele?._id === product?._id)
+                user?.wishlist?.find((ele) => ele?._id === product?._id)
                   ? "bg-mainColor text-white border-mainColor"
                   : "bg-white text-mainColor border-mainColor hover:bg-mainColor/5"
               }`}
@@ -538,7 +533,7 @@ export default function ProductInfo() {
 
         {/* Reviews List */}
         <div className="space-y-6">
-          {reviews?.map((review: any, index: number) => (
+          {reviews?.map((review: ReviewWithUser, index: number) => (
             <motion.div
               key={review._id}
               className="bg-white p-6 rounded-xl shadow-lg border"

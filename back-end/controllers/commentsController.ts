@@ -12,7 +12,7 @@ const addComment = async (
   const { content, rating, userId } = req.body;
   const { productId } = req.params;
   try {
-    if (req.user.id != userId) {
+    if (!req.user || req.user.id != userId) {
       return res
         .status(403)
         .json({ data: null, message: "access denied,only user himself" });
@@ -47,7 +47,7 @@ const addComment = async (
       .status(200)
       .json({ data: comments, message: "comment created successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -70,7 +70,7 @@ const getComments = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .json({ data: comments, message: "comments fetched successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -81,7 +81,7 @@ const deleteComment = async (
 ) => {
   try {
     const { commentId, userId } = req.params;
-    if (req.user.id != userId) {
+    if (!req.user || req.user.id != userId) {
       return res
         .status(403)
         .json({ data: null, message: "access denied,only user himself" });
@@ -95,7 +95,7 @@ const deleteComment = async (
       .status(200)
       .json({ data: null, message: "comment deleted successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

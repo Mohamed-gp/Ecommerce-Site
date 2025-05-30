@@ -29,7 +29,6 @@ const ContactForm = () => {
       setMessage("");
       setSubject("");
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Failed to send message");
     } finally {
       setLoading(false);

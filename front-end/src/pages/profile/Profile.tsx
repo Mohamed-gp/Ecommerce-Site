@@ -6,10 +6,15 @@ import toast from "react-hot-toast";
 import customAxios from "../../utils/axios/customAxios";
 import { useEffect, useState } from "react";
 
+interface ProfileFormData {
+  username: string;
+  image: File | null;
+}
+
 const Profile = () => {
   const { user } = useSelector((state: IRootState) => state.auth);
   const dispatch = useDispatch();
-  const [data, setData] = useState<any>({
+  const [data, setData] = useState<ProfileFormData>({
     username: "",
     image: null,
   });
@@ -18,13 +23,16 @@ const Profile = () => {
     try {
       const formData = new FormData();
       formData.append("username", data.username);
-      formData.append("image", data.image);
+      if (data.image) {
+        formData.append("image", data.image);
+      }
       const result = await customAxios.post(`/users/${user?._id}`, formData);
       dispatch(authActions.login(result.data.data));
       toast.success(result.data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update profile";
+      toast.error(errorMessage);
     }
   };
 
@@ -34,8 +42,9 @@ const Profile = () => {
       dispatch(authActions.logout());
       toast.success(data.message);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to logout";
+      toast.error(errorMessage);
     }
   };
   useEffect(() => {
@@ -101,8 +110,8 @@ const Profile = () => {
                   <input
                     type="file"
                     onChange={(e) => {
-                      if (e.target.files != null) {
-                        setData({ ...data, image: e.target.files[0] as any });
+                      if (e.target.files && e.target.files[0]) {
+                        setData({ ...data, image: e.target.files[0] });
                       }
                     }}
                     id="image-change"

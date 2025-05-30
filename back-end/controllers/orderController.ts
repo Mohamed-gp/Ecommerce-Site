@@ -2,59 +2,44 @@ import { Request, Response, NextFunction } from "express";
 import Order from "../models/Order";
 import User from "../models/User";
 import Cart from "../models/Cart";
-import Product from "../models/Product";
-
-type OrderStatus = "pending" | "processing" | "delivered";
-
-interface OrderStatusCounts {
-  pending: number;
-  processing: number;
-  delivered: number;
-  [key: string]: number; // Allow string indexing
-}
-
-interface OrderStats {
-  count: number;
-  status: OrderStatusCounts;
-}
-
-interface OrderStatusCount {
-  _id: "pending" | "processing" | "delivered" | "shipped" | "canceled";
-  count: number;
-}
-
-interface AggregatedOrder {
-  _id: string;
-  count: number;
-}
+import { Types } from "mongoose";
 
 // Create a new order after successful payment
-const createOrder = async (req: Request, res: Response, next: NextFunction) => {
+const createOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { userId, items, totalAmount, paymentId, shippingAddress } = req.body;
 
-    // Create the order
-    const order = await Order.create({
-      user: userId,
+    const order = await Order.build({
+      user: new Types.ObjectId(userId),
       items,
       totalAmount,
       paymentId,
       shippingAddress,
       status: "processing",
-    });
+      paymentMethod: "stripe", // Default payment method
+    }).save();
 
     // Clear the user's cart after successful order
-    await Cart.deleteMany({ user: userId });
+    await Cart.deleteMany({
+      user: new Types.ObjectId(userId),
+    }).exec();
 
-    // Update the user's cart reference
-    await User.findByIdAndUpdate(userId, { $set: { cart: [] } });
+    await User.findByIdAndUpdate(
+      new Types.ObjectId(userId),
+      { $set: { cart: [] } },
+      { new: true }
+    ).exec();
 
     return res.status(201).json({
       message: "Order created successfully",
       data: order,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -63,40 +48,27 @@ const getAllOrders = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const { page = 1, limit = 10, status } = req.query;
-    const pageNumber = parseInt(page as string);
-    const limitNumber = parseInt(limit as string);
+    const { status } = req.query;
+    const query: Record<string, unknown> = {};
 
-    // Build query based on filters
-    const query: any = {};
     if (status) {
-      query.status = status;
+      query["status"] = status;
     }
 
-    // Count total orders matching the query
-    const totalOrders = await Order.countDocuments(query);
-
-    // Fetch orders with pagination
     const orders = await Order.find(query)
-      .populate("user", "name email")
+      .populate("user", "username email")
       .populate("items.product")
       .sort({ createdAt: -1 })
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
+      .exec();
 
     return res.status(200).json({
       message: "Orders fetched successfully",
-      data: {
-        orders,
-        totalOrders,
-        currentPage: pageNumber,
-        totalPages: Math.ceil(totalOrders / limitNumber),
-      },
+      data: orders,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -105,20 +77,22 @@ const getUserOrders = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const userId = req.params.userId;
-
-    const orders = await Order.find({ user: userId })
+    const { userId } = req.params;
+    const orders = await Order.find({
+      user: new Types.ObjectId(userId),
+    })
       .populate("items.product")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .exec();
 
     return res.status(200).json({
       message: "User orders fetched successfully",
       data: orders,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -127,13 +101,14 @@ const getOrderById = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const orderId = req.params.orderId;
+    const orderId = req.params["orderId"];
 
-    const order = await Order.findById(orderId)
-      .populate("user", "name email")
-      .populate("items.product");
+    const order = await Order.findById(new Types.ObjectId(orderId))
+      .populate("user", "username email")
+      .populate("items.product")
+      .exec();
 
     if (!order) {
       return res.status(404).json({
@@ -147,7 +122,7 @@ const getOrderById = async (
       data: order,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -156,19 +131,12 @@ const updateOrderStatus = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
 
-    const validStatuses = [
-      "pending",
-      "processing",
-      "shipped",
-      "delivered",
-      "canceled",
-    ];
-    if (!validStatuses.includes(status)) {
+    if (!isValidOrderStatus(status)) {
       return res.status(400).json({
         message: "Invalid status value",
         data: null,
@@ -176,10 +144,10 @@ const updateOrderStatus = async (
     }
 
     const order = await Order.findByIdAndUpdate(
-      orderId,
+      new Types.ObjectId(orderId),
       { status },
       { new: true }
-    );
+    ).exec();
 
     if (!order) {
       return res.status(404).json({
@@ -193,22 +161,21 @@ const updateOrderStatus = async (
       data: order,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 // Get revenue statistics
 const getRevenueStats = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0));
     const endOfToday = new Date(today.setHours(23, 59, 59, 999));
 
-    // Get today's revenue
     const todayRevenue = await Order.aggregate([
       {
         $match: {
@@ -225,7 +192,6 @@ const getRevenueStats = async (
       },
     ]);
 
-    // Get current month revenue
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(
       today.getFullYear(),
@@ -253,7 +219,6 @@ const getRevenueStats = async (
       },
     ]);
 
-    // Get total revenue
     const totalRevenue = await Order.aggregate([
       {
         $match: {
@@ -273,30 +238,30 @@ const getRevenueStats = async (
       message: "Revenue statistics fetched successfully",
       data: {
         today: {
-          revenue: todayRevenue.length > 0 ? todayRevenue[0].totalRevenue : 0,
-          orders: todayRevenue.length > 0 ? todayRevenue[0].orderCount : 0,
+          revenue: todayRevenue[0]?.totalRevenue || 0,
+          orders: todayRevenue[0]?.orderCount || 0,
         },
         month: {
-          revenue: monthRevenue.length > 0 ? monthRevenue[0].totalRevenue : 0,
-          orders: monthRevenue.length > 0 ? monthRevenue[0].orderCount : 0,
+          revenue: monthRevenue[0]?.totalRevenue || 0,
+          orders: monthRevenue[0]?.orderCount || 0,
         },
         total: {
-          revenue: totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,
-          orders: totalRevenue.length > 0 ? totalRevenue[0].orderCount : 0,
+          revenue: totalRevenue[0]?.totalRevenue || 0,
+          orders: totalRevenue[0]?.orderCount || 0,
         },
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 // Get order statistics
 const getOrderStats = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0));
@@ -305,7 +270,6 @@ const getOrderStats = async (
     startOfWeek.setDate(today.getDate() - today.getDay());
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // Get orders for different time periods with status breakdown
     const todayStats = await getOrderStatsForPeriod(startOfToday, endOfToday);
     const weekStats = await getOrderStatsForPeriod(startOfWeek, endOfToday);
     const monthStats = await getOrderStatsForPeriod(startOfMonth, endOfToday);
@@ -319,7 +283,7 @@ const getOrderStats = async (
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -351,11 +315,7 @@ const getOrderStatsForPeriod = async (startDate: Date, endDate: Date) => {
 
   orders.forEach((order) => {
     stats.count += order.count;
-    if (
-      order._id &&
-      typeof order._id === "string" &&
-      order._id in stats.status
-    ) {
+    if (order._id && order._id in stats.status) {
       stats.status[order._id as keyof typeof stats.status] = order.count;
     }
   });
@@ -363,11 +323,15 @@ const getOrderStatsForPeriod = async (startDate: Date, endDate: Date) => {
   return stats;
 };
 
+// Type guard for order status
 function isValidOrderStatus(
-  status: any
-): status is "pending" | "processing" | "delivered" | "shipped" | "canceled" {
-  return ["pending", "processing", "delivered", "shipped", "canceled"].includes(
-    status
+  status: unknown
+): status is "pending" | "processing" | "shipped" | "delivered" | "canceled" {
+  return (
+    typeof status === "string" &&
+    ["pending", "processing", "delivered", "shipped", "canceled"].includes(
+      status
+    )
   );
 }
 

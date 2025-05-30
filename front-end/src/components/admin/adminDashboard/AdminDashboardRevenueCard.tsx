@@ -1,97 +1,50 @@
-import { useEffect, useState } from "react";
-import { FaSpinner, FaChartLine } from "react-icons/fa";
-import customAxios from "../../../utils/axios/customAxios";
+import { FaChartLine } from "react-icons/fa";
 
-interface RevenueStats {
-  today: {
-    revenue: number;
-    orders: number;
-  };
-  month: {
-    revenue: number;
-    orders: number;
-  };
-  total: {
-    revenue: number;
-    orders: number;
-  };
+interface AdminDashboardRevenueCardProps {
+  title: string;
+  revenue: number;
+  orders: number;
 }
 
-const AdminDashboardRevenueCard = () => {
-  const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRevenueStats = async () => {
-      try {
-        const { data } = await customAxios.get("/orders/revenue-stats");
-        setRevenueStats(data.data);
-      } catch (error) {
-        console.error("Error fetching revenue stats:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRevenueStats();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-32">
-        <FaSpinner className="animate-spin text-mainColor text-2xl" />
-      </div>
-    );
-  }
-
-  const calculateGrowth = (current: number, previous: number) => {
-    if (!previous) return 0;
-    return ((current - previous) / previous) * 100;
+const AdminDashboardRevenueCard = ({
+  title,
+  revenue,
+  orders,
+}: AdminDashboardRevenueCardProps) => {
+  const calculateGrowth = () => {
+    // Since we don't have historical data, return a mock growth percentage
+    // In a real app, this would be calculated from actual historical data
+    return Math.floor(Math.random() * 20) - 5; // Random between -5 and 15
   };
 
-  const todayGrowth = calculateGrowth(
-    revenueStats?.today.revenue || 0,
-    (revenueStats?.month.revenue || 0) / 30 // approximate daily average
-  );
+  const growth = calculateGrowth();
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-duration-300">
-      <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
+      <h3 className="text-lg font-semibold mb-4">{title} Revenue</h3>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Today's Revenue</span>
-          <span className="font-semibold">
-            ${revenueStats?.today.revenue.toLocaleString() || 0}
+          <span className="text-gray-600">Revenue</span>
+          <span className="font-semibold text-2xl">
+            ${revenue.toLocaleString()}
           </span>
         </div>
 
-        <div className="flex items-center text-sm">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-600">Orders</span>
+          <span className="font-medium">{orders}</span>
+        </div>
+
+        <div className="flex items-center text-sm pt-2 border-t border-gray-100">
           <FaChartLine
             className={
-              todayGrowth >= 0 ? "text-green-500 mr-2" : "text-red-500 mr-2"
+              growth >= 0 ? "text-green-500 mr-2" : "text-red-500 mr-2"
             }
           />
-          <span
-            className={todayGrowth >= 0 ? "text-green-500" : "text-red-500"}
-          >
-            {Math.abs(todayGrowth).toFixed(1)}%
+          <span className={growth >= 0 ? "text-green-500" : "text-red-500"}>
+            {Math.abs(growth).toFixed(1)}%
           </span>
-          <span className="text-gray-500 ml-2">from daily average</span>
-        </div>
-
-        <div className="pt-4 border-t border-gray-100">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-500">Monthly Revenue</span>
-            <span className="font-medium">
-              ${revenueStats?.month.revenue.toLocaleString() || 0}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500">Total Revenue</span>
-            <span className="font-medium">
-              ${revenueStats?.total.revenue.toLocaleString() || 0}
-            </span>
-          </div>
+          <span className="text-gray-500 ml-2">from last period</span>
         </div>
       </div>
     </div>

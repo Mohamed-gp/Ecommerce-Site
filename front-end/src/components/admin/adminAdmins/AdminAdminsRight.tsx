@@ -14,42 +14,40 @@ const AdminAdminsRight = () => {
       const { data } = await customAxios.get("/admin/admins");
       setAdmins(data.data);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error("Failed to fetch admins");
     }
   };
-  const addAdminHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+
+  const addAdminHandler = async (adminData: any) => {
     try {
-      const { data } = await customAxios.post(
-        "/admin/admins",
-        {
-          adminEmail,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      toast.success(data.message);
-      setAdminEmail("");
-      getAdmins();
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
-    }
-  };
-  const deleteHandler = async (id: string) => {
-    try {
-      const { data } = await customAxios.delete(`/admin/admins/${id}`);
+      const { data } = await customAxios.post("/admin/users", adminData);
       toast.success(data.message);
       getAdmins();
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error("Failed to add admin");
     }
   };
+
+  const deleteAdminHandler = async (id: string) => {
+    try {
+      const { data } = await customAxios.delete(`/admin/users/${id}`);
+      setAdmins(admins.filter((admin) => admin._id !== id));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error("Failed to delete admin");
+    }
+  };
+
+  const updateAdminHandler = async (id: string, adminData: any) => {
+    try {
+      const { data } = await customAxios.put(`/admin/users/${id}`, adminData);
+      toast.success(data.message);
+      getAdmins();
+    } catch (error) {
+      toast.error("Failed to update admin");
+    }
+  };
+
   useEffect(() => {
     getAdmins();
   }, []);
@@ -68,7 +66,7 @@ const AdminAdminsRight = () => {
             </div>
             <div className="flex items-center gap-4 pr-4 ">
               <button
-                onClick={() => deleteHandler(admin?._id)}
+                onClick={() => deleteAdminHandler(admin?._id)}
                 className="flex items-center gap-2 bg-red-500 py-2 px-4 text-white"
                 style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
               >
@@ -80,7 +78,10 @@ const AdminAdminsRight = () => {
         ))}
       </div>
       <form
-        onSubmit={(e) => addAdminHandler(e)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          addAdminHandler({ adminEmail });
+        }}
         className="flex w-full  items-center mt-4 justify-between"
       >
         <input

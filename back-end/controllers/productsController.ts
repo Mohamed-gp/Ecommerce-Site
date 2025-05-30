@@ -2,7 +2,6 @@ import cloudinary from "../config/cloudinary";
 import { NextFunction, Request, Response } from "express";
 import Product from "../models/Product";
 import User from "../models/User";
-import multer from "multer";
 import removeFiles from "../utils/fs/cleanUpload";
 import { verifyCreateProduct } from "../utils/joi/productValidation";
 import { authRequest } from "../interfaces/authInterface";
@@ -19,13 +18,15 @@ const getAllProducts = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     let { search, category, newArrivals } = req.query;
     if (search && search != "") {
       const products = await Product.find({
         name: { $regex: search, $options: "i" },
-      }).populate("category");
+      })
+        .populate("category")
+        .exec();
       return res.status(200).json({
         message: "fetched Successfully",
         data: products,
@@ -34,37 +35,20 @@ const getAllProducts = async (
     if (newArrivals == "true") {
       const products = await Product.find()
         .sort({ createdAt: -1 })
-        .populate("category");
+        .populate("category")
+        .exec();
       return res.status(200).json({
         message: "fetched Successfully",
         data: products,
       });
     }
     if (category && category != "") {
-      // const products = await Product.aggregate([
-      //   {
-      //     $lookup: {
-      //       from: "categories",
-      //       localField: "category",
-      //       foreignField: "_id",
-      //       as: "categoryInfo",
-      //     },
-      //   },
-      //   {
-      //     $unwind: "$categoryInfo",
-      //   },
-      //   {
-      //     $match: {
-      //       "categoryInfo.name": category,
-      //     },
-      //   },
-      // ]);
       if (typeof category == "string") {
         category = category.replace("+", " ");
       }
-      const products = await Product.find({}).populate("category");
+      const products = await Product.find().populate("category").exec();
       const filteredProducts = products.filter(
-        (product) => product.category.name == category
+        (product: any) => product.category?.name == category
       );
       return res.status(200).json({
         message: "fetched Successfully",
@@ -72,14 +56,15 @@ const getAllProducts = async (
       });
     }
 
-    const products = await Product.find().populate("category");
+    const products = await Product.find().populate("category").exec();
     return res
       .status(200)
       .json({ message: "fetched successfully", data: products });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
 /**
  *
  * @method GET
@@ -88,9 +73,15 @@ const getAllProducts = async (
  * @desc get products
  *
  */
-const getProduct = async (req: Request, res: Response, next: NextFunction) => {
+const getProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
-    const product = await Product.findById(req.params.id).populate("category");
+    const product = await Product.findById(req.params["id"])
+      .populate("category")
+      .exec();
     if (!product) {
       return res.status(404).json({ data: null, message: "product not found" });
     }
@@ -99,7 +90,7 @@ const getProduct = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .json({ message: "fetched successfully", data: product });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -107,11 +98,11 @@ const createProduct = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     removeFiles();
     const { error } = verifyCreateProduct(req.body);
-    if (error) {
+    if (error && error.details && error.details[0]) {
       return res
         .status(400)
         .json({ message: error.details[0].message, data: null });
@@ -130,7 +121,8 @@ const createProduct = async (
       pictures.map((picture) => cloudinary.uploader.upload(picture))
     );
     const pictureUrls = uploadedPictures.map((picture) => picture.url);
-    const product = await Product.create({
+
+    const product = Product.build({
       name: req.body.name,
       description: req.body.description,
       price: +req.body.price,
@@ -139,11 +131,13 @@ const createProduct = async (
       isFeatured: req.body.isFeatured,
       images: pictureUrls,
     });
+    await product.save();
+
     return res
       .status(201)
       .json({ message: "created successfully", data: product });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -151,36 +145,63 @@ const deleteProduct = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params["id"]).exec();
     if (!product) {
       return res
         .status(404)
         .json({ data: null, message: "no product find with this id" });
     } else {
-      await Product.findByIdAndDelete(req.params.id);
+      await Product.findByIdAndDelete(req.params["id"]);
       return res
         .status(200)
         .json({ data: null, message: "deleted successfully" });
     }
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 const getFeaturedProducts = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const products = await Product.find({ isFeatured: true });
+    const products = await Product.find({ isFeatured: true }).exec();
     return res
       .status(200)
       .json({ message: "fetched successfully", data: products });
   } catch (error) {
-    next(error);
+    return next(error);
+  }
+};
+
+/**
+ * @method GET
+ * @route /api/products/new-arrivals
+ * @access public
+ * @desc get new arrival products (latest 8 products)
+ */
+const getNewArrivals = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const products = await Product.find()
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .populate("category")
+      .exec();
+
+    return res.status(200).json({
+      message: "New arrivals fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -188,16 +209,16 @@ const toggleWishlist = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   const { userId, productId } = req.body;
   try {
-    if (userId !== req.user.id) {
+    if (!req.user || userId !== req.user.id) {
       return res.status(403).json({
         data: null,
         message: "Access denied, you must be the user himself",
       });
     }
-    let user = await User.findById(userId).populate("wishlist");
+    let user = await User.findById(userId).populate("wishlist").exec();
     if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -208,12 +229,15 @@ const toggleWishlist = async (
       user.wishlist.push(productId);
     }
     await user.save();
-    user = await User.findById(userId).populate("wishlist");
+    user = await User.findById(userId).populate("wishlist").exec();
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
     return res
       .status(200)
       .json({ message: "wishlist toggled successfull", data: user.wishlist });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -224,4 +248,5 @@ export {
   deleteProduct,
   getFeaturedProducts,
   toggleWishlist,
+  getNewArrivals,
 };

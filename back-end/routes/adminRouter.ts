@@ -13,7 +13,9 @@ import {
   deleteUser,
   getAllComments,
   deleteCommentAsAdmin,
+  getAllProductsForAdmin,
 } from "../controllers/adminController";
+import { deleteProduct } from "../controllers/productsController";
 import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
 import demoAdmin from "../middlewares/demoAdmin";
 const router = Router();
@@ -33,6 +35,10 @@ router.route("/users/count").get(verifyToken, verifyAdmin, getUsersCount);
 router
   .route("/categories/count")
   .get(verifyToken, verifyAdmin, getCategoriesCount);
+router.route("/products").get(verifyToken, verifyAdmin, getAllProductsForAdmin);
+router
+  .route("/products/:id")
+  .delete(verifyToken, verifyAdmin, demoAdmin, deleteProduct);
 router.route("/products/count").get(verifyToken, verifyAdmin, getProductsCount);
 router.route("/comments/count").get(verifyToken, verifyAdmin, getCommentsCount);
 router.route("/comments").get(verifyToken, verifyAdmin, getAllComments);

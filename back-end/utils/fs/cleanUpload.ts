@@ -1,4 +1,3 @@
-import exress from "express";
 import fs from "fs";
 import path from "path";
 
@@ -10,4 +9,3 @@ const removefiles = async () => {
 };
 
 export default removefiles;
-

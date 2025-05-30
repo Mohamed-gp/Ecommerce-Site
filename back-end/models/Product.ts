@@ -1,4 +1,21 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
+
+export interface IProduct extends Document {
+  name: string;
+  description: string;
+  price: number;
+  promoPercentage: number;
+  images: string[];
+  isFeatured: boolean;
+  category: mongoose.Types.ObjectId;
+  comments: mongoose.Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ProductModel extends Model<IProduct> {
+  build(attrs: Partial<IProduct>): IProduct;
+}
 
 const schema = new mongoose.Schema(
   {
@@ -30,13 +47,13 @@ const schema = new mongoose.Schema(
       default: false,
     },
     category: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
     comments: [
       {
-        type: [mongoose.Schema.ObjectId],
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Comment",
       },
     ],
@@ -44,6 +61,12 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Product = mongoose.models.Product || mongoose.model("Product", schema);
+schema.statics["build"] = (attrs: Partial<IProduct>) => {
+  return new Product(attrs);
+};
+
+const Product =
+  (mongoose.models["Product"] as ProductModel) ||
+  mongoose.model<IProduct, ProductModel>("Product", schema);
 
 export default Product;

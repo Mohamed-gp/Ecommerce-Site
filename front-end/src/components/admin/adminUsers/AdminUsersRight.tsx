@@ -30,7 +30,6 @@ const AdminUsersRight = () => {
       setUsers(data.data);
       setFilteredUsers(data.data);
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Error fetching users");
     } finally {
       setIsLoading(false);
@@ -77,7 +76,6 @@ const AdminUsersRight = () => {
           toast.success(`User role updated to ${newRole} successfully`);
           getUsers();
         } catch (error: any) {
-          console.error(error);
           toast.error(
             error.response?.data?.message || "Error updating user role"
           );
@@ -102,7 +100,6 @@ const AdminUsersRight = () => {
           toast.success("User deleted successfully");
           getUsers();
         } catch (error: any) {
-          console.error(error);
           toast.error(error.response?.data?.message || "Error deleting user");
         }
       }

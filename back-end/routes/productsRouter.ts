@@ -6,6 +6,7 @@ import {
   getProduct,
   getFeaturedProducts,
   toggleWishlist,
+  getNewArrivals,
 } from "../controllers/productsController";
 import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
 import upload from "../config/multer";
@@ -25,6 +26,7 @@ router
     createProduct
   );
 router.route("/featured").get(getFeaturedProducts);
+router.route("/new-arrivals").get(getNewArrivals);
 router.route("/wishlist").post(verifyToken, toggleWishlist);
 router
   .route("/:id")

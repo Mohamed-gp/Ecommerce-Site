@@ -23,6 +23,7 @@ import {
   Cell,
 } from "recharts";
 import customAxios from "../../../utils/axios/customAxios";
+import toast from "react-hot-toast";
 
 const COLORS = [
   "#00C2FF",
@@ -58,7 +59,7 @@ const AdminDashBoardRight = () => {
       setSalesData(analytics.salesData);
       setCategoryData(analytics.categoryData);
     } catch (error) {
-      console.error("Error fetching dashboard analytics:", error);
+      toast.error("Failed to fetch dashboard analytics");
     } finally {
       setIsLoading(false);
     }
@@ -243,9 +244,6 @@ const AdminDashBoardRight = () => {
           </div>
         </div>
       </div>
-
-      {/* Statistics Overview */}
-      <AdminCount />
     </div>
   );
 };

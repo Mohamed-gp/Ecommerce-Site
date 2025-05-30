@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FaTrash,
   FaRegComment,
   FaUser,
   FaBoxOpen,
   FaRegCalendar,
-} from "react-icons/fa6";
-import axios from "axios";
+} from "react-icons/fa";
+import customAxios from "../../../utils/axios/customAxios";
 import toast from "react-hot-toast";
 
 interface Comment {
@@ -25,7 +25,7 @@ interface Comment {
   createdAt: string;
 }
 
-const AdminComments: React.FC = () => {
+const AdminCommentsRight: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -36,19 +36,10 @@ const AdminComments: React.FC = () => {
 
   const fetchComments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/admin/comments`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await customAxios.get("/admin/comments");
       setComments(response.data.data);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      toast.error("Failed to fetch comments");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to fetch comments");
     } finally {
       setLoading(false);
     }
@@ -61,20 +52,11 @@ const AdminComments: React.FC = () => {
 
     setDeleting(commentId);
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `${import.meta.env.VITE_SERVER_URL}/api/admin/comments/${commentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await customAxios.delete(`/admin/comments/${commentId}`);
       setComments(comments.filter((comment) => comment._id !== commentId));
       toast.success("Comment deleted successfully");
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      toast.error("Failed to delete comment");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to delete comment");
     } finally {
       setDeleting(null);
     }
@@ -109,14 +91,16 @@ const AdminComments: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex-1 p-6 bg-gray-50">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
+    <div className="flex-1 p-6 bg-gray-50">
       <div className="flex items-center gap-3 mb-6">
         <FaRegComment className="h-6 w-6 text-blue-600" />
         <h1 className="text-2xl font-bold text-gray-900">Manage Comments</h1>
@@ -197,4 +181,4 @@ const AdminComments: React.FC = () => {
   );
 };
 
-export default AdminComments;
+export default AdminCommentsRight;

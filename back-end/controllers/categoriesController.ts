@@ -11,7 +11,7 @@ import Category from "../models/Category";
  *
  */
 const getAllCategories = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -21,7 +21,7 @@ const getAllCategories = async (
       .status(200)
       .json({ message: "fetched successfully", data: categories });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -59,7 +59,7 @@ const createCategory = async (
       .status(201)
       .json({ data: category, message: "category created successfull" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -72,7 +72,11 @@ const createCategory = async (
  *
  */
 
-const deleteCategory = async (req: Request, res: Response,next : NextFunction) => {
+const deleteCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
@@ -85,7 +89,7 @@ const deleteCategory = async (req: Request, res: Response,next : NextFunction) =
       .status(200)
       .json({ message: "category deleted successfully", data: null });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

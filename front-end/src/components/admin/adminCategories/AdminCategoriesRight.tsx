@@ -25,8 +25,7 @@ const AdminCategoriesRight = () => {
       setLoading(true);
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
       toast.error(
         error?.response?.data?.message || "Failed to fetch categories"
       );
@@ -51,8 +50,7 @@ const AdminCategoriesRight = () => {
       toast.success(data.message);
       setCategory("");
       getCategories();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
       toast.error(
         error?.response?.data?.message || "Failed to create category"
       );
@@ -78,8 +76,7 @@ const AdminCategoriesRight = () => {
         const { data } = await customAxios.delete(`categories/${id}`);
         toast.success(data.message);
         getCategories();
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
         toast.error(
           error?.response?.data?.message || "Failed to delete category"
         );

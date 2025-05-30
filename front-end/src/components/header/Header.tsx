@@ -1,16 +1,18 @@
-import { useEffect, useState, useRef } from "react";
-import HeaderCenter from "./HeaderCenter";
+import { useEffect, useRef, useState } from "react";
 import HeaderLeft from "./HeaderLeft";
+import HeaderCenter from "./HeaderCenter";
 import HeaderRight from "./HeaderRight";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         const height = headerRef.current.offsetHeight;
+        setHeaderHeight(height);
         document.documentElement.style.setProperty(
           "--header-height",
           `${height}px`
@@ -20,12 +22,13 @@ export default function Header() {
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 0);
-      // Use RAF to ensure smooth height updates
       requestAnimationFrame(updateHeaderHeight);
     };
 
     // Initial setup
     updateHeaderHeight();
+
+    // Add event listeners
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", updateHeaderHeight);
 
@@ -36,22 +39,22 @@ export default function Header() {
   }, []);
 
   return (
-    <header
-      ref={headerRef}
-      className={`bg-white/95 backdrop-blur-sm sticky z-[999] left-0 top-0 transition-all duration-300 ${
-        scrolled ? "py-2" : "py-4"
-      }`}
-      style={{
-        boxShadow: scrolled ? "rgba(0, 0, 0, 0.08) 0px 4px 12px" : "none",
-      }}
-    >
-      <div className="container">
-        <div className="flex items-center justify-between gap-2">
-          <HeaderLeft />
-          <HeaderCenter />
-          <HeaderRight />
+    <>
+      <header
+        ref={headerRef}
+        className={`fixed w-full top-0 left-0 bg-white/95 backdrop-blur-sm z-[999] transition-all duration-300 ${
+          scrolled ? "py-2 shadow-sm" : "py-4"
+        }`}
+      >
+        <div className="container">
+          <div className="flex items-center justify-between gap-2">
+            <HeaderLeft />
+            <HeaderCenter />
+            <HeaderRight />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <div style={{ height: `${headerHeight}px` }} />
+    </>
   );
 }

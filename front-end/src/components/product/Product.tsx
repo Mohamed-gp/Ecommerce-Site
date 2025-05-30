@@ -11,7 +11,7 @@ import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/store";
-import { authActions } from "../../redux/slices/authSlice";
+import { cartActions } from "../../redux/slices/cartSlice";
 import customAxios from "../../utils/axios/customAxios";
 
 interface Product {
@@ -44,45 +44,56 @@ export default function Product({ product }: ProductProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [preloadedImages, setPreloadedImages] = useState<Set<string>>(
+    new Set()
+  );
   const productRef = useRef<HTMLDivElement>(null);
-
-  const toggleWishListHandler = async (userId: string, productId: string) => {
-    if (!user) {
-      navigate("/register");
-      return;
-    }
-    try {
-      const { data } = await customAxios.post("/products/wishlist", {
-        userId,
-        productId,
-      });
-      dispatch(authActions.setWishlist(data.data));
-      toast.success(data.message);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error(error);
-        toast.error(error.message);
-      }
-    }
-  };
 
   const addToCart = async () => {
     if (!user) {
-      navigate("/register");
+      toast.error("Please login to add items to cart");
       return;
     }
+
     try {
-      const { data } = await customAxios.post("/cart/add", {
-        userId: user._id,
+      await customAxios.post("/cart/add", {
+        productId: product._id,
+        quantity: 1,
+      });
+      dispatch(cartActions.addToCart({ product, quantity: 1 }));
+      toast.success("Product added to cart!");
+    } catch (error) {
+      toast.error("Failed to add product to cart");
+    }
+  };
+
+  const addToWishlist = async () => {
+    if (!user) {
+      toast.error("Please login to add items to wishlist");
+      return;
+    }
+
+    try {
+      await customAxios.post("/users/wishlist", {
         productId: product._id,
       });
-      dispatch(authActions.setCart(data.data));
-      toast.success(data.message);
+      toast.success("Product added to wishlist!");
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error);
-        toast.error(error.message);
-      }
+      toast.error("Failed to add product to wishlist");
+    }
+  };
+
+  const buyNow = async () => {
+    if (!user) {
+      toast.error("Please login to purchase");
+      return;
+    }
+
+    try {
+      await addToCart();
+      navigate("/cart");
+    } catch (error) {
+      toast.error("Failed to proceed to checkout");
     }
   };
 
@@ -91,22 +102,42 @@ export default function Product({ product }: ProductProps) {
       const { data } = await customAxios(`/comments/${product._id}`);
       setReviews(data.data);
     } catch (error) {
-      console.error(error);
+      toast.error("Failed to fetch reviews");
     }
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    const nextIndex = (currentImageIndex + 1) % product.images.length;
+    preloadImage(product.images[nextIndex]);
+    setCurrentImageIndex(nextIndex);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + product.images.length) % product.images.length
-    );
+    const prevIndex =
+      (currentImageIndex - 1 + product.images.length) % product.images.length;
+    preloadImage(product.images[prevIndex]);
+    setCurrentImageIndex(prevIndex);
+  };
+
+  // Preload images for faster switching
+  const preloadImage = (src: string) => {
+    if (!preloadedImages.has(src)) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        setPreloadedImages((prev) => new Set([...prev, src]));
+      };
+    }
   };
 
   useEffect(() => {
     getReviews();
+
+    // Preload first few images immediately
+    if (product.images && product.images.length > 0) {
+      product.images.slice(0, 3).forEach(preloadImage);
+    }
+
     const currentRef = productRef.current;
 
     // Intersection Observer for lazy loading
@@ -140,7 +171,7 @@ export default function Product({ product }: ProductProps) {
   return (
     <div
       ref={productRef}
-      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
+      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -155,9 +186,9 @@ export default function Product({ product }: ProductProps) {
           <img
             src={product?.images[currentImageIndex]}
             alt={product?.name}
-            className={`w-full h-full object-contain transform transition-all duration-500 ${
-              isHovered ? "scale-110" : "scale-100"
-            } ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
+            className={`w-full h-full object-contain transition-opacity duration-150 ${
+              isImageLoaded ? "opacity-100" : "opacity-0"
+            }`}
             loading="lazy"
             onLoad={() => setIsImageLoaded(true)}
           />
@@ -171,7 +202,7 @@ export default function Product({ product }: ProductProps) {
                 e.preventDefault();
                 prevImage();
               }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 text-white p-1.5 rounded-full hover:bg-black/80 transition-colors duration-150 z-10"
             >
               <FaChevronLeft size={12} />
             </button>
@@ -180,7 +211,7 @@ export default function Product({ product }: ProductProps) {
                 e.preventDefault();
                 nextImage();
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 text-white p-1.5 rounded-full hover:bg-black/80 transition-colors duration-150 z-10"
             >
               <FaChevronRight size={12} />
             </button>
@@ -192,10 +223,11 @@ export default function Product({ product }: ProductProps) {
                   key={index}
                   onClick={(e) => {
                     e.preventDefault();
+                    preloadImage(product.images[index]);
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentImageIndex ? "bg-mainColor" : "bg-white/50"
+                  className={`w-2 h-2 rounded-full transition-colors duration-150 ${
+                    index === currentImageIndex ? "bg-mainColor" : "bg-white/60"
                   }`}
                 />
               ))}
@@ -227,23 +259,23 @@ export default function Product({ product }: ProductProps) {
         {/* Quick Actions */}
         {user && (
           <div
-            className={`absolute right-3 flex flex-col gap-2 transition-all duration-300 ${
-              isHovered ? "opacity-100 top-14" : "opacity-0 -top-10"
+            className={`absolute right-3 top-3 flex flex-col gap-2 transition-opacity duration-200 ${
+              isHovered ? "opacity-100" : "opacity-0"
             }`}
           >
             <button
               onClick={(e) => {
                 e.preventDefault();
-                toggleWishListHandler(user._id, product._id);
+                addToWishlist();
               }}
-              className="p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors group/btn"
+              className="p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors duration-150"
             >
               {user?.wishlist?.find(
                 (item: Product) => item._id === product._id
               ) ? (
-                <FaHeart className="text-mainColor transform group-hover/btn:scale-110 transition-transform" />
+                <FaHeart className="text-mainColor" />
               ) : (
-                <FaRegHeart className="text-gray-600 transform group-hover/btn:scale-110 transition-transform" />
+                <FaRegHeart className="text-gray-600" />
               )}
             </button>
             <button
@@ -251,9 +283,9 @@ export default function Product({ product }: ProductProps) {
                 e.preventDefault();
                 addToCart();
               }}
-              className="p-2 rounded-full bg-mainColor text-white shadow-md hover:bg-opacity-90 transition-colors group/btn"
+              className="p-2 rounded-full bg-mainColor text-white shadow-md hover:bg-opacity-90 transition-colors duration-150"
             >
-              <FaCartShopping className="transform group-hover/btn:scale-110 transition-transform" />
+              <FaCartShopping />
             </button>
           </div>
         )}
@@ -264,7 +296,7 @@ export default function Product({ product }: ProductProps) {
         {/* Title and Rating */}
         <div className="mb-4">
           <Link to={`/product/${product._id}`} className="block group">
-            <h3 className="font-medium text-gray-900 group-hover:text-mainColor transition-colors line-clamp-1">
+            <h3 className="font-medium text-gray-900 group-hover:text-mainColor transition-colors duration-150 line-clamp-1">
               {product?.name}
             </h3>
           </Link>
@@ -274,11 +306,11 @@ export default function Product({ product }: ProductProps) {
               {[...Array(5)].map((_, i) => (
                 <FaStar
                   key={i}
-                  className={`transform transition-transform ${
+                  className={`${
                     i < Math.round(averageRating)
                       ? "text-yellow-400"
                       : "text-gray-300"
-                  } ${isHovered ? "scale-110" : "scale-100"}`}
+                  }`}
                   size={14}
                 />
               ))}
@@ -292,11 +324,7 @@ export default function Product({ product }: ProductProps) {
         {/* Price and Action */}
         <div className="flex items-center justify-between h-10">
           <div className="flex flex-col">
-            <span
-              className={`text-xl font-bold text-mainColor transition-all duration-300 ${
-                isHovered ? "scale-110" : "scale-100"
-              }`}
-            >
+            <span className="text-xl font-bold text-mainColor">
               $
               {(product?.price * (1 - product?.promoPercentage / 100)).toFixed(
                 2
@@ -311,7 +339,7 @@ export default function Product({ product }: ProductProps) {
 
           <Link
             to={`/product/${product._id}`}
-            className={`py-2 px-4 text-sm border border-gray-200 rounded-lg transition-all duration-300 ${
+            className={`py-2 px-4 text-sm border border-gray-200 rounded-lg transition-all duration-150 ${
               isHovered
                 ? "bg-mainColor text-white border-mainColor"
                 : "text-gray-700 hover:border-mainColor hover:text-mainColor"

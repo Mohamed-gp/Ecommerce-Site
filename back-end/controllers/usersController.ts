@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/User";
-import multer from "multer";
 import removeFiles from "../utils/fs/cleanUpload";
 import { verifyUpdateUser } from "../utils/joi/userValidation";
 import cloudinary from "../config/cloudinary";
+import nodemailer from "nodemailer";
 
 const getUserByIdController = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
@@ -19,13 +19,13 @@ const getUserByIdController = async (
         .json({ data: null, message: "no user found with this email" });
     }
     user.password = "";
-    user.cart = null;
+    user.cart = [] as any;
     return res.status(200).json({
       data: user,
       message: "user found",
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -33,7 +33,7 @@ const updateUserData = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   const { username } = req.body;
   try {
     if (!username && !req.file) {
@@ -43,13 +43,13 @@ const updateUserData = async (
     }
 
     const { error } = verifyUpdateUser(req.body);
-    if (error) {
+    if (error && error.details && error.details[0]) {
       return res
         .status(400)
         .json({ message: error.details[0].message, data: null });
     }
     const file = req.file as Express.Multer.File;
-    let user = await User.findById(req.params.id)
+    let user = await User.findById(req.params["id"])
       .populate({
         path: "cart",
         populate: {
@@ -59,16 +59,21 @@ const updateUserData = async (
       })
       .populate("wishlist");
 
+    if (!user) {
+      return res.status(404).json({ data: null, message: "User not found" });
+    }
+
     if (file) {
       try {
         const picture = file.path;
         const uploadedPicture = await cloudinary.uploader.upload(picture);
-        console.log(uploadedPicture);
-        const pictureUrl = uploadedPicture.url;
-        user.photoUrl = pictureUrl;
+        if (uploadedPicture) {
+          // Picture uploaded successfully
+          user.photoUrl = uploadedPicture.secure_url;
+        }
         removeFiles();
       } catch (error) {
-        next(error);
+        return next(error);
       }
     }
     if (username != "") {
@@ -80,12 +85,15 @@ const updateUserData = async (
       .status(201)
       .json({ message: "user info updated successfull", data: user });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-import nodemailer from "nodemailer";
-const subscribe = async (req: Request, res: Response, next: NextFunction) => {
+const subscribe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { email } = req.body;
 
@@ -112,14 +120,14 @@ const subscribe = async (req: Request, res: Response, next: NextFunction) => {
       port: 587,
       secure: false, // Use `true` for port 465, `false` for all other ports
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS_KEY,
+        user: process.env["EMAIL"],
+        pass: process.env["EMAIL_PASS_KEY"],
       },
     });
 
     // send mail with defined transport object
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL, // sender address
+    await transporter.sendMail({
+      from: process.env["EMAIL"], // sender address
       to: email, // list of receivers
       subject: "SwiftBuy Subscription ✔", // Subject line
       text: "you successfully subscribed we gonna email with the latest news of our app", // plain text body
@@ -130,7 +138,7 @@ const subscribe = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .json({ data: null, message: "successfully subscribed" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

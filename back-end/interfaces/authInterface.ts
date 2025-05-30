@@ -1,15 +1,28 @@
 import { Request } from "express";
-interface loginInterface {
+import { Types } from "mongoose";
+
+export interface LoginInterface {
   email: string;
   password: string;
 }
-interface registerInterface {
+
+export interface RegisterInterface {
   username: string;
   email: string;
   password: string;
 }
-interface authRequest extends Request {
-  user?: any;
+
+export interface DecodedUser {
+  id: string;
+  role: "user" | "admin";
 }
 
-export { loginInterface, registerInterface, authRequest };
+export interface AuthRequest extends Request {
+  user?: DecodedUser;
+}
+
+export {
+  LoginInterface as loginInterface,
+  RegisterInterface as registerInterface,
+  AuthRequest as authRequest,
+};

@@ -44,7 +44,6 @@ export default function Wishlist() {
       dispatch(authActions.setWishlist(data.data));
       toast.success("Item removed from wishlist");
     } catch (error) {
-      console.log(error);
       toast.error("Failed to remove item from wishlist");
     } finally {
       setIsLoading(false);
@@ -99,7 +98,7 @@ export default function Wishlist() {
         });
         successCount++;
       } catch (error) {
-        console.log(error);
+        // Silently continue with next product
       }
     }
 
@@ -114,7 +113,7 @@ export default function Wishlist() {
           `Added ${successCount} item${successCount > 1 ? "s" : ""} to cart`
         );
       } catch (error) {
-        console.log(error);
+        toast.error("Failed to update cart");
       }
     }
 

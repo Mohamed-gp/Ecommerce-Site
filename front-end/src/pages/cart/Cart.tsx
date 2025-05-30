@@ -17,6 +17,27 @@ export default function Cart() {
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const getCart = async () => {
+    try {
+      const { data } = await customAxios.get(`/cart/${user?._id}`);
+      dispatch(authActions.setCart(data.data));
+    } catch (error) {
+      toast.error("Failed to load cart");
+    }
+  };
+
+  const removeFromCart = async (userId: string, productId: string) => {
+    try {
+      const { data } = await customAxios.delete(
+        `/cart/remove/${userId}/${productId}`
+      );
+      dispatch(authActions.setCart(data.data));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error("Failed to remove item from cart");
+    }
+  };
+
   const removeFromCartHandler = async (userId: string, productId: string) => {
     try {
       const { data } = await customAxios.delete(
@@ -25,7 +46,6 @@ export default function Cart() {
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
     } catch (error: any) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -40,7 +60,6 @@ export default function Cart() {
       dispatch(authActions.setCart(data.data));
       toast.success(data.message);
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -60,7 +79,6 @@ export default function Cart() {
       toast.success("Coupon applied successfully!");
       setCoupon("");
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Invalid coupon code");
       setAppliedCoupon(null);
     } finally {
@@ -99,7 +117,6 @@ export default function Cart() {
       });
       window.open(data.data, "_self");
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Checkout failed");
     } finally {
       setIsLoading(false);

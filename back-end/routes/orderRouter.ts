@@ -6,8 +6,9 @@ import {
   getOrderById,
   updateOrderStatus,
   getRevenueStats,
+  getOrderStats,
 } from "../controllers/orderController";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken, verifyAdmin } from "../middlewares/verifyToken";
 import verifyObjectId from "../middlewares/verifyObjectId";
 
 const router = express.Router();
@@ -15,18 +16,20 @@ const router = express.Router();
 // Public routes
 router.post("/", createOrder);
 
+// Admin routes (must come before parameterized routes)
+router.get("/stats/revenue", verifyToken, verifyAdmin, getRevenueStats);
+router.get("/stats", verifyToken, verifyAdmin, getOrderStats);
+router.get("/admin", verifyToken, verifyAdmin, getAllOrders);
+
 // Protected routes
 router.get("/user/:userId", verifyToken, getUserOrders);
 router.get("/:orderId", verifyToken, verifyObjectId, getOrderById);
-
-// Admin routes
-router.get("/", verifyToken, getAllOrders);
 router.patch(
   "/:orderId/status",
   verifyToken,
+  verifyAdmin,
   verifyObjectId,
   updateOrderStatus
 );
-router.get("/stats/revenue", verifyToken, getRevenueStats);
 
 export default router;

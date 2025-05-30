@@ -39,9 +39,8 @@ export default function Register() {
       });
       dispatch(authActions.login(data.data));
       toast.success(data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
     }
     setLoading(false);
   };

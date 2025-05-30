@@ -39,7 +39,6 @@ const AdminMessagesRight = () => {
       setMessages(data.data);
       setFilteredMessages(data.data);
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Error fetching messages");
     } finally {
       setIsLoading(false);
@@ -85,7 +84,6 @@ const AdminMessagesRight = () => {
         getMessages();
       }
     } catch (error: any) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Error deleting message");
     }
   };
@@ -95,7 +93,6 @@ const AdminMessagesRight = () => {
       await customAxios.patch(`/messages/${messageId}/read`);
       getMessages();
     } catch (error: any) {
-      console.error(error);
       toast.error(
         error.response?.data?.message || "Error marking message as read"
       );

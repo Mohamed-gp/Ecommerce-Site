@@ -1,44 +1,53 @@
 {
-  "name": "back-end",
+  "name": "swiftbuy-backend",
   "version": "1.0.0",
-  "main": "index.ts",
+  "description": "SwiftBuy E-commerce Backend API",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.ts",
-    "build": "echo 'No build necessary for Express server'"
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "build": "tsc",
+    "build:production": "npm run clean && tsc",
+    "clean": "rimraf dist",
+    "postinstall": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cloudinary": "^2.2.0",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "joi": "^17.13.3",
-    "joi-password-complexity": "^5.2.0",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.4",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.6",
     "multer": "^1.4.5-lts.1",
-    "node": "^18.20.4",
-    "nodemailer": "^6.9.14",
-    "stripe": "^16.2.0"
+    "cloudinary": "^1.40.0",
+    "joi": "^17.9.2",
+    "stripe": "^13.5.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.3",
-    "ts-node": "^10.9.2",
-    "nodemon": "^3.1.4",
-    "@types/nodemailer": "^6.4.15",
-    "@types/bcrypt": "^5.0.2",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie-parser": "^1.4.7",
-    "@types/cors": "^2.8.17",
-    "@types/dotenv": "^8.2.0",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.6",
-    "@types/multer": "^1.4.11",
-    "@types/node": "^20.14.9"
-  }
+    "@types/node": "^20.5.0",
+    "@types/express": "^4.17.17",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/cors": "^2.8.13",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/multer": "^1.4.7",
+    "typescript": "^5.1.6",
+    "ts-node-dev": "^2.0.0",
+    "rimraf": "^5.0.1"
+  },
+  "keywords": [
+    "ecommerce",
+    "api",
+    "express",
+    "mongodb",
+    "typescript"
+  ],
+  "author": "SwiftBuy Team",
+  "license": "MIT"
 }

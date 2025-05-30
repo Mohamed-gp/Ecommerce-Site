@@ -61,7 +61,6 @@ export default function Store() {
       const { data } = await customAxios.get("/categories");
       setCategories(data.data);
     } catch (error) {
-      console.log(error);
       toast.error("Failed to load categories");
     }
   };
@@ -107,14 +106,17 @@ export default function Store() {
           );
           break;
         case "rating":
-          filteredProducts.sort((a: any, b: any) => b.avgRating - a.avgRating);
+          filteredProducts.sort((a: ProductInterface, b: ProductInterface) => {
+            const aRating = (a as any).avgRating || 0;
+            const bRating = (b as any).avgRating || 0;
+            return bRating - aRating;
+          });
           break;
         // "newest" is default from backend
       }
 
       setProducts(filteredProducts);
     } catch (error) {
-      console.log(error);
       toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
@@ -146,9 +148,8 @@ export default function Store() {
       });
       dispatch(authActions.setWishlist(data.data));
       toast.success(data.message);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch (error) {
+      toast.error("Failed to update wishlist");
     }
   };
 

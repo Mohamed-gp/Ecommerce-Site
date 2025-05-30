@@ -57,9 +57,9 @@ const AdminOrdersRight = () => {
   const getOrders = async () => {
     try {
       setIsLoading(true);
-      const { data } = await customAxios.get("/orders");
-      setOrders(data.data);
-      setFilteredOrders(data.data);
+      const { data } = await customAxios.get("/orders/admin");
+      setOrders(data.data.orders || data.data);
+      setFilteredOrders(data.data.orders || data.data);
     } catch (error: unknown) {
       console.error(error);
       const apiError = error as ApiError;

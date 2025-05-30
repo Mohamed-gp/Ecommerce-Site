@@ -4,6 +4,13 @@ import Product from "../models/Product";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
+interface CartItem {
+  product: {
+    _id: string;
+  };
+  quantity: number;
+}
+
 const createPayment = async (
   req: Request,
   res: Response,
@@ -11,18 +18,26 @@ const createPayment = async (
 ) => {
   // price and info about the product come forom the server and client send only ids to prevent user to put 0 dollar
   try {
-    let { cart } = req.body;
+    let { cart }: { cart: CartItem[] } = req.body;
     const lineItems = await Promise.all(
-      cart.map(async (ele: any) => {
+      cart.map(async (ele: CartItem) => {
         const product = await Product.findById(ele.product._id);
-        let amount =
-          product?.price * 100 * (1 - product?.promoPercentage / 100);
+
+        if (!product) {
+          throw new Error(`Product with id ${ele.product._id} not found`);
+        }
+
+        const price = product.price || 0;
+        const promoPercentage = product.promoPercentage || 0;
+
+        let amount = price * 100 * (1 - promoPercentage / 100);
         amount = Math.ceil(amount);
+
         return {
           price_data: {
             currency: "usd",
             product_data: {
-              name: product.name,
+              name: product.name || "Product",
             },
             unit_amount: amount, // Stripe expects the amount in cents
           },
@@ -49,7 +64,9 @@ const createPayment = async (
       data: session.url,
     });
   } catch (error) {
-    console.log(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Payment processing failed" });
     next(error);
   }
 };

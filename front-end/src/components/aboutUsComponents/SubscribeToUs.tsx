@@ -24,12 +24,12 @@ const SubscribeToUs = () => {
       });
       toast.success(data.message);
       setEmail(""); // Clear the form after successful subscription
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to subscribe. Please try again."
-      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error && error.response?.data?.message
+          ? error.response.data.message
+          : "Failed to subscribe. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

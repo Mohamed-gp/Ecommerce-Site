@@ -5,6 +5,7 @@ import {
   FaPlus,
   FaChevronLeft,
   FaChevronRight,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -13,6 +14,8 @@ import toast from "react-hot-toast";
 import { Product } from "../../../interfaces/dbInterfaces";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { IRootState } from "../../../redux/store";
 
 const AdminProductsRight = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -23,22 +26,62 @@ const AdminProductsRight = () => {
     [key: string]: number;
   }>({});
 
-  const getAllProducts = async () => {
+  const user = useSelector((state: IRootState) => state.auth.user);
+  const isDemoAdmin = user?.id === "66f16f6ae8f6650bf25c28d3";
+
+  const getProducts = async () => {
     try {
       setIsLoading(true);
-      const { data } = await customAxios.get("/products");
+      const { data } = await customAxios.get("/admin/products");
       setProducts(data.data);
       setFilteredProducts(data.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to load products");
+    } finally {
       setIsLoading(false);
     }
   };
 
+  const deleteProduct = async (id: string) => {
+    if (isDemoAdmin) {
+      Swal.fire({
+        icon: "warning",
+        title: "Demo Admin Restriction",
+        text: "Delete operations are not allowed in demo mode. This is a read-only demo.",
+        confirmButtonColor: "#00c2ff",
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await customAxios.delete(`/admin/products/${id}`);
+      toast.success("Product deleted successfully!");
+      getProducts();
+    } catch (error: any) {
+      if (error.response?.data?.isDemo) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to delete product"
+        );
+      }
+    }
+  };
+
   useEffect(() => {
-    getAllProducts();
+    getProducts();
   }, []);
 
   useEffect(() => {
@@ -55,29 +98,6 @@ const AdminProductsRight = () => {
 
     setFilteredProducts(results);
   }, [searchTerm, products]);
-
-  const deleteHandler = async (id: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#00c2ff",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const { data } = await customAxios.delete(`/products/${id}`);
-          getAllProducts();
-          toast.success(data.message);
-        } catch (error) {
-          console.log(error);
-          toast.error(error.response.data.message);
-        }
-      }
-    });
-  };
 
   const nextImage = (productId: string, totalImages: number) => {
     setCurrentImageIndex((prev) => ({
@@ -108,6 +128,22 @@ const AdminProductsRight = () => {
 
   return (
     <div className="p-6 flex-1 bg-gray-50">
+      {/* Demo Admin Warning */}
+      {isDemoAdmin && (
+        <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <FaExclamationTriangle className="text-yellow-600 mr-3" />
+            <div>
+              <h3 className="text-yellow-800 font-semibold">Demo Admin Mode</h3>
+              <p className="text-yellow-700 text-sm">
+                You're logged in as a demo admin. Some operations like creating,
+                editing, and deleting are restricted.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Products</h1>
 
@@ -123,13 +159,31 @@ const AdminProductsRight = () => {
             <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
 
-          <Link
-            to="/admin/products/add"
-            className="bg-mainColor text-white px-5 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors whitespace-nowrap"
-          >
-            <FaPlus size={14} />
-            <span>Add Product</span>
-          </Link>
+          {isDemoAdmin ? (
+            <button
+              onClick={() => {
+                Swal.fire({
+                  icon: "info",
+                  title: "Demo Admin Restriction",
+                  text: "Adding new products is not allowed in demo mode.",
+                  confirmButtonColor: "#00c2ff",
+                });
+              }}
+              className="bg-gray-400 text-white px-5 py-2 rounded-lg flex items-center gap-2 cursor-not-allowed whitespace-nowrap"
+              disabled
+            >
+              <FaPlus size={14} />
+              <span>Add Product (Demo)</span>
+            </button>
+          ) : (
+            <Link
+              to="/admin/products/add"
+              className="bg-mainColor text-white px-5 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors whitespace-nowrap"
+            >
+              <FaPlus size={14} />
+              <span>Add Product</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -150,12 +204,14 @@ const AdminProductsRight = () => {
               ? "Try adjusting your search term."
               : "Start by adding your first product."}
           </p>
-          <Link
-            to="/admin/products/add"
-            className="inline-flex items-center px-4 py-2 bg-mainColor text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <FaPlus className="mr-2" size={14} /> Add New Product
-          </Link>
+          {!isDemoAdmin && (
+            <Link
+              to="/admin/products/add"
+              className="inline-flex items-center px-4 py-2 bg-mainColor text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <FaPlus className="mr-2" size={14} /> Add New Product
+            </Link>
+          )}
         </div>
       ) : (
         <motion.div
@@ -175,7 +231,7 @@ const AdminProductsRight = () => {
                   <img
                     src={product.images[currentImageIndex[product._id] || 0]}
                     alt={product.name}
-                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-contain transition-opacity duration-150"
                   />
                 </div>
 
@@ -185,7 +241,7 @@ const AdminProductsRight = () => {
                       onClick={() =>
                         prevImage(product._id, product.images.length)
                       }
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 hover:bg-black/70"
                     >
                       <FaChevronLeft size={12} />
                     </button>
@@ -193,12 +249,12 @@ const AdminProductsRight = () => {
                       onClick={() =>
                         nextImage(product._id, product.images.length)
                       }
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 hover:bg-black/70"
                     >
                       <FaChevronRight size={12} />
                     </button>
 
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       {product.images.map((_, index) => (
                         <button
                           key={index}
@@ -208,7 +264,7 @@ const AdminProductsRight = () => {
                               [product._id]: index,
                             }))
                           }
-                          className={`w-2 h-2 rounded-full transition-colors ${
+                          className={`w-2 h-2 rounded-full transition-colors duration-150 ${
                             index === (currentImageIndex[product._id] || 0)
                               ? "bg-mainColor"
                               : "bg-white/50"
@@ -268,18 +324,39 @@ const AdminProductsRight = () => {
                 </div>
 
                 <div className="flex justify-between gap-2">
-                  <Link
-                    to={`/admin/products/edit/${product._id}`}
-                    className="flex-1 text-center py-2 px-3 text-xs bg-mainColor text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <FaEdit className="inline mr-1" /> Edit
-                  </Link>
+                  {isDemoAdmin ? (
+                    <button
+                      onClick={() => {
+                        Swal.fire({
+                          icon: "info",
+                          title: "Demo Admin Restriction",
+                          text: "Editing products is not allowed in demo mode.",
+                          confirmButtonColor: "#00c2ff",
+                        });
+                      }}
+                      className="flex-1 text-center py-2 px-3 text-xs bg-gray-400 text-white rounded-lg cursor-not-allowed"
+                    >
+                      <FaEdit className="inline mr-1" /> Edit (Demo)
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/admin/products/edit/${product._id}`}
+                      className="flex-1 text-center py-2 px-3 text-xs bg-mainColor text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <FaEdit className="inline mr-1" /> Edit
+                    </Link>
+                  )}
 
                   <button
-                    onClick={() => deleteHandler(product._id)}
-                    className="flex-1 py-2 px-3 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    onClick={() => deleteProduct(product._id)}
+                    className={`flex-1 py-2 px-3 text-xs rounded-lg transition-colors ${
+                      isDemoAdmin
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-red-500 text-white hover:bg-red-600"
+                    }`}
                   >
-                    <FaTrash className="inline mr-1" /> Delete
+                    <FaTrash className="inline mr-1" />
+                    {isDemoAdmin ? "Delete (Demo)" : "Delete"}
                   </button>
                 </div>
               </div>

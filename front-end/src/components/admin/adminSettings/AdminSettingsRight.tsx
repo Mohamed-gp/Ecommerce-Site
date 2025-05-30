@@ -23,8 +23,9 @@ const AdminSettingsRight = () => {
       dispatch(authActions.login(result.data.data));
       toast.success(result.data.message);
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message || "Failed to update user info"
+      );
     }
   };
 
@@ -34,10 +35,35 @@ const AdminSettingsRight = () => {
       dispatch(authActions.logout(null));
       toast.success(data.message);
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to logout");
     }
   };
+
+  const getSettings = async () => {
+    try {
+      const { data } = await customAxios.get("/admin/settings");
+      setFormData(data.data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to load settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data } = await customAxios.put("/admin/settings", formData);
+      toast.success("Settings updated successfully!");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div

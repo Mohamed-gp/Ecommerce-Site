@@ -24,10 +24,10 @@ const AdminDashboardHeader = () => {
   // Get unread messages count
   const getUnreadMessagesCount = async () => {
     try {
-      const { data } = await customAxios.get("/messages/unread/count");
+      const { data } = await customAxios.get("/messages/unread-count");
       setUnreadMessages(data.data);
     } catch (error) {
-      console.error("Error fetching unread messages:", error);
+      toast.error("Error fetching unread messages");
     }
   };
 
@@ -79,7 +79,6 @@ const AdminDashboardHeader = () => {
       setShowContactForm(false);
       getUnreadMessagesCount(); // Refresh unread count
     } catch (error: unknown) {
-      console.error(error);
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
@@ -243,7 +242,6 @@ const AdminDashboardHeader = () => {
                         );
                         navigate("/login");
                       } catch (error: unknown) {
-                        console.error("Logout failed:", error);
                         dispatch(authActions.logout());
                         localStorage.removeItem("user");
                         const errorMessage =

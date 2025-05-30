@@ -1,6 +1,6 @@
 import { SessionProvider } from "next-auth/react";
-import react from "react";
+import { ReactNode } from "react";
 
-export const NextAuthProvider = ({ children }: { children: react.ReactNode }) => {
+export const NextAuthProvider = ({ children }: { children: ReactNode }) => {
   return <SessionProvider>{children}</SessionProvider>;
 };
