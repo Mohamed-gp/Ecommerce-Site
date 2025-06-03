@@ -19,7 +19,7 @@ const connectToDB = async () => {
     process.on("SIGINT", async () => {
       await mongoose.connection.close();
       console.log(
-        "🔌 MongoDB connection closed due to application termination"
+        "🔌  MongoDB connection closed due to application termination"
       );
       process.exit(0);
     });
