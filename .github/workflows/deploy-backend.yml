@@ -32,7 +32,7 @@ jobs:
         run: |
           cd ~/apps/Ecommerce-Site/back-end
           npm install
-          npm run build
+          npm run dev
 
       # Step 5: Ensure PM2 is available
       - name: Install PM2 Globally
