@@ -5,24 +5,29 @@ import {
   FaClock,
   FaTrash,
   FaEnvelope,
+  FaUser,
 } from "react-icons/fa";
 import customAxios from "../../../utils/axios/customAxios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
+interface UserInfo {
+  _id: string;
+  username: string;
+  email: string;
+  photoUrl: string;
+}
+
 interface Message {
   _id: string;
   subject: string;
   message: string;
-  userId: {
-    _id: string;
-    username: string;
-    email: string;
-    photoUrl: string;
-  };
+  userId?: UserInfo; // Now optional
+  guestName?: string; // Added guest name
+  guestEmail?: string; // Added guest email
   createdAt: string;
-  read: boolean;
+  isRead: boolean; // Field name fixed
 }
 
 const AdminMessagesRight = () => {
@@ -37,7 +42,7 @@ const AdminMessagesRight = () => {
       const { data } = await customAxios.get("/messages");
       setMessages(data.data);
       setFilteredMessages(data.data);
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Error fetching messages");
     } finally {
       setIsLoading(false);
@@ -54,14 +59,17 @@ const AdminMessagesRight = () => {
       return;
     }
 
-    const filtered = messages.filter(
-      (message) =>
+    const filtered = messages.filter((message) => {
+      const senderName = message.userId?.username || message.guestName || "";
+      const senderEmail = message.userId?.email || message.guestEmail || "";
+
+      return (
         message.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        message.userId.username
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        message.userId.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        senderEmail.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+
     setFilteredMessages(filtered);
   }, [searchTerm, messages]);
 
@@ -82,7 +90,7 @@ const AdminMessagesRight = () => {
         toast.success("Message deleted successfully");
         getMessages();
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Error deleting message");
     }
   };
@@ -91,7 +99,7 @@ const AdminMessagesRight = () => {
     try {
       await customAxios.patch(`/messages/${messageId}/read`);
       getMessages();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Error marking message as read"
       );
@@ -109,6 +117,11 @@ const AdminMessagesRight = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
+  };
+
+  // Function to determine if a message is from a guest
+  const isGuestMessage = (message: Message): boolean => {
+    return !message.userId && !!message.guestName && !!message.guestEmail;
   };
 
   return (
@@ -145,26 +158,51 @@ const AdminMessagesRight = () => {
               key={message._id}
               variants={itemVariants}
               className={`bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow ${
-                !message.read ? "border-l-4 border-mainColor" : ""
+                !message.isRead ? "border-l-4 border-mainColor" : ""
               }`}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100">
-                      <img
-                        src={message.userId.photoUrl || "/default-avatar.png"}
-                        alt={message.userId.username}
-                        className="h-full w-full object-cover"
-                      />
+                    {/* Display profile differently based on if it's a guest message */}
+                    <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                      {isGuestMessage(message) ? (
+                        <FaUser className="text-gray-400" size={20} />
+                      ) : (
+                        <img
+                          src={message.userId?.photoUrl || "/websiteavatar.png"}
+                          alt={message.userId?.username || "User"}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "/websiteavatar.png";
+                          }}
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">
-                        {message.userId.username}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {message.userId.email}
-                      </p>
+                      {isGuestMessage(message) ? (
+                        <>
+                          <p className="text-sm font-medium text-gray-900 flex items-center">
+                            {message.guestName}
+                            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+                              Guest
+                            </span>
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {message.guestEmail}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium text-gray-900">
+                            {message.userId?.username}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {message.userId?.email}
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -183,7 +221,7 @@ const AdminMessagesRight = () => {
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-3">
-                  {!message.read && (
+                  {!message.isRead && (
                     <button
                       onClick={() => markAsRead(message._id)}
                       className="inline-flex items-center px-3 py-1 border border-mainColor text-sm text-mainColor rounded-md hover:bg-mainColor hover:text-white transition-colors"

@@ -6,9 +6,11 @@ import CategoryProductLine from "../../components/categoryProductLine/CategoryPr
 import StoreProducts from "../../components/store/StoreProducts";
 import ContactForm from "../../components/contactUs/ContactForm";
 import customAxios from "../../utils/axios/customAxios";
-import { FaArrowRight, FaEnvelope } from "react-icons/fa";
+import { FaArrowRight, FaEnvelope, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { IRootState } from "../../redux/store";
 
 interface Category {
   _id: string;
@@ -16,9 +18,14 @@ interface Category {
 }
 
 export default function Home() {
+  const { user } = useSelector((state: IRootState) => state.auth);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterName, setNewsletterName] = useState("");
+  const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
+  const [showNameField, setShowNameField] = useState(false);
 
   const getAllCategories = async () => {
     try {
@@ -38,7 +45,54 @@ export default function Home() {
     setTimeout(() => {
       setFadeIn(true);
     }, 100);
-  }, []);
+
+    // If no logged-in user, we'll need to collect name
+    setShowNameField(!user);
+  }, [user]);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate input
+    if (!newsletterEmail) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    if (!user && !newsletterName) {
+      toast.error("Please enter your name");
+      return;
+    }
+
+    try {
+      setIsSubmittingNewsletter(true);
+
+      // Create the message payload
+      const messageData = user
+        ? {
+            subject: "Newsletter Subscription",
+            message: `${user.username} would like to subscribe to the newsletter with email: ${newsletterEmail}`,
+            userId: user._id,
+          }
+        : {
+            subject: "Newsletter Subscription",
+            message: `${newsletterName} would like to subscribe to the newsletter.`,
+            guestName: newsletterName,
+            guestEmail: newsletterEmail,
+          };
+
+      await customAxios.post("/messages/send", messageData);
+
+      toast.success("Thanks for subscribing to our newsletter!");
+      setNewsletterEmail("");
+      setNewsletterName("");
+    } catch (error) {
+      toast.error("Failed to subscribe. Please try again.");
+      console.error("Newsletter submission error:", error);
+    } finally {
+      setIsSubmittingNewsletter(false);
+    }
+  };
 
   return (
     <div
@@ -108,19 +162,62 @@ export default function Home() {
               <p className="text-gray-600 mb-8 text-lg">
                 Subscribe to receive updates on new products and special offers
               </p>
-              <form className="flex max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-grow rounded-l-full px-6 py-3 border-2 border-mainColor focus:outline-none focus:ring-2 focus:ring-mainColor/20 transition-shadow"
-                />
-                <button
-                  type="submit"
-                  className="bg-mainColor text-white px-8 py-3 rounded-r-full hover:bg-[#00aae6] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg"
-                >
-                  Subscribe
-                  <FaArrowRight className="transform group-hover:translate-x-1 transition-transform" />
-                </button>
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="max-w-md mx-auto space-y-3"
+              >
+                {/* Name field for guests */}
+                {showNameField && (
+                  <div className="flex">
+                    <div className="flex-grow relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <FaUser />
+                      </span>
+                      <input
+                        type="text"
+                        value={newsletterName}
+                        onChange={(e) => setNewsletterName(e.target.value)}
+                        placeholder="Your name"
+                        className="w-full rounded-full px-12 py-3 border-2 border-mainColor focus:outline-none focus:ring-2 focus:ring-mainColor/20 transition-shadow"
+                        required={!user}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Email field */}
+                <div className="flex">
+                  <div className="flex-grow relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                      <FaEnvelope />
+                    </span>
+                    <input
+                      type="email"
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="w-full rounded-l-full px-12 py-3 border-2 border-mainColor focus:outline-none focus:ring-2 focus:ring-mainColor/20 transition-shadow"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingNewsletter}
+                    className="bg-mainColor text-white px-8 py-3 rounded-r-full hover:bg-[#00aae6] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isSubmittingNewsletter ? (
+                      <>
+                        <span className="animate-spin inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></span>
+                        Subscribing...
+                      </>
+                    ) : (
+                      <>
+                        Subscribe
+                        <FaArrowRight className="transform group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>
