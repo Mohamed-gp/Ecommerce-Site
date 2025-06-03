@@ -6,6 +6,7 @@ import categoriesRouter from "./routes/categoriesRouter";
 import adminRouter from "./routes/adminRouter";
 import orderRouter from "./routes/orderRouter";
 import messagesRouter from "./routes/messagesRouter";
+import configRouter from "./routes/configRouter";
 import connectToDB from "./lib/connectToDB";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -92,6 +93,7 @@ const startServer = async () => {
     app.use("/api/orders", orderRouter);
     app.use("/api/coupons", couponsRouter);
     app.use("/api/messages", messagesRouter);
+    app.use("/api/config", configRouter);
 
     // Error handling middleware
     app.use(notFound);

@@ -11,6 +11,7 @@ const categoriesRouter_1 = __importDefault(require("./routes/categoriesRouter"))
 const adminRouter_1 = __importDefault(require("./routes/adminRouter"));
 const orderRouter_1 = __importDefault(require("./routes/orderRouter"));
 const messagesRouter_1 = __importDefault(require("./routes/messagesRouter"));
+const configRouter_1 = __importDefault(require("./routes/configRouter"));
 const connectToDB_1 = __importDefault(require("./lib/connectToDB"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
@@ -86,6 +87,7 @@ const startServer = async () => {
         app.use("/api/orders", orderRouter_1.default);
         app.use("/api/coupons", couponsRouter_1.default);
         app.use("/api/messages", messagesRouter_1.default);
+        app.use("/api/config", configRouter_1.default);
         // Error handling middleware
         app.use(errors_1.notFound);
         app.use(errors_1.errorHandler);

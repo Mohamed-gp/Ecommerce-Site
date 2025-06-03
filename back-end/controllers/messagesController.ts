@@ -4,46 +4,73 @@ import Message from "../models/Message";
 import User from "../models/User";
 import { Types } from "mongoose";
 
-// Send a message (for users)
+// Send a message (for users and guests)
 const sendMessage = async (
   req: authRequest,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { subject, message, userId } = req.body;
+    const { subject, message, userId, guestName, guestEmail } = req.body;
 
-    if (!subject || !message || !userId) {
+    // Validate required fields
+    if (!subject || !message) {
       return res.status(400).json({
-        message: "Subject, message, and userId are required",
+        message: "Subject and message are required",
         data: null,
       });
     }
 
-    const user = await User.findById(new Types.ObjectId(userId));
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
+    // Handle registered user message
+    if (userId) {
+      const user = await User.findById(new Types.ObjectId(userId));
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+          data: null,
+        });
+      }
+
+      const newMessage = await Message.build({
+        subject,
+        message,
+        userId: new Types.ObjectId(userId),
+        isRead: false,
+      } as any).save();
+
+      const populatedMessage = await Message.findById(newMessage._id).populate({
+        path: "userId",
+        select: "username email photoUrl",
+      });
+
+      return res.status(201).json({
+        message: "Message sent successfully",
+        data: populatedMessage,
+      });
+    }
+    // Handle guest message
+    else if (guestName && guestEmail) {
+      const newMessage = await Message.build({
+        subject,
+        message,
+        guestName,
+        guestEmail,
+        isRead: false,
+      } as any).save();
+
+      return res.status(201).json({
+        message: "Message sent successfully",
+        data: newMessage,
+      });
+    }
+    // Reject invalid message
+    else {
+      return res.status(400).json({
+        message:
+          "Either userId or guest information (name and email) must be provided",
         data: null,
       });
     }
-
-    const newMessage = await Message.build({
-      subject,
-      message,
-      userId: new Types.ObjectId(userId),
-      isRead: false,
-    } as any).save();
-
-    const populatedMessage = await Message.findById(newMessage._id).populate({
-      path: "userId",
-      select: "username email photoUrl",
-    });
-
-    return res.status(201).json({
-      message: "Message sent successfully",
-      data: populatedMessage,
-    });
   } catch (error) {
     return next(error);
   }

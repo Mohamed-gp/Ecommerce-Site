@@ -3,7 +3,9 @@ import mongoose, { Document, Model } from "mongoose";
 export interface IMessage extends Document {
   subject: string;
   message: string;
-  userId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId; // Make userId optional
+  guestName?: string; // Add guest name field
+  guestEmail?: string; // Add guest email field
   isRead: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,7 +28,16 @@ const messageSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false, // Changed to false so it's optional
+    },
+    // New fields for guests
+    guestName: {
+      type: String,
+      required: false,
+    },
+    guestEmail: {
+      type: String,
+      required: false,
     },
     isRead: {
       type: Boolean,
