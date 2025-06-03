@@ -42,10 +42,10 @@ jobs:
       # Step 6: Restart the backend application using PM2
       - name: Restart SwiftBuy Backend
         run: |
-          pm2 restart swiftbuy-backend 
+          pm2 restart swiftbuy-backend
 
-      # Step 7: Show PM2 Status
+      # Step 7: Show PM2 Status (without continuous logs)
       - name: Show PM2 Status
         run: |
           pm2 status
-          pm2 logs swiftbuy-backend --lines 10
+          pm2 log swiftbuy-backend --lines 10 --nostream
