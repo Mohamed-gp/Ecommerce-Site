@@ -1,7 +1,14 @@
 import customAxios from "../../utils/axios/customAxios";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaEyeSlash, FaEye, FaLock, FaEnvelope } from "react-icons/fa6";
+import {
+  FaEyeSlash,
+  FaEye,
+  FaLock,
+  FaEnvelope,
+  FaUser,
+  FaUserShield,
+} from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import GoogleSignIn from "../../components/oauth/GoogleSignInButton";
 import { useDispatch } from "react-redux";
@@ -16,6 +23,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const [isHiddenPassword, setisHiddenPassword] = useState(true);
+
   const loginHandler = async (e: React.FormEvent) => {
     setLoading(true);
     e.preventDefault();
@@ -37,6 +45,27 @@ const Login = () => {
     }
     setLoading(false);
   };
+
+  // Auto-fill demo account credentials
+  const fillDemoCredentials = (type: "user" | "admin") => {
+    if (type === "user") {
+      setformData({
+        email: "user@demo.com",
+        password: "user@demo.com",
+      });
+    } else if (type === "admin") {
+      setformData({
+        email: "admin@admin.com",
+        password: "admin@admin.com",
+      });
+    }
+    toast.success(
+      `${
+        type === "admin" ? "Admin" : "User"
+      } demo credentials filled. Click Sign in to continue.`
+    );
+  };
+
   return (
     <>
       <div className="flex items-center justify-center">
@@ -79,7 +108,7 @@ const Login = () => {
           }}
           className="flex h-full w-full flex-col justify-center px-6 py-10 md:w-1/2 max-w-md mx-auto"
         >
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               Welcome Back
             </h1>
@@ -88,9 +117,47 @@ const Login = () => {
             </p>
           </div>
 
+          {/* Demo Accounts Section */}
+          <div className="mb-6 bg-gradient-to-r from-mainColor/5 to-blue-500/5 rounded-xl p-5 border border-mainColor/10">
+            <div className="text-center mb-3">
+              <h3 className="text-lg font-semibold text-mainColor">
+                🎯 Try Demo Accounts
+              </h3>
+              <p className="text-sm text-gray-500">
+                Click any account to auto-fill credentials
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Admin Demo Account */}
+              <button
+                onClick={() => fillDemoCredentials("admin")}
+                className="flex flex-col items-center justify-center p-3 rounded-lg bg-white hover:bg-mainColor/5 border border-gray-200 transition-colors"
+              >
+                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-mainColor mb-2">
+                  <FaUserShield size={18} />
+                </div>
+                <p className="font-medium text-gray-800">Admin</p>
+                <p className="text-xs text-gray-500 mt-1">admin@admin.com</p>
+              </button>
+
+              {/* User Demo Account */}
+              <button
+                onClick={() => fillDemoCredentials("user")}
+                className="flex flex-col items-center justify-center p-3 rounded-lg bg-white hover:bg-mainColor/5 border border-gray-200 transition-colors"
+              >
+                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-mainColor mb-2">
+                  <FaUser size={16} />
+                </div>
+                <p className="font-medium text-gray-800">User</p>
+                <p className="text-xs text-gray-500 mt-1">user@demo.com</p>
+              </button>
+            </div>
+          </div>
+
           <GoogleSignIn />
 
-          <div className="relative my-6 flex items-center">
+          <div className="relative my-5 flex items-center">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="flex-shrink mx-4 text-gray-500 text-sm font-medium">
               or continue with email
