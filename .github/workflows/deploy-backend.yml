@@ -32,7 +32,6 @@ jobs:
         run: |
           cd ~/apps/Ecommerce-Site/back-end
           npm install
-          npm run dev
 
       # Step 5: Ensure PM2 is available
       - name: Install PM2 Globally
@@ -43,7 +42,7 @@ jobs:
       # Step 6: Restart the backend application using PM2
       - name: Restart SwiftBuy Backend
         run: |
-          pm2 restart swiftbuy-backend || pm2 start ~/apps/Ecommerce-Site/back-end/dist/index.js --name swiftbuy-backend
+          pm2 restart swiftbuy-backend 
 
       # Step 7: Show PM2 Status
       - name: Show PM2 Status
