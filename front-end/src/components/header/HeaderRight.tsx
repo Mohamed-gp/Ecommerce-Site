@@ -14,7 +14,7 @@ export default function HeaderRight() {
       </Link>
 
       {user?.role != "admin" ? (
-        <Link to={user ? `/profile` : `/register`} className=" md:text-xl ">
+        <Link to={user ? `/profile` : `/login`} className=" md:text-xl ">
           <FaUser />
         </Link>
       ) : (
@@ -24,14 +24,14 @@ export default function HeaderRight() {
       )}
       <div className="border-r-2 py-2 pr-3 ">
         <Link
-          to={user?._id ? `/wishlist` : "/register"}
+          to={user?._id ? `/wishlist` : "/login"}
           className=" md:text-xl"
         >
           <FaHeart />
         </Link>
       </div>
       <Link
-        to={user?._id ? `/cart` : "/register"}
+        to={user?._id ? `/cart` : "/login"}
         className="cart-icon relative md:text-xl"
       >
         <FaCartShopping />
