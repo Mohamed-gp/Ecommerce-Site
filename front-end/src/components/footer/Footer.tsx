@@ -49,7 +49,7 @@ export default function Footer() {
             </div>
             <div className="flex space-x-4 justify-center lg:justify-start">
               <a
-                href="#"
+                href=""
                 className="text-gray-400 hover:text-mainColor transition-colors"
               >
                 <FaFacebook className="text-xl hover:scale-110 transition-transform" />
@@ -93,20 +93,19 @@ export default function Footer() {
               <li>
                 <HashLink
                   smooth
-                  to="/#newArrivals"
+                  to="/#new-arrivals"
                   className="text-gray-400 hover:text-mainColor transition-colors inline-block"
                 >
                   New Arrivals
                 </HashLink>
               </li>
               <li>
-                <HashLink
-                  smooth
-                  to="/#store"
+                <Link
+                  to="/store"
                   className="text-gray-400 hover:text-mainColor transition-colors inline-block"
                 >
                   Store
-                </HashLink>
+                </Link>
               </li>
             </ul>
           </div>

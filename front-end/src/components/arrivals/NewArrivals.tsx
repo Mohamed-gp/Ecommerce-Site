@@ -33,6 +33,7 @@ export default function NewArrivals() {
       className={`py-16 bg-gradient-to-b from-white to-mainColor/5 transition-opacity duration-500 ${
         fadeIn ? "opacity-100" : "opacity-0"
       }`}
+      id="new-arrivals"
     >
       <div className="container">
         <motion.div

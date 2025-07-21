@@ -67,12 +67,10 @@ const addToCart = async (
       })
       .exec();
 
-    return res
-      .status(200)
-      .json({
-        message: "Added successfully to cart",
-        data: updatedUser?.cart || [],
-      });
+    return res.status(200).json({
+      message: "Added successfully to cart",
+      data: updatedUser?.cart || [],
+    });
   } catch (error) {
     return next(error);
   }

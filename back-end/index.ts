@@ -45,7 +45,10 @@ const startServer = async () => {
 
     app.use(
       cors({
-        origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        origin: (
+          origin: string | undefined,
+          callback: (err: Error | null, allow?: boolean) => void
+        ) => {
           // Allow requests with no origin (mobile apps, etc.)
           if (!origin) return callback(null, true);
 

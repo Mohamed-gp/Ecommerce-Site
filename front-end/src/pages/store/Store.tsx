@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FaSearch, FaStar, FaSpinner, FaFilter } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -68,7 +68,7 @@ export default function Store() {
     }
   };
 
-  const getProducts = async () => {
+  const getProducts = useCallback(async () => {
     try {
       setIsLoading(true);
       let url = "/products?";
@@ -124,7 +124,7 @@ export default function Store() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedCategory, searchTerm, priceRange, selectedRating, sortBy]);
 
   useEffect(() => {
     getCategories();
@@ -132,7 +132,7 @@ export default function Store() {
 
   useEffect(() => {
     getProducts();
-  }, [selectedCategory, priceRange, sortBy, selectedRating, getProducts]);
+  }, [getProducts]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
