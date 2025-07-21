@@ -5,7 +5,7 @@ const env = import.meta.env.VITE_ENV;
 const customAxios = axios.create({
   baseURL:
     env === "production"
-      ? "https://swiftbuy1.production-server.tech/api/"
+      ? "https://ecommerce-site-cool.onrender.com/api/"
       : "http://localhost:3000/api/",
   withCredentials: true, 
 });
