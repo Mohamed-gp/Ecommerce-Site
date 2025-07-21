@@ -107,7 +107,7 @@ const createProduct = async (
         .status(400)
         .json({ message: error.details[0].message, data: null });
     }
-    const files = req.files as Express.Multer.File[];
+    const files = req.files as any[];
     if (files.length < 1) {
       return res.status(400).json({
         message: "you must upload at least one image of the product",

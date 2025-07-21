@@ -93,7 +93,7 @@ const deleteFromCart = async (
   }
 
   try {
-    const cartItem = await Cart.findOneAndDelete({
+    const cartItem = await Cart.findOne({
       user: new Types.ObjectId(userId),
       product: new Types.ObjectId(productId),
     }).exec();
@@ -104,6 +104,12 @@ const deleteFromCart = async (
         data: null,
       });
     }
+
+    // Delete the cart item
+    await Cart.findOneAndDelete({
+      user: new Types.ObjectId(userId),
+      product: new Types.ObjectId(productId),
+    }).exec();
 
     const user = await User.findByIdAndUpdate(
       new Types.ObjectId(userId),

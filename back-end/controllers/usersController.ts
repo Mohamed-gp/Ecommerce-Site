@@ -48,7 +48,7 @@ const updateUserData = async (
         .status(400)
         .json({ message: error.details[0].message, data: null });
     }
-    const file = req.file as Express.Multer.File;
+    const file = req.file as any;
     let user = await User.findById(req.params["id"])
       .populate({
         path: "cart",

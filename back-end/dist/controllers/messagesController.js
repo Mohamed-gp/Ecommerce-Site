@@ -7,37 +7,62 @@ exports.deleteMessage = exports.markMessageAsRead = exports.getUnreadMessagesCou
 const Message_1 = __importDefault(require("../models/Message"));
 const User_1 = __importDefault(require("../models/User"));
 const mongoose_1 = require("mongoose");
-// Send a message (for users)
+// Send a message (for users and guests)
 const sendMessage = async (req, res, next) => {
     try {
-        const { subject, message, userId } = req.body;
-        if (!subject || !message || !userId) {
+        const { subject, message, userId, guestName, guestEmail } = req.body;
+        // Validate required fields
+        if (!subject || !message) {
             return res.status(400).json({
-                message: "Subject, message, and userId are required",
+                message: "Subject and message are required",
                 data: null,
             });
         }
-        const user = await User_1.default.findById(new mongoose_1.Types.ObjectId(userId));
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
+        // Handle registered user message
+        if (userId) {
+            const user = await User_1.default.findById(new mongoose_1.Types.ObjectId(userId));
+            if (!user) {
+                return res.status(404).json({
+                    message: "User not found",
+                    data: null,
+                });
+            }
+            const newMessage = await Message_1.default.build({
+                subject,
+                message,
+                userId: new mongoose_1.Types.ObjectId(userId),
+                isRead: false,
+            }).save();
+            const populatedMessage = await Message_1.default.findById(newMessage._id).populate({
+                path: "userId",
+                select: "username email photoUrl",
+            });
+            return res.status(201).json({
+                message: "Message sent successfully",
+                data: populatedMessage,
+            });
+        }
+        // Handle guest message
+        else if (guestName && guestEmail) {
+            const newMessage = await Message_1.default.build({
+                subject,
+                message,
+                guestName,
+                guestEmail,
+                isRead: false,
+            }).save();
+            return res.status(201).json({
+                message: "Message sent successfully",
+                data: newMessage,
+            });
+        }
+        // Reject invalid message
+        else {
+            return res.status(400).json({
+                message: "Either userId or guest information (name and email) must be provided",
                 data: null,
             });
         }
-        const newMessage = await Message_1.default.build({
-            subject,
-            message,
-            userId: new mongoose_1.Types.ObjectId(userId),
-            isRead: false,
-        }).save();
-        const populatedMessage = await Message_1.default.findById(newMessage._id).populate({
-            path: "userId",
-            select: "username email photoUrl",
-        });
-        return res.status(201).json({
-            message: "Message sent successfully",
-            data: populatedMessage,
-        });
     }
     catch (error) {
         return next(error);

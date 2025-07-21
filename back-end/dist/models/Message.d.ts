@@ -2,7 +2,9 @@ import mongoose, { Document, Model } from "mongoose";
 export interface IMessage extends Document {
     subject: string;
     message: string;
-    userId: mongoose.Types.ObjectId;
+    userId?: mongoose.Types.ObjectId;
+    guestName?: string;
+    guestEmail?: string;
     isRead: boolean;
     createdAt: Date;
     updatedAt: Date;

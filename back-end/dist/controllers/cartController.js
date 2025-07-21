@@ -79,7 +79,7 @@ const deleteFromCart = async (req, res, next) => {
         });
     }
     try {
-        const cartItem = await Cart_1.default.findOneAndDelete({
+        const cartItem = await Cart_1.default.findOne({
             user: new mongoose_1.Types.ObjectId(userId),
             product: new mongoose_1.Types.ObjectId(productId),
         }).exec();
@@ -89,6 +89,11 @@ const deleteFromCart = async (req, res, next) => {
                 data: null,
             });
         }
+        // Delete the cart item
+        await Cart_1.default.findOneAndDelete({
+            user: new mongoose_1.Types.ObjectId(userId),
+            product: new mongoose_1.Types.ObjectId(productId),
+        }).exec();
         const user = await User_1.default.findByIdAndUpdate(new mongoose_1.Types.ObjectId(userId), { $pull: { cart: cartItem._id } }, { new: true })
             .populate({
             path: "cart",

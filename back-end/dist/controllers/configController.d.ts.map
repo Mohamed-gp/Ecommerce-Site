@@ -1,1 +1,1 @@
-{"version":3,"file":"configController.d.ts","sourceRoot":"","sources":["../../controllers/configController.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAE5C;;;GAGG;AACH,QAAA,MAAM,iBAAiB,QAAS,OAAO,OAAO,QAAQ,uCAwBrD,CAAC;AAEF,OAAO,EAAE,iBAAiB,EAAE,CAAC"}
+{"version":3,"file":"configController.d.ts","sourceRoot":"","sources":["../../controllers/configController.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAE5C;;;GAGG;AACH,QAAA,MAAM,iBAAiB,QAAS,OAAO,OAAO,QAAQ,uCAoCrD,CAAC;AAEF,OAAO,EAAE,iBAAiB,EAAE,CAAC"}

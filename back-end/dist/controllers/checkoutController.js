@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPayment = void 0;
 const stripe_1 = __importDefault(require("stripe"));
 const Product_1 = __importDefault(require("../models/Product"));
-const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
+const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-08-16",
+});
 const createPayment = async (req, res, next) => {
     // price and info about the product come forom the server and client send only ids to prevent user to put 0 dollar
     try {

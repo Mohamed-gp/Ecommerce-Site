@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
 import Product from "../models/Product";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: "2023-08-16",
+});
 
 interface CartItem {
   product: {

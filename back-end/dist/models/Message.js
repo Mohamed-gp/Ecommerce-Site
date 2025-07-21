@@ -16,7 +16,16 @@ const messageSchema = new mongoose_1.default.Schema({
     userId: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: false, // Changed to false so it's optional
+    },
+    // New fields for guests
+    guestName: {
+        type: String,
+        required: false,
+    },
+    guestEmail: {
+        type: String,
+        required: false,
     },
     isRead: {
         type: Boolean,
