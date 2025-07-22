@@ -55,13 +55,10 @@ const loginController = async (
     res
       .cookie("swiftbuy-token", token, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: process.env["NODE_ENV"] == "development" ? "lax" : "none",
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        secure: process.env["NODE_ENV"] == "development" ? false : true,
-        domain:
-          process.env["NODE_ENV"] == "development"
-            ? "localhost"
-            : "production-server.tech",
+        secure: true,
+        // Remove domain restriction to allow cross-origin cookies
       })
       .status(200)
       .json({ message: "login successfully", data: user });
@@ -112,13 +109,10 @@ const registerController = async (
     res
       .cookie("swiftbuy-token", token, {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: process.env["NODE_ENV"] == "development" ? "lax" : "none",
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        secure: process.env["NODE_ENV"] == "development" ? false : true,
-        domain:
-          process.env["NODE_ENV"] == "development"
-            ? "localhost"
-            : "production-server.tech",
+        secure: true,
+        // Remove domain restriction to allow cross-origin cookies
       })
       .status(201)
       .json({ data: user, message: "created successfully" });
@@ -158,13 +152,10 @@ const googleSignIncontroller = async (
       res
         .cookie("swiftbuy-token", token, {
           httpOnly: true,
-          sameSite: "none",
+          sameSite: process.env["NODE_ENV"] == "development" ? "lax" : "none",
           maxAge: 1000 * 60 * 60 * 24 * 365,
-          secure: process.env["NODE_ENV"] == "development" ? false : true,
-          domain:
-            process.env["NODE_ENV"] == "development"
-              ? "localhost"
-              : "production-server.tech",
+          secure: true,
+          // Remove domain restriction to allow cross-origin cookies
         })
         .status(200)
         .json({ message: "login successfully", data: user });
@@ -192,13 +183,10 @@ const googleSignIncontroller = async (
       res
         .cookie("swiftbuy-token", token, {
           httpOnly: true,
-          sameSite: "none",
+          sameSite: process.env["NODE_ENV"] == "development" ? "lax" : "none",
           maxAge: 1000 * 60 * 60 * 24 * 365,
-          secure: process.env["NODE_ENV"] == "development" ? false : true,
-          domain:
-            process.env["NODE_ENV"] == "development"
-              ? "localhost"
-              : "production-server.tech",
+          secure: true,
+          // Remove domain restriction to allow cross-origin cookies
         })
         .status(201)
         .json({ message: "user created successfully", data: user });
@@ -214,12 +202,9 @@ const logoutController = (_req: Request, res: Response) => {
   res
     .clearCookie("swiftbuy-token", {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env["NODE_ENV"] == "development" ? false : true,
-      domain:
-        process.env["NODE_ENV"] == "development"
-          ? "localhost"
-          : "production-server.tech",
+      sameSite: process.env["NODE_ENV"] == "development" ? "lax" : "none",
+      secure: true,
+      // Remove domain restriction to allow cross-origin cookies
     })
     .status(200)
     .json({ data: null, message: "logout successfully" });
