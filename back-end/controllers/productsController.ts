@@ -20,46 +20,60 @@ const getAllProducts = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    let { search, category, newArrivals } = req.query;
-    if (search && search != "") {
-      const products = await Product.find({
-        name: { $regex: search, $options: "i" },
-      })
-        .populate("category")
-        .exec();
-      return res.status(200).json({
-        message: "fetched Successfully",
-        data: products,
-      });
-    }
-    if (newArrivals == "true") {
-      const products = await Product.find()
-        .sort({ createdAt: -1 })
-        .populate("category")
-        .exec();
-      return res.status(200).json({
-        message: "fetched Successfully",
-        data: products,
-      });
-    }
-    if (category && category != "") {
-      if (typeof category == "string") {
-        category = category.replace("+", " ");
-      }
-      const products = await Product.find().populate("category").exec();
-      const filteredProducts = products.filter(
-        (product: any) => product.category?.name == category
-      );
-      return res.status(200).json({
-        message: "fetched Successfully",
-        data: filteredProducts,
-      });
+    let { search, category, newArrivals, minPrice, maxPrice, sort } = req.query;
+
+    // Build base query
+    let query: any = {};
+
+    // Search filter
+    if (search && search !== "") {
+      query.name = { $regex: search, $options: "i" };
     }
 
-    const products = await Product.find().populate("category").exec();
-    return res
-      .status(200)
-      .json({ message: "fetched successfully", data: products });
+    // Price filter
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseFloat(minPrice as string);
+      if (maxPrice) query.price.$lte = parseFloat(maxPrice as string);
+    }
+
+    // Get all products with filters
+    let productsQuery = Product.find(query)
+      .populate("category")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "username photoUrl",
+        },
+      });
+
+    // Apply sorting
+    if (sort === "newest" || newArrivals === "true") {
+      productsQuery = productsQuery.sort({ createdAt: -1 });
+    } else if (sort === "price-low") {
+      productsQuery = productsQuery.sort({ price: 1 });
+    } else if (sort === "price-high") {
+      productsQuery = productsQuery.sort({ price: -1 });
+    }
+
+    const products = await productsQuery.exec();
+
+    // Category filter (after fetching to use populated category name)
+    let filteredProducts = products;
+    if (category && category !== "") {
+      if (typeof category === "string") {
+        category = category.replace("+", " ");
+      }
+      filteredProducts = products.filter(
+        (product: any) => product.category?.name === category
+      );
+    }
+
+    return res.status(200).json({
+      message: "fetched Successfully",
+      data: filteredProducts,
+    });
   } catch (error) {
     return next(error);
   }
@@ -81,6 +95,13 @@ const getProduct = async (
   try {
     const product = await Product.findById(req.params["id"])
       .populate("category")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "username photoUrl",
+        },
+      })
       .exec();
     if (!product) {
       return res.status(404).json({ data: null, message: "product not found" });
@@ -169,7 +190,16 @@ const getFeaturedProducts = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const products = await Product.find({ isFeatured: true }).exec();
+    const products = await Product.find({ isFeatured: true })
+      .populate("category")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "username photoUrl",
+        },
+      })
+      .exec();
     return res
       .status(200)
       .json({ message: "fetched successfully", data: products });
@@ -194,6 +224,13 @@ const getNewArrivals = async (
       .sort({ createdAt: -1 })
       .limit(8)
       .populate("category")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "username photoUrl",
+        },
+      })
       .exec();
 
     return res.status(200).json({

@@ -34,6 +34,9 @@ const addComment = async (req, res, next) => {
             user: userId,
             rate: rating,
         });
+        // Add the comment to the product's comments array
+        product.comments.push(comment._id);
+        await product.save();
         const comments = await Comment_1.default.find({ product: productId }).populate("user");
         comments.map((comment) => {
             comment.user.password = "";
@@ -80,6 +83,10 @@ const deleteComment = async (req, res, next) => {
         if (!comment) {
             return res.status(404).json({ message: "comment doesn't exist" });
         }
+        // Remove comment from product's comments array
+        await Product_1.default.findByIdAndUpdate(comment.product, {
+            $pull: { comments: commentId }
+        });
         await Comment_1.default.findByIdAndDelete(comment._id);
         return res
             .status(200)

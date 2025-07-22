@@ -25,6 +25,7 @@ const getAllProducts = async (req, res, next) => {
                 name: { $regex: search, $options: "i" },
             })
                 .populate("category")
+                .populate("comments")
                 .exec();
             return res.status(200).json({
                 message: "fetched Successfully",
@@ -35,6 +36,7 @@ const getAllProducts = async (req, res, next) => {
             const products = await Product_1.default.find()
                 .sort({ createdAt: -1 })
                 .populate("category")
+                .populate("comments")
                 .exec();
             return res.status(200).json({
                 message: "fetched Successfully",
@@ -45,14 +47,14 @@ const getAllProducts = async (req, res, next) => {
             if (typeof category == "string") {
                 category = category.replace("+", " ");
             }
-            const products = await Product_1.default.find().populate("category").exec();
+            const products = await Product_1.default.find().populate("category").populate("comments").exec();
             const filteredProducts = products.filter((product) => product.category?.name == category);
             return res.status(200).json({
                 message: "fetched Successfully",
                 data: filteredProducts,
             });
         }
-        const products = await Product_1.default.find().populate("category").exec();
+        const products = await Product_1.default.find().populate("category").populate("comments").exec();
         return res
             .status(200)
             .json({ message: "fetched successfully", data: products });
@@ -74,6 +76,7 @@ const getProduct = async (req, res, next) => {
     try {
         const product = await Product_1.default.findById(req.params["id"])
             .populate("category")
+            .populate("comments")
             .exec();
         if (!product) {
             return res.status(404).json({ data: null, message: "product not found" });
@@ -149,7 +152,7 @@ const deleteProduct = async (req, res, next) => {
 exports.deleteProduct = deleteProduct;
 const getFeaturedProducts = async (_req, res, next) => {
     try {
-        const products = await Product_1.default.find({ isFeatured: true }).exec();
+        const products = await Product_1.default.find({ isFeatured: true }).populate("comments").exec();
         return res
             .status(200)
             .json({ message: "fetched successfully", data: products });
@@ -171,6 +174,7 @@ const getNewArrivals = async (_req, res, next) => {
             .sort({ createdAt: -1 })
             .limit(8)
             .populate("category")
+            .populate("comments")
             .exec();
         return res.status(200).json({
             message: "New arrivals fetched successfully",

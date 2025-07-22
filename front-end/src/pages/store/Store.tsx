@@ -31,10 +31,6 @@ interface Category {
   name: string;
 }
 
-interface ProductWithRating extends ProductInterface {
-  avgRating?: number;
-}
-
 export default function Store() {
   const location = useLocation();
 
@@ -82,40 +78,46 @@ export default function Store() {
       if (priceRange.min > 0 || priceRange.max < 10000) {
         url += `minPrice=${priceRange.min}&maxPrice=${priceRange.max}&`;
       }
-      if (selectedRating > 0) {
-        url += `minRating=${selectedRating}&`;
-      }
       if (sortBy) {
         url += `sort=${sortBy}`;
       }
 
       const { data } = await customAxios.get(url);
-      const filteredProducts = data.data;
+      let filteredProducts = data.data;
 
-      // Client-side sorting
-      switch (sortBy) {
-        case "price-low":
-          filteredProducts.sort(
-            (a: ProductInterface, b: ProductInterface) =>
-              a.price * (1 - a.promoPercentage / 100) -
-              b.price * (1 - b.promoPercentage / 100)
-          );
-          break;
-        case "price-high":
-          filteredProducts.sort(
-            (a: ProductInterface, b: ProductInterface) =>
-              b.price * (1 - b.promoPercentage / 100) -
-              a.price * (1 - a.promoPercentage / 100)
-          );
-          break;
-        case "rating":
-          filteredProducts.sort((a: ProductInterface, b: ProductInterface) => {
-            const aRating = (a as ProductWithRating).avgRating || 0;
-            const bRating = (b as ProductWithRating).avgRating || 0;
-            return bRating - aRating;
-          });
-          break;
-        // "newest" is default from backend
+      // Client-side rating filter
+      if (selectedRating > 0) {
+        console.log("Filtering by rating:", selectedRating);
+        console.log("Products before rating filter:", filteredProducts);
+        filteredProducts = filteredProducts.filter(
+          (product: ProductInterface) => {
+            if (!product.comments || product.comments.length === 0)
+              return false;
+            const avgRating =
+              product.comments.reduce((sum, comment) => sum + comment.rate, 0) /
+              product.comments.length;
+            return avgRating >= selectedRating;
+          }
+        );
+        console.log("Filtered products by rating:", filteredProducts.length); 
+      }
+
+      // Client-side sorting for rating (since backend doesn't handle this)
+      if (sortBy === "rating") {
+        filteredProducts.sort((a: ProductInterface, b: ProductInterface) => {
+          // Calculate average rating from comments
+          const aRating =
+            a.comments.length > 0
+              ? a.comments.reduce((sum, comment) => sum + comment.rate, 0) /
+                a.comments.length
+              : 0;
+          const bRating =
+            b.comments.length > 0
+              ? b.comments.reduce((sum, comment) => sum + comment.rate, 0) /
+                b.comments.length
+              : 0;
+          return bRating - aRating;
+        });
       }
 
       setProducts(filteredProducts);
@@ -124,7 +126,14 @@ export default function Store() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedCategory, searchTerm, priceRange, selectedRating, sortBy]);
+  }, [
+    selectedCategory,
+    searchTerm,
+    priceRange.min,
+    priceRange.max,
+    selectedRating,
+    sortBy,
+  ]);
 
   useEffect(() => {
     getCategories();
@@ -249,6 +258,19 @@ export default function Store() {
               <div className="mb-6">
                 <h3 className="font-medium mb-3">Rating</h3>
                 <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="rating-all"
+                      name="rating"
+                      checked={selectedRating === 0}
+                      onChange={() => setSelectedRating(0)}
+                      className="w-4 h-4 text-mainColor border-gray-300 focus:ring-mainColor"
+                    />
+                    <label htmlFor="rating-all" className="ml-2 text-gray-700">
+                      All Ratings
+                    </label>
+                  </div>
                   {[5, 4, 3, 2, 1].map((rating) => (
                     <div key={rating} className="flex items-center">
                       <input

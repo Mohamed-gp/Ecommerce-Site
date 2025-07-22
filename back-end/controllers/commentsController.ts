@@ -37,6 +37,11 @@ const addComment = async (
       rate: rating,
     });
 
+    // Add the comment to the product's comments array
+    await Product.findByIdAndUpdate(productId, {
+      $push: { comments: comment._id },
+    });
+
     const comments = await Comment.find({ product: productId }).populate(
       "user"
     );
@@ -90,6 +95,12 @@ const deleteComment = async (
     if (!comment) {
       return res.status(404).json({ message: "comment doesn't exist" });
     }
+
+    // Remove the comment from the product's comments array
+    await Product.findByIdAndUpdate(comment.product, {
+      $pull: { comments: comment._id },
+    });
+
     await Comment.findByIdAndDelete(comment._id);
     return res
       .status(200)

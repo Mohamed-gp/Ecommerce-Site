@@ -58,9 +58,7 @@ const addToCart = async (req, res, next) => {
             },
         })
             .exec();
-        return res
-            .status(200)
-            .json({
+        return res.status(200).json({
             message: "Added successfully to cart",
             data: updatedUser?.cart || [],
         });
