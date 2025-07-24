@@ -23,6 +23,14 @@ const sendMessage = async (
 
     // Handle registered user message
     if (userId) {
+      // Validate ObjectId format
+      if (!Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({
+          message: "Invalid userId format",
+          data: null,
+        });
+      }
+
       const user = await User.findById(new Types.ObjectId(userId));
       if (!user) {
         return res.status(404).json({
@@ -126,7 +134,15 @@ const markMessageAsRead = async (
   try {
     const { id } = req.params;
 
-    const message = await Message.findById(new Types.ObjectId(id));
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid message ID format",
+        data: null,
+      });
+    }
+
+    const message = await Message.findById(id);
     if (!message) {
       return res.status(404).json({
         message: "Message not found",
@@ -155,7 +171,15 @@ const deleteMessage = async (
   try {
     const { id } = req.params;
 
-    const message = await Message.findByIdAndDelete(new Types.ObjectId(id));
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid message ID format",
+        data: null,
+      });
+    }
+
+    const message = await Message.findByIdAndDelete(id);
     if (!message) {
       return res.status(404).json({
         message: "Message not found",

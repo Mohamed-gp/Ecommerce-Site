@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Types } from "mongoose";
 import Coupon from "../models/Coupon";
 
 // Get all coupons
@@ -59,6 +60,15 @@ const deleteCoupon = async (
 ): Promise<Response | void> => {
   try {
     const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid coupon ID format",
+        data: null,
+      });
+    }
+
     const coupon = await Coupon.findByIdAndDelete(id);
     if (!coupon) {
       return res.status(404).json({

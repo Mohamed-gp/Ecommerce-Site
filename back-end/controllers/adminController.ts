@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Types } from "mongoose";
 import { authRequest } from "../interfaces/authInterface";
 import User from "../models/User";
 import Product from "../models/Product";
@@ -55,6 +56,15 @@ const deleteAdmin = async (
 ) => {
   try {
     const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid user ID format",
+      });
+    }
+
     /// joi validation email
     let admin: any = await User.findById(id);
     if (!admin) {
@@ -303,6 +313,14 @@ const updateUserRole = async (
     const { id } = req.params;
     const { role } = req.body;
 
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid user ID format",
+        data: null,
+      });
+    }
+
     if (!["user", "admin"].includes(role)) {
       return res.status(400).json({
         message: "Invalid role. Must be 'user' or 'admin'",
@@ -333,6 +351,14 @@ const updateUserRole = async (
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid user ID format",
+        data: null,
+      });
+    }
 
     const user = await User.findById(id);
     if (!user) {
@@ -388,6 +414,14 @@ const deleteCommentAsAdmin = async (
 ) => {
   try {
     const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid comment ID format",
+        data: null,
+      });
+    }
 
     const comment = await Comment.findById(id);
     if (!comment) {

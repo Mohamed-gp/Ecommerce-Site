@@ -1,5 +1,6 @@
 import cloudinary from "../config/cloudinary";
 import { NextFunction, Request, Response } from "express";
+import { Types } from "mongoose";
 import Product from "../models/Product";
 import User from "../models/User";
 import removeFiles from "../utils/fs/cleanUpload";
@@ -93,7 +94,17 @@ const getProduct = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const product = await Product.findById(req.params["id"])
+    const productId = req.params["id"];
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid product ID format",
+      });
+    }
+
+    const product = await Product.findById(productId)
       .populate("category")
       .populate({
         path: "comments",
@@ -168,13 +179,23 @@ const deleteProduct = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const product = await Product.findById(req.params["id"]).exec();
+    const productId = req.params["id"];
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid product ID format",
+      });
+    }
+
+    const product = await Product.findById(productId).exec();
     if (!product) {
       return res
         .status(404)
         .json({ data: null, message: "no product find with this id" });
     } else {
-      await Product.findByIdAndDelete(req.params["id"]);
+      await Product.findByIdAndDelete(productId);
       return res
         .status(200)
         .json({ data: null, message: "deleted successfully" });

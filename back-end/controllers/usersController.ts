@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Types } from "mongoose";
 import User from "../models/User";
 import removeFiles from "../utils/fs/cleanUpload";
 import { verifyUpdateUser } from "../utils/joi/userValidation";
@@ -12,6 +13,15 @@ const getUserByIdController = async (
 ): Promise<Response | void> => {
   try {
     const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid user ID format",
+      });
+    }
+
     const user = await User.findById(id);
     if (!user) {
       return res
@@ -36,6 +46,16 @@ const updateUserData = async (
 ): Promise<Response | void> => {
   const { username } = req.body;
   try {
+    const userId = req.params["id"];
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid user ID format",
+      });
+    }
+
     if (!username && !req.file) {
       return res
         .status(400)
@@ -49,7 +69,7 @@ const updateUserData = async (
         .json({ message: error.details[0].message, data: null });
     }
     const file = req.file as any;
-    let user = await User.findById(req.params["id"])
+    let user = await User.findById(userId)
       .populate({
         path: "cart",
         populate: {

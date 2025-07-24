@@ -7,7 +7,16 @@ const verifyToken = (
   res: Response,
   next: NextFunction
 ): Response | void => {
-  const token = req.cookies["swiftbuy-token"];
+  // Check for token in cookie first, then in Authorization header
+  let token = req.cookies["swiftbuy-token"];
+  
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7); // Remove "Bearer " prefix
+    }
+  }
+  
   if (token) {
     try {
       const decodedPayload = jwt.verify(

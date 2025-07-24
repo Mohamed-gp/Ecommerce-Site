@@ -11,6 +11,22 @@ const addToCart = async (
 ): Promise<Response | void> => {
   const { productId, userId, quantity } = req.body;
 
+  // Validate required fields
+  if (!userId || !productId) {
+    return res.status(400).json({
+      message: "userId and productId are required",
+      data: null,
+    });
+  }
+
+  // Validate ObjectId format
+  if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({
+      message: "Invalid userId or productId format",
+      data: null,
+    });
+  }
+
   try {
     const user = await User.findById(new Types.ObjectId(userId))
       .populate({
@@ -82,6 +98,22 @@ const deleteFromCart = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { productId, userId } = req.params;
+
+  // Validate required fields
+  if (!userId || !productId) {
+    return res.status(400).json({
+      message: "userId and productId are required",
+      data: null,
+    });
+  }
+
+  // Validate ObjectId format
+  if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({
+      message: "Invalid userId or productId format",
+      data: null,
+    });
+  }
 
   if (!req.user?.id || userId !== req.user.id) {
     return res.status(403).json({

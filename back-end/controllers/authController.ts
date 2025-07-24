@@ -61,7 +61,10 @@ const loginController = async (
         // Remove domain restriction to allow cross-origin cookies
       })
       .status(200)
-      .json({ message: "login successfully", data: user });
+      .json({ 
+        message: "login successfully", 
+        data: { ...user.toObject(), token } 
+      });
     return null;
   } catch (error) {
     next(error);
@@ -115,7 +118,10 @@ const registerController = async (
         // Remove domain restriction to allow cross-origin cookies
       })
       .status(201)
-      .json({ data: user, message: "created successfully" });
+      .json({ 
+        data: { ...user.toObject(), token }, 
+        message: "created successfully" 
+      });
     return null;
   } catch (error) {
     next(error);
@@ -158,7 +164,10 @@ const googleSignIncontroller = async (
           // Remove domain restriction to allow cross-origin cookies
         })
         .status(200)
-        .json({ message: "login successfully", data: user });
+        .json({ 
+          message: "login successfully", 
+          data: { ...user.toObject(), token } 
+        });
       return null;
     } else {
       const generatedPassword =
@@ -189,7 +198,10 @@ const googleSignIncontroller = async (
           // Remove domain restriction to allow cross-origin cookies
         })
         .status(201)
-        .json({ message: "user created successfully", data: user });
+        .json({ 
+          message: "user created successfully", 
+          data: { ...user.toObject(), token } 
+        });
       return null;
     }
   } catch (error) {

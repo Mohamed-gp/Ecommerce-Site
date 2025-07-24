@@ -13,6 +13,22 @@ const createOrder = async (
   try {
     const { userId, items, totalAmount, paymentId, shippingAddress } = req.body;
 
+    // Validate required fields
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+        data: null,
+      });
+    }
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        message: "Invalid userId format",
+        data: null,
+      });
+    }
+
     const order = await Order.build({
       user: new Types.ObjectId(userId),
       items,

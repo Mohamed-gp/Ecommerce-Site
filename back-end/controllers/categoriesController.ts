@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { Types } from "mongoose";
 import Category from "../models/Category";
 // import asyncHandler from "express-async-handler"
 
@@ -78,13 +79,23 @@ const deleteCategory = async (
   next: NextFunction
 ) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const { id } = req.params;
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        data: null,
+        message: "Invalid category ID format",
+      });
+    }
+
+    const category = await Category.findById(id);
     if (!category) {
       return res
         .status(400)
         .json({ data: null, message: "this category not found" });
     }
-    await Category.findByIdAndDelete(req.params.id);
+    await Category.findByIdAndDelete(id);
     return res
       .status(200)
       .json({ message: "category deleted successfully", data: null });
